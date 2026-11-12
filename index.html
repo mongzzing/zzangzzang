@@ -712,9 +712,16 @@ const dayCache = {}, dayLoading = {};
 function loadDay(field, level, date) {
   const k = field + '-' + level + '-' + date;
   if (k in dayCache || dayLoading[k]) return;
+  try {
+    const saved = JSON.parse(localStorage.getItem('zz-day-' + k) || 'null');
+    if (saved) { dayCache[k] = saved; return; }
+  } catch (e) { /* 없어도 됨 */ }
   dayLoading[k] = true;
   call('getEngDay', pin, field, level, date)
-    .then(d => { dayCache[k] = d && Array.isArray(d.items) && d.items.length === 3 ? d.items : null; })
+    .then(d => {
+      dayCache[k] = d && Array.isArray(d.items) && d.items.length === 3 ? d.items : null;
+      if (dayCache[k]) { try { localStorage.setItem('zz-day-' + k, JSON.stringify(dayCache[k])); } catch (e) { /* 없어도 됨 */ } }
+    })
     .catch(() => { dayCache[k] = null; })
     .then(() => { delete dayLoading[k]; if (view === 'eng') renderEng(); });
 }
@@ -1389,9 +1396,10 @@ function renderEng() {
   const base = field.start ? new Date(field.start[0], field.start[1], field.start[2]) : ENG_BASE;
   const idx = dayIndex(now, field.days.length, base);
   const dk = keyOf(now), ck = s.field + '-' + s.level + '-' + dk;
-  loadDay(s.field, s.level, dk);
+  Object.keys(LEVELS).forEach(lv => loadDay(s.field, lv, dk));
   const fromFile = dayCache[ck];
-  const items = fromFile || field.days[idx];
+  const waiting = !fromFile && dayLoading[ck];
+  const items = fromFile || (waiting && s.level === 'adv' ? [] : field.days[idx]);
   $('eng-source').textContent = fromFile ? '' : dayLoading[ck] ? '오늘 표현 불러오는 중이에요.'
     : s.level === 'adv' ? '오늘 심화 표현이 아직 준비 안 돼서 기본 표현을 보여 드려요. 내일부터는 매일 새로 나와요.' : '';
   const W = ['일', '월', '화', '수', '목', '금', '토'];
