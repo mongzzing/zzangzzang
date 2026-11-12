@@ -179,6 +179,39 @@ h1, h2, h3, p { margin: 0; }
 .hide-en .expr-en:not(.peek), .hide-en .ex-en:not(.peek) { filter: blur(7px); cursor: pointer; user-select: none; }
 .hide-en .expr-en, .hide-en .ex-en { transition: filter .15s; }
 .levels { display: flex; gap: 6px; }
+/* 영작 체크 */
+.quiz { display: flex; flex-direction: column; gap: 12px; border-color: var(--brand); }
+.quiz-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.quiz-tag { font-size: 12px; font-weight: 700; border-radius: 4px; padding: 2px 8px; background: var(--brand-tint); color: var(--brand-dark); }
+.quiz-tag.review { background: #fff4d6; color: #8a5a00; }
+.quiz-ko { font-size: 18px; font-weight: 700; line-height: 1.4; }
+.quiz-hint { font-size: 13px; color: var(--soft); }
+.quiz textarea { width: 100%; min-height: 84px; resize: vertical; background: #fafafa; border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 6px; padding: 10px; font-size: 16px; }
+.quiz textarea:focus { border-bottom: 2px solid var(--brand); outline: none; }
+.quiz-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn.ghost { background: var(--card); color: var(--brand-dark); border: 1px solid var(--line); }
+.result { border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.result.pass { background: var(--good-tint); }
+.result.fail { background: var(--alert-tint); }
+.score { font-size: 22px; font-weight: 800; }
+.result.pass .score { color: var(--good); }
+.result.fail .score { color: var(--alert); }
+.answer-line { display: flex; gap: 8px; align-items: center; }
+.answer-line p { flex: 1; font-size: 15px; }
+.miss { color: var(--alert); font-weight: 800; text-decoration: underline; }
+.summary { text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.summary .big { font-size: 40px; }
+/* 가족 달력 */
+.fam-today { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.fam-person { display: flex; align-items: center; gap: 6px; font-size: 13px; background: #f5f5f7; border-radius: 999px; padding: 4px 10px 4px 4px; }
+.fam-person img { width: 26px; height: 26px; border-radius: 50%; display: block; }
+.fam-person.not img { filter: grayscale(1); opacity: .45; }
+.fam-person b { font-weight: 700; }
+.fam-day { position: relative; aspect-ratio: 1; border-radius: 6px; background: #f5f5f7; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px; font-size: 11px; color: var(--soft); }
+.fam-day.today { outline: 2px solid var(--brand); outline-offset: -2px; color: var(--text); font-weight: 700; }
+.fam-day.future { opacity: .45; }
+.fam-faces { display: flex; flex-wrap: wrap; justify-content: center; gap: 1px; margin-top: 1px; }
+.fam-faces img { width: clamp(10px, 3.2vw, 16px); height: clamp(10px, 3.2vw, 16px); border-radius: 50%; display: block; }
 .source { font-size: 12px; color: var(--soft); }
 .done-btn { width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; font-weight: 700; }
 .done-btn.is-done { background: var(--good); }
@@ -268,6 +301,7 @@ h1, h2, h3, p { margin: 0; }
         <p class="source" id="eng-source"></p>
         <div class="exprs" id="exprs"></div>
         <button class="btn done-btn" id="done-btn" type="button"></button>
+        <section class="card quiz" id="quiz" hidden aria-live="polite"></section>
         <button class="undo" id="undo" type="button" hidden>체크 취소</button>
         <p class="error" id="eng-error" role="alert"></p>
         <section class="card" aria-labelledby="board-title">
@@ -277,6 +311,14 @@ h1, h2, h3, p { margin: 0; }
           </div>
           <div class="cal" id="cal"></div>
           <div id="complete"></div>
+        </section>
+        <section class="card" aria-labelledby="fam-title">
+          <div class="board-head">
+            <h2 class="section-title" id="fam-title">👨‍👩‍👧 가족 공부 달력</h2>
+            <p class="meta" id="fam-meta"></p>
+          </div>
+          <div class="fam-today" id="fam-today"></div>
+          <div class="cal" id="fam-cal"></div>
         </section>
       </section>
 
@@ -371,6 +413,7 @@ const mock = {
   async getEng(p, who) { return this.eng[who] || null; },
   async saveEng(p, who, data) { this.eng[who] = data; return true; },
   async getEngDay() { return null; },
+  async getEngAll() { const o = {}; Object.keys(PEOPLE).forEach(n => { o[n] = Object.keys((this.eng[n] || {}).done || {}); }); return o; },
 };
 const call = (fn, ...args) => new Promise((resolve, reject) => {
   if (window.ZZ_API) {
@@ -674,7 +717,8 @@ function go(v) {
   }));
   if (v === 'home') renderHome();
   if (v === 'blog') showTab(tab);
-  if (v === 'eng') renderEng();
+  if (v === 'eng') { renderEng(); loadFamily(); }
+  if (v === 'home') loadFamily();
   $('stage').scrollTop = 0;
 }
 
@@ -691,6 +735,8 @@ function renderHome() {
     if (a.id === 'eng' && engData) {
       const done = !!engData.done[keyOf(new Date())];
       b.append(el('span', 't-status ' + (done ? 'done' : 'todo'), done ? '✓ 오늘 공부 완료' : '● 오늘 아직 안 했어요'));
+      const fam = familyDoneToday();
+      if (fam) b.append(el('span', 't-desc', '가족 ' + fam.n + '/' + fam.total + '명 오늘 공부함'));
     }
     b.addEventListener('click', () => { if (!busy) go(a.id); });
     return b;
@@ -1450,11 +1496,15 @@ function renderEng() {
   $('play-all').onclick = () => speakList(queue);
 
   const done = !!s.done[keyOf(now)];
+  todayQuiz = { items: fromFile || (items.length ? items : null), field: s.field, level: s.level };
+  const reviews = dueReviews().length;
   const db = $('done-btn');
-  db.textContent = done ? '✓ 오늘 공부 완료! 도장 쾅' : '오늘 공부했어요 ✍️';
+  db.textContent = done ? '✓ 오늘 공부 완료! 다시 풀어 보기' : '✍️ 영작 체크하고 도장 받기' + (reviews ? ' (복습 ' + reviews + '개 포함)' : '');
   db.classList.toggle('is-done', done);
-  $('undo').hidden = !done;
+  db.hidden = !!quiz;
+  $('undo').hidden = true;
   renderBoard(s, now);
+  renderFamily(now);
 }
 
 function renderBoard(s, now) {
@@ -1491,13 +1541,216 @@ function renderBoard(s, now) {
   $('complete').replaceChildren(...(count === days ? [el('div', 'complete', '🏅 ' + (m + 1) + '월 완주! 참 잘했어요')] : []));
 }
 
-$('done-btn').addEventListener('click', () => {
-  const k = keyOf(new Date());
-  if (engData.done[k]) return;
-  engData.done[k] = true;
-  renderEng();
+
+/* ───────── 영작 체크 + 복습 ───────── */
+// 배운 표현은 engData.learned 에 쌓인다. 맞히면 1→3→7→14일 뒤에 다시 나오고, 틀리면 다음 날 다시 나온다
+const REVIEW_DAYS = [1, 1, 3, 7, 14];   // box 0~4 → 다음 복습까지 날짜 수. box 5 는 졸업
+const REVIEW_MAX = 6;
+let quiz = null, todayQuiz = null;
+
+const addDays = (key, n) => { const [y, m, d] = key.split('-').map(Number); return keyOf(new Date(y, m - 1, d + n)); };
+const exprKey = (field, en) => field + '|' + en.toLowerCase().replace(/\s+/g, ' ').trim();
+
+function dueReviews() {
+  const today = keyOf(new Date());
+  const todayKeys = new Set(((todayQuiz && todayQuiz.items) || []).map(it => exprKey(todayQuiz.field, it.en)));
+  return Object.entries((engData && engData.learned) || {})
+    .filter(([k, x]) => x.due && x.due <= today && !todayKeys.has(k))
+    .sort((a, b) => (a[1].due < b[1].due ? -1 : 1))
+    .slice(0, REVIEW_MAX);
+}
+
+function startQuiz() {
+  stopSpeak();
+  const qs = [];
+  const t = todayQuiz;
+  if (t && t.items) t.items.forEach(it => qs.push({ key: exprKey(t.field, it.en), en: it.en, ko: it.ko, ex: it.ex, sen: it.ex[0], isNew: true, field: t.field, level: t.level }));
+  dueReviews().forEach(([k, x]) => qs.push({ key: k, en: x.en, ko: x.ko, ex: x.ex, sen: x.ex[(x.box || 0) % 2] || x.ex[0], isNew: false, field: x.field, level: x.level }));
+  if (!qs.length) return;
+  quiz = { qs, i: 0, graded: false, right: 0 };
+  $('done-btn').hidden = true;
+  renderQuiz();
+  $('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 채점: 단어 단위로 맞춰 보고(순서 포함) 비슷한 정도를 % 로
+const CONTRACT = [[/n't\b/g, ' not'], [/'ll\b/g, ' will'], [/'re\b/g, ' are'], [/'ve\b/g, ' have'], [/'m\b/g, ' am'], [/'d\b/g, ' would']];
+function words(s) {
+  let t = String(s).toLowerCase().replace(/[’‘]/g, "'");
+  t = t.replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'can not').replace(/\bcannot\b/g, 'can not');
+  CONTRACT.forEach(([r, w]) => { t = t.replace(r, w); });
+  return t.replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean);
+}
+function grade(answer, user) {
+  const a = words(answer), u = words(user);
+  const n = a.length, m = u.length;
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    L[i][j] = a[i] === u[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const hit = new Set();
+  for (let i = 0, j = 0; i < n && j < m;) {
+    if (a[i] === u[j]) { hit.add(i); i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  const score = n + m ? Math.round(200 * L[0][0] / (n + m)) : 0;
+  return { score, hit, a };
+}
+// 정답 문장을 원래 모양대로 보여 주되, 못 쓴 단어는 빨갛게
+function markAnswer(answer, hit) {
+  const p = el('p');
+  let idx = 0;
+  answer.split(/(\s+)/).forEach(tok => {
+    if (!tok.trim()) { p.append(tok); return; }
+    const n = words(tok).length;
+    let missed = false;
+    for (let k = 0; k < n; k++) if (!hit.has(idx + k)) missed = true;
+    idx += n;
+    p.append(missed && n ? el('span', 'miss', tok) : tok);
+  });
+  return p;
+}
+
+function renderQuiz() {
+  const box = $('quiz');
+  if (!quiz) { box.hidden = true; return; }
+  box.hidden = false;
+  const q = quiz.qs[quiz.i];
+  if (!q) return renderSummary();
+  const head = el('div', 'quiz-head');
+  head.append(el('span', 'quiz-tag' + (q.isNew ? '' : ' review'), q.isNew ? '오늘 표현' : '복습'), el('span', 'meta', '영작 체크 ' + (quiz.i + 1) + ' / ' + quiz.qs.length));
+  const ko = el('p', 'quiz-ko', q.sen[1]);
+  const hint = el('p', 'quiz-hint', '힌트: ' + q.ko);
+  const ta = el('textarea');
+  ta.id = 'quiz-input';
+  ta.placeholder = '영어로 써 보세요. 키보드의 🎤 버튼으로 말해도 돼요';
+  ta.setAttribute('autocapitalize', 'sentences');
+  const btns = el('div', 'quiz-btns');
+  const check = el('button', 'btn', '채점하기');
+  check.type = 'button';
+  const showExpr = el('button', 'btn ghost', '표현 보기');
+  showExpr.type = 'button';
+  showExpr.addEventListener('click', () => { hint.textContent = '힌트: ' + q.en + ' (' + q.ko + ')'; showExpr.remove(); });
+  const skip = el('button', 'btn ghost', '모르겠어요');
+  skip.type = 'button';
+  btns.append(check, showExpr, skip);
+  const res = el('div');
+  box.replaceChildren(head, ko, hint, ta, btns, res);
+
+  const finish = user => {
+    const g = grade(q.sen[0], user);
+    const pass = g.score >= 70;
+    if (pass) quiz.right++;
+    record(q, pass);
+    const r = el('div', 'result ' + (pass ? 'pass' : 'fail'));
+    r.append(el('p', 'score', (pass ? '👏 ' : '💪 ') + g.score + '점'),
+      el('p', 'meta', pass ? '잘했어요! 빨간 단어만 한 번 더 확인해 보세요.' : '아깝네요. 빨간 단어를 보고 소리 내서 따라 해 보세요. 내일 다시 나와요.'));
+    const line = el('div', 'answer-line');
+    const say = sayBtn(q.sen[0], true);
+    line.append(markAnswer(q.sen[0], g.hit), say);
+    r.append(line);
+    const next = el('button', 'btn', quiz.i + 1 < quiz.qs.length ? '다음 문제' : '결과 보기');
+    next.type = 'button';
+    next.addEventListener('click', () => { quiz.i++; renderQuiz(); });
+    btns.replaceChildren(next);
+    res.replaceChildren(r);
+    ta.readOnly = true;
+    speakList([[q.sen[0], say]]);
+  };
+  check.addEventListener('click', () => { if (!ta.value.trim()) { ta.focus(); return; } finish(ta.value); });
+  skip.addEventListener('click', () => finish(''));
+  setTimeout(() => ta.focus(), 50);
+}
+
+function record(q, pass) {
+  const today = keyOf(new Date());
+  const L = engData.learned = engData.learned || {};
+  const x = L[q.key] || { en: q.en, ko: q.ko, ex: q.ex, field: q.field, level: q.level, first: today, box: 0 };
+  if (L[q.key] && x.last === today) return;   // 같은 날 다시 풀어도 한 번만 반영
+  if (pass) x.box = Math.min(5, (q.isNew && !L[q.key] ? 0 : x.box || 0) + 1);
+  else x.box = 0;
+  x.last = today;
+  if (x.box >= 5) delete x.due; else x.due = addDays(today, REVIEW_DAYS[x.box]);
+  L[q.key] = x;
+}
+
+function renderSummary() {
+  const total = quiz.qs.length, right = quiz.right;
+  const today = keyOf(new Date());
+  engData.done[today] = true;
   saveEng();
-});
+  familyMarkMe();
+  const box = $('quiz');
+  const s = el('div', 'summary');
+  s.append(el('p', 'big', right === total ? '🏆' : right >= total / 2 ? '🎉' : '💪'),
+    el('p', 'score', total + '문제 중 ' + right + '개 통과'),
+    el('p', 'meta', '오늘 도장 쾅! 틀린 표현은 내일, 맞힌 표현은 며칠 뒤에 복습으로 다시 나와요.'));
+  const close = el('button', 'btn', '닫기');
+  close.type = 'button';
+  close.addEventListener('click', () => { quiz = null; renderQuiz(); renderEng(); });
+  s.append(close);
+  box.replaceChildren(s);
+  renderBoard(engData, new Date());
+  renderFamily(new Date());
+}
+
+/* ───────── 가족 공부 달력 ───────── */
+let family = null;
+function loadFamily() {
+  call('getEngAll', pin).then(f => { family = f || {}; familyMarkMe(false); if (view === 'eng') renderFamily(new Date()); if (view === 'home') renderHome(); }).catch(() => {});
+}
+function familyMarkMe(render) {
+  if (!family || !engData) return;
+  const mine = new Set(family[current] || []);
+  Object.keys(engData.done || {}).forEach(k => mine.add(k));
+  family[current] = [...mine];
+  if (render !== false && view === 'home') renderHome();
+}
+function familyDoneToday() {
+  if (!family) return null;
+  const today = keyOf(new Date());
+  const names = Object.keys(PEOPLE);
+  return { n: names.filter(n => (family[n] || []).includes(today)).length, total: names.length };
+}
+function renderFamily(now) {
+  if (!$('fam-cal')) return;
+  const names = Object.keys(PEOPLE);
+  const sets = {};
+  names.forEach(n => { sets[n] = new Set((family && family[n]) || []); });
+  if (engData) Object.keys(engData.done || {}).forEach(k => sets[current].add(k));
+  const today = keyOf(now);
+  const y = now.getFullYear(), m = now.getMonth();
+  const days = new Date(y, m + 1, 0).getDate();
+  $('fam-meta').textContent = family ? (m + 1) + '월' : '불러오는 중';
+  $('fam-today').replaceChildren(...names.map(n => {
+    const did = sets[n].has(today);
+    let count = 0, streak = 0;
+    for (let d = 1; d <= days; d++) if (sets[n].has(keyOf(new Date(y, m, d)))) count++;
+    const c = new Date(y, m, now.getDate());
+    if (!sets[n].has(keyOf(c))) c.setDate(c.getDate() - 1);
+    while (sets[n].has(keyOf(c))) { streak++; c.setDate(c.getDate() - 1); }
+    const chip = el('div', 'fam-person' + (did ? '' : ' not'));
+    chip.append(photo(n), el('b', '', n), (did ? ' ✓ ' : ' 아직 ') + '· ' + count + '일' + (streak > 1 ? ' 🔥' + streak : ''));
+    return chip;
+  }));
+  const first = new Date(y, m, 1).getDay();
+  const cells = ['일', '월', '화', '수', '목', '금', '토'].map(w => el('div', 'dow', w));
+  for (let i = 0; i < first; i++) cells.push(el('div'));
+  for (let d = 1; d <= days; d++) {
+    const k = keyOf(new Date(y, m, d));
+    const cls = ['fam-day'];
+    if (d === now.getDate()) cls.push('today');
+    if (d > now.getDate()) cls.push('future');
+    const cell = el('div', cls.join(' '), d);
+    const faces = el('div', 'fam-faces');
+    const who = names.filter(n => sets[n].has(k));
+    who.forEach(n => faces.append(photo(n)));
+    cell.append(faces);
+    cell.setAttribute('aria-label', d + '일 ' + (who.length ? who.join(', ') + ' 공부함' : '아무도 안 함'));
+    cells.push(cell);
+  }
+  $('fam-cal').replaceChildren(...cells);
+}
+
+$('done-btn').addEventListener('click', startQuiz);
 $('undo').addEventListener('click', () => { delete engData.done[keyOf(new Date())]; renderEng(); saveEng(); });
 $('slow').addEventListener('click', () => { engData.slow = !engData.slow; renderEng(); saveEng(); });
 $('hide-en').addEventListener('click', () => { engData.hideEn = !engData.hideEn; renderEng(); saveEng(); });
