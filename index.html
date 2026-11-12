@@ -2,36 +2,1560 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>짱짱이네</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+/* 업무 앱처럼 차분한 화면: 왼쪽 사람 레일, 왼쪽 판에 맡기는 칸, 오른쪽 판에 진행 접수증 */
+:root {
+  --bg: #f0f0f3;
+  --panel: #fafafa;
+  --card: #ffffff;
+  --line: #e0e0e3;
+  --text: #242424;
+  --soft: #616161;
+  --brand: #5b5fc7;
+  --brand-dark: #4f52b2;
+  --brand-tint: #e8ebfa;
+  --alert: #c4314b;
+  --alert-tint: #fcf0f2;
+  --good: #107c41;
+  --good-tint: #e7f4ec;
+  --font: "Segoe UI Variable Text", "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; word-break: keep-all; font-variant-numeric: tabular-nums; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+h1, h2, h3, p { margin: 0; }
+
+.avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; display: block; flex: none; }
+.logo { display: inline-flex; align-items: center; gap: 3px; color: var(--brand); font-family: "Jua", var(--font); font-size: 20px; font-weight: 400; line-height: 1; white-space: nowrap; flex: none; }
+.logo img { width: 30px; height: 31px; display: block; }
+.logo.home { background: transparent; border: 0; padding: 0; cursor: pointer; }
+
+/* 첫 화면 */
+.picker { height: 100%; display: grid; place-items: center; padding: 16px; overflow: auto; }
+.picker-card { display: flex; flex-direction: column; align-items: center; gap: 28px; width: 100%; max-width: 520px; text-align: center; }
+.picker-card .logo { flex-direction: column; gap: 2px; font-size: 40px; }
+.picker-card .logo img { width: 104px; height: 106px; }
+.accounts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; width: 100%; }
+.account { background: transparent; border: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; }
+.app-icon { position: relative; display: block; width: 100%; max-width: 132px; aspect-ratio: 1; transition: transform .14s ease-out; }
+.app-icon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 24%; box-shadow: 0 2px 8px rgba(0,0,0,.18); display: block; }
+.account:hover .app-icon { transform: translateY(-4px); }
+.account:active .app-icon { transform: scale(.94); }
+.badge { position: absolute; top: -6px; right: -6px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 12px; background: var(--alert); color: #fff; font-size: 13px; font-weight: 600; display: grid; place-items: center; border: 2px solid var(--bg); }
+.pin-form { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; text-align: left; font-weight: 600; }
+.btn:disabled { opacity: .7; cursor: default; }
+@media (max-width: 460px) { .accounts { gap: 16px; } }
+@media (prefers-reduced-motion: reduce) { .app-icon { transition: none; } }
+
+/* 앱 */
+.app { height: 100%; display: grid; grid-template-rows: 48px minmax(0, 1fr); }
+.titlebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.me { display: flex; align-items: center; gap: 8px; background: transparent; border: 0; border-radius: 6px; padding: 4px 6px; }
+.me:hover { background: #e5e5e8; }
+.shell { display: grid; grid-template-columns: 68px minmax(0, 1fr); min-height: 0; }
+.rail { display: flex; flex-direction: column; gap: 2px; padding: 4px; }
+.rail-btn { position: relative; background: transparent; border: 0; border-radius: 6px; padding: 7px 2px 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--soft); }
+.rail-btn:hover { background: #e5e5e8; color: var(--text); }
+.rail-btn[aria-pressed="true"] { color: var(--brand); font-weight: 600; }
+.rail-btn[aria-pressed="true"]::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; background: var(--brand); border-radius: 2px; }
+.stage { background: var(--panel); border-radius: 8px 0 0 0; overflow: auto; min-height: 0; }
+.columns { max-width: 1080px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.05); padding: 16px; }
+.form { display: flex; flex-direction: column; gap: 14px; }
+.section-title { font-size: 16px; font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label, .field-label { font-weight: 600; }
+.field input, .field textarea { background: #fafafa; border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 4px; padding: 7px 10px; width: 100%; }
+.field input:focus, .field textarea:focus { border-bottom: 2px solid var(--brand); outline: none; }
+.field textarea { min-height: 112px; resize: vertical; }
+.field textarea.short { min-height: 64px; }
+::placeholder { color: #8a8a8a; }
+.drop { border: 1px dashed #b0b0b0; border-radius: 6px; padding: 24px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font-weight: 600; color: var(--brand-dark); }
+.drop:hover, .drop.over { background: var(--brand-tint); border-color: var(--brand); }
+.drop small { color: var(--soft); font-weight: 400; font-size: 12px; }
+.drop:focus-within { outline: 2px solid var(--brand); outline-offset: 1px; }
+.field input.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; }
+.thumbs:empty { display: none; }
+.thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; display: block; }
+.error { color: var(--alert); font-size: 13px; font-weight: 600; }
+.error:empty { display: none; }
+.btn { background: var(--brand); color: #fff; border: 0; border-radius: 4px; padding: 7px 16px; font-weight: 600; text-decoration: none; display: inline-block; }
+.btn:hover { background: var(--brand-dark); }
+.form .btn { align-self: flex-start; min-width: 120px; }
+
+.tickets { display: flex; flex-direction: column; gap: 10px; }
+.ticket { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.ticket.ask { border-color: #e9b4bf; }
+.ticket-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.ticket h3 { font-size: 15px; font-weight: 600; line-height: 1.35; }
+.meta { font-size: 13px; color: var(--soft); }
+.chip { font-size: 12px; font-weight: 600; border-radius: 4px; padding: 2px 8px; white-space: nowrap; background: #f0f0f0; color: var(--soft); }
+.chip.ready { background: var(--good-tint); color: var(--good); }
+.chip.need { background: var(--alert-tint); color: var(--alert); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.steps li { border-top: 3px solid var(--line); padding-top: 4px; font-size: 12px; color: var(--soft); }
+.steps li.on { border-color: var(--brand); color: var(--text); font-weight: 600; }
+.ticket.finished .steps li.on { border-color: var(--good); }
+.question { font-weight: 600; }
+.answer { display: flex; gap: 6px; }
+.answer input { flex: 1; min-width: 0; background: #fafafa; border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 4px; padding: 6px 10px; }
+.answer input:focus { border-bottom: 2px solid var(--brand); outline: none; }
+.ticket .btn { align-self: flex-start; }
+
+.tabs { display: flex; gap: 4px; padding: 8px 20px 0; max-width: 1080px; margin: 0 auto; border-bottom: 1px solid var(--line); }
+.tab { background: transparent; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 600; color: var(--soft); }
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+.pane { max-width: 720px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.chat-log { display: flex; flex-direction: column; gap: 8px; min-height: 240px; max-height: 58vh; overflow: auto; }
+.bubble { max-width: 85%; padding: 8px 12px; border-radius: 8px; background: #f0f0f4; white-space: pre-wrap; word-break: break-word; align-self: flex-start; }
+.bubble.me { background: var(--brand-tint); align-self: flex-end; }
+.chat-form textarea { flex: 1; min-width: 0; min-height: 40px; max-height: 120px; resize: vertical; background: #fafafa; border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 4px; padding: 7px 10px; }
+.chat-form textarea:focus { border-bottom: 2px solid var(--brand); outline: none; }
+.chat-form .btn { align-self: flex-end; }
+#guide { min-height: 260px; }
+.saved { font-size: 13px; color: var(--good); font-weight: 600; }
+
+/* 홈 */
+.back { background: transparent; border: 0; border-radius: 6px; padding: 4px 8px 4px 2px; display: flex; align-items: center; gap: 2px; font-weight: 600; color: var(--brand-dark); }
+.back:hover { background: #e5e5e8; }
+.rail-btn .ico { font-size: 20px; line-height: 1; }
+.home-view { max-width: 760px; margin: 0 auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 18px; }
+.hello { font-size: 22px; font-weight: 700; }
+.hello small { display: block; font-size: 14px; font-weight: 400; color: var(--soft); margin-top: 2px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tile { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 18px 16px; min-height: 140px; transition: transform .12s ease-out, box-shadow .12s; }
+.tile:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.tile .t-ico { font-size: 32px; line-height: 1; }
+.tile .t-name { font-size: 16px; font-weight: 700; margin-top: 4px; }
+.tile .t-desc { color: var(--soft); font-size: 13px; }
+.tile .t-status { margin-top: auto; font-size: 12px; font-weight: 600; }
+.tile .t-status.done { color: var(--good); }
+.tile .t-status.todo { color: var(--alert); }
+.tile.soon { border-style: dashed; background: transparent; box-shadow: none; color: var(--soft); align-items: center; justify-content: center; text-align: center; }
+.tile.soon:hover { transform: none; box-shadow: none; }
+
+/* 영어 */
+.eng { max-width: 720px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.eng-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.eng-head h2 { font-size: 20px; font-weight: 700; }
+.eng-head .meta { margin-top: 2px; }
+.fields { display: flex; gap: 6px; flex-wrap: wrap; }
+.fchip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 13px; color: var(--soft); }
+.fchip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.tbtn { border: 1px solid var(--line); background: var(--card); border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.tbtn[aria-pressed="true"] { background: var(--brand-tint); border-color: var(--brand); color: var(--brand-dark); }
+.exprs { display: flex; flex-direction: column; gap: 12px; }
+.expr { display: flex; flex-direction: column; gap: 10px; }
+.expr-top { display: flex; align-items: flex-start; gap: 10px; }
+.num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--brand-tint); color: var(--brand-dark); font-weight: 700; display: grid; place-items: center; font-size: 13px; margin-top: 2px; }
+.expr-main { flex: 1; min-width: 0; }
+.expr-en { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.expr-ko { color: var(--soft); font-size: 14px; margin-top: 2px; }
+.say { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 17px; }
+.say.small { width: 34px; height: 34px; font-size: 15px; background: var(--brand-tint); color: var(--brand-dark); }
+.say.playing { background: var(--good); color: #fff; }
+.examples { list-style: none; margin: 0; padding: 0 0 0 36px; display: flex; flex-direction: column; gap: 8px; }
+.ex { display: flex; gap: 10px; align-items: center; background: #f7f7fa; border-radius: 8px; padding: 10px 10px 10px 12px; }
+.ex-text { flex: 1; min-width: 0; }
+.ex-en { font-size: 15px; }
+.ex-en b { color: var(--brand-dark); }
+.ex-ko { font-size: 12px; color: var(--soft); margin-top: 1px; }
+.hide-en .expr-en:not(.peek), .hide-en .ex-en:not(.peek) { filter: blur(7px); cursor: pointer; user-select: none; }
+.hide-en .expr-en, .hide-en .ex-en { transition: filter .15s; }
+.levels { display: flex; gap: 6px; }
+.source { font-size: 12px; color: var(--soft); }
+.done-btn { width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; font-weight: 700; }
+.done-btn.is-done { background: var(--good); }
+.undo { align-self: center; background: transparent; border: 0; color: var(--soft); font-size: 12px; text-decoration: underline; }
+.notice { background: var(--alert-tint); color: var(--alert); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.board-head .meta b { color: #d23c3c; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dow { text-align: center; font-size: 11px; color: var(--soft); font-weight: 600; padding-bottom: 2px; }
+.day { position: relative; aspect-ratio: 1; border-radius: 6px; background: #f5f5f7; display: grid; place-items: center; font-size: 12px; color: var(--soft); }
+.day.future { opacity: .45; }
+.day.today { outline: 2px solid var(--brand); outline-offset: -2px; color: var(--text); font-weight: 700; }
+.day.done { background: transparent; }
+.stamp { position: absolute; inset: 8%; border: 2.5px solid #d23c3c; border-radius: 50%; color: #d23c3c; display: grid; place-items: center; font-family: "Jua", var(--font); font-size: clamp(9px, 2.4vw, 13px); line-height: 1.05; text-align: center; transform: rotate(-14deg); opacity: .88; }
+.complete { margin-top: 12px; text-align: center; padding: 14px; border: 3px double #d23c3c; border-radius: 10px; color: #d23c3c; font-family: "Jua", var(--font); font-size: 20px; }
+
+@media (max-width: 800px) {
+  .eng, .home-view { padding: 14px 12px; }
+  .examples { padding-left: 0; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .stage { border-radius: 0; }
+  .columns { grid-template-columns: minmax(0, 1fr); padding: 12px; gap: 14px; }
+  .tabs { padding: 4px 12px 0; }
+  .pane { padding: 12px; }
+}
+</style>
 <meta name="theme-color" content="#f0f0f3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="짱짱이네">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<style>
-  /* 짱짱이네 앱 껍데기: 구글 Apps Script 웹앱을 화면 가득 띄운다 (구글 안내 띠가 안 보이게) */
-  html, body { margin: 0; height: 100%; background: #f0f0f3; overflow: hidden; }
-  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing: border-box; }
-  iframe { display: block; width: 100%; height: 100%; border: 0; }
-  .splash { position: fixed; inset: 0; display: grid; place-items: center; background: #f0f0f3; transition: opacity .3s; font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #5b5fc7; }
-  .splash img { width: 96px; height: 96px; display: block; margin: 0 auto 10px; }
-  .splash p { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
-  .splash.hide { opacity: 0; pointer-events: none; }
-</style>
+<script>window.ZZ_API = "https://script.google.com/macros/s/AKfycbwq4vdiYAzv1yI2LbwTTCjMXVoLCYMFGjeoBPOzHmmF8nIWEJk3QASSmybGHTA1Till/exec";</script>
 </head>
 <body>
-<iframe id="app" title="짱짱이네" allow="autoplay; clipboard-write"
-  src="https://script.google.com/macros/s/AKfycbwq4vdiYAzv1yI2LbwTTCjMXVoLCYMFGjeoBPOzHmmF8nIWEJk3QASSmybGHTA1Till/exec"></iframe>
-<div class="splash" id="splash"><div><img src="icons/logo.svg" alt=""><p>짱짱이네</p></div></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M4 17l5-4 3 2 4-4 4 4"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+</svg>
+
+<section class="picker" id="picker" aria-labelledby="picker-title">
+  <div class="picker-card">
+    <h1 class="logo" id="picker-title"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjYgMCA4OCA5MCI+CiAgPHBhdGggZD0iTTUwIDE4IEw4NCA0NyBWODIgSDE2IFY0NyBaIiBmaWxsPSIjNWI1ZmM3IiBzdHJva2U9IiM1YjVmYzciIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNTAgMTIgQzQ0IDIgNTYgMCA1NCA3IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNGJiMWMiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMzciIGN5PSI1NiIgcj0iNSIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjYzIiBjeT0iNTYiIHI9IjUiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIyNyIgY3k9IjY3IiByPSI1IiBmaWxsPSIjZjRiYjFjIi8+CiAgPGNpcmNsZSBjeD0iNzMiIGN5PSI2NyIgcj0iNSIgZmlsbD0iI2Y0YmIxYyIvPgogIDxwYXRoIGQ9Ik00MCA2OCBRNTAgODAgNjAgNjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="">짱짱이네</h1>
+    <div class="accounts" id="accounts"></div>
+    <form class="pin-form" id="pin-form" hidden>
+      <label for="pin">가족 비밀번호</label>
+      <div class="answer"><input id="pin" type="password" inputmode="numeric" autocomplete="current-password"><button class="btn" type="submit">들어가기</button></div>
+      <p class="error" id="pin-error" role="alert"></p>
+    </form>
+    <p class="error" id="load-error" role="alert"></p>
+  </div>
+</section>
+
+<div class="app" id="app" hidden>
+  <div class="titlebar">
+    <div class="brand">
+      <button class="back" id="back" type="button" hidden><svg><use href="#i-back"/></svg>홈</button>
+      <button class="logo home" id="home" type="button" aria-label="홈으로"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjYgMCA4OCA5MCI+CiAgPHBhdGggZD0iTTUwIDE4IEw4NCA0NyBWODIgSDE2IFY0NyBaIiBmaWxsPSIjNWI1ZmM3IiBzdHJva2U9IiM1YjVmYzciIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNTAgMTIgQzQ0IDIgNTYgMCA1NCA3IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNGJiMWMiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMzciIGN5PSI1NiIgcj0iNSIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjYzIiBjeT0iNTYiIHI9IjUiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIyNyIgY3k9IjY3IiByPSI1IiBmaWxsPSIjZjRiYjFjIi8+CiAgPGNpcmNsZSBjeD0iNzMiIGN5PSI2NyIgcj0iNSIgZmlsbD0iI2Y0YmIxYyIvPgogIDxwYXRoIGQ9Ik00MCA2OCBRNTAgODAgNjAgNjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="">짱짱이네</button>
+    </div>
+    <button class="me" id="me" type="button" aria-label="다른 사람으로 들어가기"></button>
+  </div>
+  <div class="shell">
+    <nav class="rail" id="rail" aria-label="메뉴"></nav>
+    <div class="stage" id="stage">
+      <section class="home-view" id="view-home">
+        <h2 class="hello" id="hello"></h2>
+        <div class="tiles" id="tiles"></div>
+      </section>
+
+      <section class="eng" id="view-eng" hidden>
+        <div class="eng-head">
+          <div>
+            <h2>오늘의 비즈니스 영어</h2>
+            <p class="meta" id="eng-date"></p>
+          </div>
+          <div class="fields" id="fields" role="group" aria-label="분야 고르기"></div>
+        </div>
+        <div class="levels" id="levels" role="group" aria-label="난이도 고르기"></div>
+        <p class="notice" id="tts-notice" hidden>이 브라우저는 읽어주기를 지원하지 않아요. 크롬이나 사파리로 열어 주세요.</p>
+        <div class="tools">
+          <button class="tbtn" id="play-all" type="button">▶ 전체 듣기</button>
+          <button class="tbtn" id="slow" type="button" aria-pressed="false">🐢 천천히</button>
+          <button class="tbtn" id="hide-en" type="button" aria-pressed="false">🙈 영어 가리기</button>
+        </div>
+        <p class="source" id="eng-source"></p>
+        <div class="exprs" id="exprs"></div>
+        <button class="btn done-btn" id="done-btn" type="button"></button>
+        <button class="undo" id="undo" type="button" hidden>체크 취소</button>
+        <p class="error" id="eng-error" role="alert"></p>
+        <section class="card" aria-labelledby="board-title">
+          <div class="board-head">
+            <h2 class="section-title" id="board-title"></h2>
+            <p class="meta" id="board-meta"></p>
+          </div>
+          <div class="cal" id="cal"></div>
+          <div id="complete"></div>
+        </section>
+      </section>
+
+      <div id="view-blog" hidden>
+      <div class="tabs" role="tablist" aria-label="화면 바꾸기">
+        <button class="tab" type="button" role="tab" id="tab-post" aria-selected="true">맡기기</button>
+        <button class="tab" type="button" role="tab" id="tab-chat" aria-selected="false">채팅</button>
+        <button class="tab" type="button" role="tab" id="tab-guide" aria-selected="false">내 지침</button>
+      </div>
+      <main class="columns" id="pane-post">
+        <form class="card form" id="form" novalidate>
+          <h2 class="section-title">새 글 맡기기</h2>
+          <div class="field">
+            <span class="field-label">사진</span>
+            <label class="drop" id="drop" for="photos">
+              <svg><use href="#i-photo"/></svg>
+              사진 고르기
+              <small>대충 다 넣어도 돼요. 고르고 보정하는 건 맡겨 주세요</small>
+              <input class="sr-only" id="photos" type="file" accept="image/*,video/*" multiple>
+            </label>
+            <div class="thumbs" id="thumbs"></div>
+          </div>
+          <div class="field">
+            <label for="place">어디 다녀왔어요?</label>
+            <input id="place" type="text" placeholder="연남동 카멜우동" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="memo">하고 싶은 말</label>
+            <textarea id="memo" placeholder="국물 진하고 면 쫄깃함. 웨이팅 20분, 주차는 근처 공영주차장."></textarea>
+          </div>
+          <div class="field">
+            <label for="request">요청사항</label>
+            <textarea id="request" class="short" placeholder="편한 말투로 써 주세요. 첫 사진은 간판으로 해 주세요."></textarea>
+          </div>
+          <p class="error" id="error" role="alert"></p>
+          <button class="btn" id="send" type="submit">맡기기</button>
+        </form>
+
+        <section class="tickets" aria-labelledby="tickets-title">
+          <h2 class="section-title" id="tickets-title">맡긴 글</h2>
+          <div class="tickets" id="list"></div>
+        </section>
+      </main>
+      <section class="pane" id="pane-chat" hidden>
+        <p class="meta" id="chat-state"></p>
+        <div class="card chat-log" id="chat-log" aria-live="polite"></div>
+        <form class="answer chat-form" id="chat-form">
+          <textarea id="chat-text" aria-label="메시지" placeholder="맡긴 글 고쳐 달라고 하거나 궁금한 걸 물어보세요"></textarea>
+          <button class="btn" id="chat-send" type="submit">보내기</button>
+        </form>
+        <p class="error" id="chat-error" role="alert"></p>
+      </section>
+      <section class="pane" id="pane-guide" hidden>
+        <form class="card form" id="guide-form">
+          <div class="field">
+            <label for="guide">내 블로그 지침</label>
+            <textarea id="guide" placeholder="말투, 글 길이, 사진 순서, 자주 쓰는 표현처럼 글마다 지켜 줬으면 하는 걸 적어 주세요."></textarea>
+          </div>
+          <p class="error" id="guide-error" role="alert"></p>
+          <div><button class="btn" id="guide-save" type="submit">저장</button> <span class="saved" id="guide-saved"></span></div>
+        </form>
+      </section>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  const splash = document.getElementById('splash');
-  const hide = () => splash.classList.add('hide');
-  document.getElementById('app').addEventListener('load', () => setTimeout(hide, 600));
-  setTimeout(hide, 8000);
+const STEPS = ['맡김', '글 쓰는 중', '임시저장 끝'];
+const PEOPLE = { '수운': 'data:image/jpeg;base64,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', '예원': 'data:image/jpeg;base64,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', '수림': 'data:image/jpeg;base64,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' };
+const MAX_LONG_SIDE = 2400;
+const MAX_FILE_MB = 40;
+
+// 구글 밖(로컬 미리보기)에서는 예시 데이터로 돈다
+const mock = {
+  state: {
+    '수운': [{ id: 'a1', place: '남동구 칼국수집', photos: 16, createdAt: new Date(Date.now() - 864e5).toISOString(), step: 2, question: '' }],
+    '예원': [],
+    '수림': [{ id: 'c1', place: '부산 돼지국밥 골목', photos: 18, createdAt: new Date(Date.now() - 36e5).toISOString(), step: 1, question: '주차장이 따로 있었어요?' }],
+  },
+  async getState() { return this.state; },
+  async createItem() { return 'm' + Date.now(); },
+  async uploadPhoto() { await new Promise(r => setTimeout(r, 200)); return true; },
+  async finishItem() { return true; },
+  async answerQuestion() { return true; },
+  async getChat() { return { messages: this.messages, guide: this.guide, online: true, waiting: false }; },
+  async sendChat(p, who, text) { this.messages.push({ role: 'me', text }); return true; },
+  async saveGuide(p, who, text) { this.guide = text; return true; },
+  messages: [{ role: 'me', text: '칼국수 글 제목 좀 더 짧게 해줘' }, { role: 'claude', text: '네, 임시저장 글 제목을 줄여 둘게요.' }],
+  guide: '',
+  eng: {},
+  async getEng(p, who) { return this.eng[who] || null; },
+  async saveEng(p, who, data) { this.eng[who] = data; return true; },
+  async getEngDay() { return null; },
+};
+const call = (fn, ...args) => new Promise((resolve, reject) => {
+  if (window.ZZ_API) {
+    // 앱 주소(github.io): 구글 로그인 없이 서버 창구로 바로 보낸다
+    fetch(window.ZZ_API, { method: 'POST', body: JSON.stringify({ fn, args }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, credentials: 'omit', redirect: 'follow' })
+      .then(r => r.json())
+      .then(d => d.ok ? resolve(d.result) : reject(new Error(d.error)))
+      .catch(reject);
+  } else if (window.google && google.script) {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args);
+  } else {
+    mock[fn](...args).then(resolve, reject);
+  }
+});
+
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const photo = (name, cls) => { const i = el('img', cls); i.src = PEOPLE[name]; i.alt = ''; return i; };
+const avatar = name => photo(name, 'avatar');
+const todo = items => items.filter(t => t.question || t.step === 2 || t.error).length;
+const messageOf = e => (e && e.message ? String(e.message) : '').replace(/^Error:\s*/, '');
+
+let state = null, current = null, picked = [], pending = null, busy = false;
+let pin = '', tab = 'post', chatWaiting = false, guideDirty = false, view = 'home', engData = null;
+try { pin = localStorage.getItem('zz-pin') || ''; } catch (e) { /* 저장 못 해도 동작 */ }
+
+function whenText(iso) {
+  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 6e4);
+  if (min < 1) return '방금';
+  if (min < 60) return min + '분 전';
+  if (min < 1440) return Math.floor(min / 60) + '시간 전';
+  return Math.floor(min / 1440) + '일 전';
+}
+
+function renderAccounts() {
+  $('accounts').replaceChildren(...Object.keys(PEOPLE).map(name => {
+    const b = el('button', 'account');
+    b.type = 'button';
+    b.id = 'account-' + name;
+    const iconBox = el('span', 'app-icon');
+    iconBox.append(photo(name));
+    const n = state ? todo(state[name] || []) : 0;
+    if (n) {
+      const badge = el('span', 'badge', n);
+      badge.setAttribute('aria-label', '할 일 ' + n + '개');
+      iconBox.append(badge);
+    }
+    b.append(iconBox, name);
+    b.addEventListener('click', () => enter(name));
+    return b;
+  }));
+}
+
+function enter(name) {
+  current = name;
+  $('picker').hidden = !!name;
+  $('app').hidden = !name;
+  if (!name) { renderAccounts(); return; }
+  $('me').replaceChildren(el('span', '', name), avatar(name));
+  guideDirty = false;
+  $('guide').value = '';
+  $('guide-saved').textContent = '';
+  engData = null;
+  go('home');
+  render();
+  refresh();
+  loadEng();
+}
+
+function showTab(name) {
+  tab = name;
+  ['post', 'chat', 'guide'].forEach(n => {
+    $('tab-' + n).setAttribute('aria-selected', String(n === name));
+    $('pane-' + n).hidden = n !== name;
+  });
+  if (name !== 'post' && current && view === 'blog') loadChat();
+}
+
+function renderChat(data) {
+  const log = $('chat-log');
+  const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
+  log.replaceChildren(...data.messages.map(m => el('p', 'bubble' + (m.role === 'me' ? ' me' : ''), m.text)));
+  if (!data.messages.length) log.append(el('p', 'meta', '아직 나눈 이야기가 없어요.'));
+  if (atEnd) log.scrollTop = log.scrollHeight;
+  chatWaiting = data.waiting;
+  $('chat-state').textContent = !data.online ? 'PC가 꺼져 있어요. 켜지면 답하고 맡긴 글도 이어서 해요.' : data.waiting ? '답을 쓰고 있어요.' : '';
+}
+
+async function loadChat() {
+  const who = current;
+  try {
+    const data = await call('getChat', pin, who);
+    if (who !== current) return;
+    renderChat(data);
+    if (!guideDirty) $('guide').value = data.guide || '';
+  } catch (e) {
+    $('chat-error').textContent = '불러오지 못했어요. 잠시 뒤 다시 해 주세요.';
+  }
+}
+
+function ticketEl(t) {
+  const finished = t.step >= 2;
+  const box = el('article', 'card ticket' + (t.question || t.error ? ' ask' : '') + (finished ? ' finished' : ''));
+
+  const head = el('div', 'ticket-head');
+  const left = el('div');
+  left.append(el('h3', '', t.place), el('p', 'meta', '사진 ' + t.photos + '장 · ' + whenText(t.createdAt)));
+  const chipCls = t.question || t.error ? 'need' : finished ? 'ready' : '';
+  head.append(left, el('span', 'chip ' + chipCls, t.error ? '확인 필요' : t.question ? '답 필요' : t.step === 3 ? '발행 완료' : finished ? '발행 대기' : STEPS[t.step]));
+
+  const steps = el('ol', 'steps');
+  STEPS.forEach((s, i) => steps.append(el('li', i <= t.step ? 'on' : '', s)));
+  box.append(head, steps);
+  if (t.error) box.append(el('p', 'question', t.error));
+
+  if (t.question) {
+    box.append(el('p', 'question', t.question));
+    const f = el('form', 'answer');
+    const input = el('input');
+    input.id = 'answer-' + t.id;
+    input.type = 'text';
+    input.placeholder = '건물 뒤에 있어요';
+    input.setAttribute('aria-label', t.question);
+    const go = el('button', 'btn', '답하기');
+    go.type = 'submit';
+    f.append(input, go);
+    f.addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) { input.focus(); return; }
+      go.disabled = true;
+      try {
+        await call('answerQuestion', pin, current, t.id, t.question, text);
+        t.question = '';
+        render();
+      } catch (err) {
+        go.disabled = false;
+        go.textContent = '다시 답하기';
+      }
+    });
+    box.append(f);
+  }
+
+  if (finished) {
+    if (t.title) box.append(el('p', 'meta', t.title));
+    if (t.step === 2) {
+      const a = el('a', 'btn', '네이버에서 확인하고 발행');
+      a.href = 'https://blog.naver.com/GoBlogWrite.naver';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      box.append(a);
+    }
+  }
+  return box;
+}
+
+function render() {
+  if (!current) return;
+  if (view === 'home') renderHome();
+  const items = state ? state[current] || [] : null;
+  if (!items) { $('list').replaceChildren(el('p', 'meta', '불러오는 중이에요.')); return; }
+  if (!items.length) { $('list').replaceChildren(el('p', 'meta', '아직 맡긴 글이 없어요.')); return; }
+  $('list').replaceChildren(...items.map(ticketEl));
+}
+
+async function refresh() {
+  try {
+    state = await call('getState', pin);
+    $('pin-form').hidden = true;
+    $('accounts').hidden = false;
+    if (current) {
+      const typing = document.activeElement && document.activeElement.id.startsWith('answer-');
+      if (!typing) render();
+    } else {
+      renderAccounts();
+    }
+  } catch (e) {
+    if (messageOf(e) === 'PIN') {
+      $('accounts').hidden = true;
+      $('pin-form').hidden = false;
+      if (pin) $('pin-error').textContent = '비밀번호가 달라요.';
+    } else {
+      $('load-error').textContent = '불러오지 못했어요. 새로고침해 주세요.';
+    }
+  }
+}
+
+function addFiles(files) {
+  const list = [...files];
+  const big = list.filter(f => f.size > MAX_FILE_MB * 1048576 && !f.type.startsWith('image/'));
+  picked = picked.concat(list.filter(f => !big.includes(f)));
+  pending = null;
+  $('thumbs').replaceChildren(...picked.filter(f => f.type.startsWith('image/')).slice(0, 12).map(f => {
+    const i = el('img');
+    i.src = URL.createObjectURL(f);
+    i.alt = '';
+    return i;
+  }));
+  $('error').textContent = big.length ? MAX_FILE_MB + 'MB 넘는 영상 ' + big.length + '개는 뺐어요.' : '';
+}
+
+// 큰 사진은 줄여서 올린다. 위치 정보도 이때 빠진다
+async function prepare(file) {
+  if (!file.type.startsWith('image/')) return { blob: file, name: file.name, mime: file.type || 'application/octet-stream' };
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, MAX_LONG_SIDE / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    bmp.close();
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
+    return { blob, name: file.name.replace(/\.[^.]+$/, '') + '.jpg', mime: 'image/jpeg' };
+  } catch (e) {
+    return { blob: file, name: file.name, mime: file.type || 'application/octet-stream' };
+  }
+}
+
+const toBase64 = blob => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = () => resolve(String(r.result).split(',')[1]);
+  r.onerror = () => reject(r.error);
+  r.readAsDataURL(blob);
+});
+
+async function uploadOne(id, file, index) {
+  const p = await prepare(file);
+  const data = await toBase64(p.blob);
+  const name = String(index + 1).padStart(3, '0') + '_' + p.name;
+  for (let tryNo = 0; ; tryNo++) {
+    try {
+      return await call('uploadPhoto', pin, current, id, name, p.mime, data);
+    } catch (e) {
+      if (tryNo >= 2) throw e;
+    }
+  }
+}
+
+async function submit(e) {
+  e.preventDefault();
+  if (busy) return;
+  const place = $('place').value.trim();
+  if (!picked.length) { $('error').textContent = '사진을 먼저 넣어 주세요.'; return; }
+  if (!place) { $('error').textContent = '다녀온 곳 이름을 적어 주세요.'; $('place').focus(); return; }
+
+  busy = true;
+  const send = $('send');
+  send.disabled = true;
+  $('error').textContent = '';
+  try {
+    // 실패 후 다시 누르면 올린 사진은 건너뛴다
+    if (!pending || pending.person !== current) {
+      send.textContent = '봉투 준비하는 중';
+      pending = { person: current, id: await call('createItem', pin, current, place, $('memo').value, $('request').value), done: 0 };
+    }
+    for (let i = pending.done; i < picked.length; i++) {
+      send.textContent = '사진 ' + (i + 1) + '/' + picked.length + ' 올리는 중';
+      await uploadOne(pending.id, picked[i], i);
+      pending.done = i + 1;
+    }
+    await call('finishItem', pin, current, pending.id, picked.length);
+    const count = picked.length;
+    const id = pending.id;
+    picked = [];
+    pending = null;
+    e.target.reset();
+    $('thumbs').replaceChildren();
+    if (state) state[current].unshift({ id, place, photos: count, createdAt: new Date().toISOString(), step: 0, question: '' });
+    render();
+    refresh();
+  } catch (err) {
+    $('error').textContent = '올리다 끊겼어요. 맡기기를 다시 누르면 이어서 올려요.';
+  } finally {
+    busy = false;
+    send.disabled = false;
+    send.textContent = '맡기기';
+  }
+}
+
+/* ───────── 홈 / 화면 전환 ───────── */
+// 앱 목록. 새 기능은 여기에 한 줄 추가하고 view-<id> 화면을 만들면 된다
+const APPS = [
+  { id: 'blog', icon: '📝', name: '블로그 글 맡기기', short: '블로그', desc: '사진·메모 올리면 글을 써 드려요' },
+  { id: 'eng', icon: '🗣️', name: '오늘의 비즈니스 영어', short: '영어', desc: '하루 표현 3개 · 원어민 발음' },
+];
+
+function go(v) {
+  view = v;
+  stopSpeak();
+  ['home', 'blog', 'eng'].forEach(x => { $('view-' + x).hidden = x !== v; });
+  $('back').hidden = v === 'home';
+  const nav = [{ id: 'home', icon: '🏠', short: '홈' }].concat(APPS);
+  $('rail').replaceChildren(...nav.map(n => {
+    const b = el('button', 'rail-btn');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(n.id === v));
+    b.append(el('span', 'ico', n.icon), n.short);
+    b.addEventListener('click', () => { if (!busy) go(n.id); });
+    return b;
+  }));
+  if (v === 'home') renderHome();
+  if (v === 'blog') showTab(tab);
+  if (v === 'eng') renderEng();
+  $('stage').scrollTop = 0;
+}
+
+function renderHome() {
+  $('hello').replaceChildren(current + '님, 안녕하세요', el('small', '', '오늘 뭐 할까요?'));
+  const tiles = APPS.map(a => {
+    const b = el('button', 'card tile');
+    b.type = 'button';
+    b.append(el('span', 't-ico', a.icon), el('span', 't-name', a.name), el('span', 't-desc', a.desc));
+    if (a.id === 'blog') {
+      const n = state ? todo(state[current] || []) : 0;
+      if (n) b.append(el('span', 't-status todo', '● 확인할 글 ' + n + '개'));
+    }
+    if (a.id === 'eng' && engData) {
+      const done = !!engData.done[keyOf(new Date())];
+      b.append(el('span', 't-status ' + (done ? 'done' : 'todo'), done ? '✓ 오늘 공부 완료' : '● 오늘 아직 안 했어요'));
+    }
+    b.addEventListener('click', () => { if (!busy) go(a.id); });
+    return b;
+  });
+  const soon = el('div', 'card tile soon');
+  soon.append(el('span', 't-ico', '＋'), el('span', 't-desc', '새 기능이 곧 추가돼요'));
+  $('tiles').replaceChildren(...tiles, soon);
+}
+
+/* ───────── 영어 ───────── */
+// 기록은 드라이브 사람 폴더의 english.json 에 저장 (폰을 바꿔도 유지). 폰에도 사본을 둬서 바로 뜬다
+const pad2 = n => String(n).padStart(2, '0');
+const keyOf = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const ENG_BASE = new Date(2026, 10, 1);
+const engDefault = () => ({ field: 'fin', level: 'basic', done: {}, slow: false, hideEn: false });
+const LEVELS = { basic: '기본', adv: '심화' };
+// 날짜별 표현 파일(드라이브 english/<분야>-<난이도>/날짜.json, PC 의 Claude 가 매일 만든다)
+const dayCache = {}, dayLoading = {};
+function loadDay(field, level, date) {
+  const k = field + '-' + level + '-' + date;
+  if (k in dayCache || dayLoading[k]) return;
+  dayLoading[k] = true;
+  call('getEngDay', pin, field, level, date)
+    .then(d => { dayCache[k] = d && Array.isArray(d.items) && d.items.length === 3 ? d.items : null; })
+    .catch(() => { dayCache[k] = null; })
+    .then(() => { delete dayLoading[k]; if (view === 'eng') renderEng(); });
+}
+const engCacheKey = who => 'zz-eng-' + who;
+
+const FIELDS = {
+  fin: { name: '재무·회계', days: [
+    [
+      { en: 'close the books', ko: '결산을 마감하다', ex: [
+        ['We need to close the books by the fifth business day.', '영업일 기준 5일까지 결산 마감해야 해요.'],
+        ['Are we still on track to close the books this Friday?', '이번 주 금요일 마감 일정 문제없나요?'] ] },
+      { en: 'reconcile A with B', ko: 'A와 B를 대사하다(맞춰 보다)', ex: [
+        ['Can you reconcile the bank statement with the ledger?', '은행 잔고랑 원장 좀 대사해 줄 수 있어요?'],
+        ["I'm still reconciling the intercompany balances.", '관계사 잔액 아직 맞춰 보는 중이에요.'] ] },
+      { en: 'accrue for ~', ko: '~를 미지급비용으로 잡다', ex: [
+        ["Let's accrue for the October utility bill.", '10월 공과금은 미지급으로 잡아 둡시다.'],
+        ['Did we accrue for the bonus this month?', '이번 달 상여 미지급 잡았어요?'] ] },
+    ],
+    [
+      { en: 'flag an issue', ko: '문제를 미리 짚어 알리다', ex: [
+        ['I just wanted to flag an issue with the vendor invoice.', '거래처 인보이스 관련해서 짚어 드릴 게 있어서요.'],
+        ['Please flag anything unusual before we finalize.', '확정 전에 이상한 거 있으면 꼭 알려 주세요.'] ] },
+      { en: 'variance', ko: '(예산 대비) 차이', ex: [
+        ["What's driving the variance in marketing spend?", '마케팅비 차이는 뭐 때문이에요?'],
+        ['The variance is mainly due to timing.', '차이는 주로 시점 차이 때문이에요.'] ] },
+      { en: 'write off', ko: '상각하다, 손실 처리하다', ex: [
+        ['We decided to write off the old receivable.', '오래된 채권은 손실 처리하기로 했어요.'],
+        ['How much inventory are we writing off this quarter?', '이번 분기 재고 얼마나 상각해요?'] ] },
+    ],
+    [
+      { en: 'run the numbers', ko: '숫자를 돌려 보다, 계산해 보다', ex: [
+        ['Let me run the numbers and get back to you.', '계산해 보고 다시 말씀드릴게요.'],
+        ['Can you run the numbers on the new pricing?', '새 가격 기준으로 숫자 좀 돌려 줄래요?'] ] },
+      { en: 'book an entry', ko: '전표를 치다', ex: [
+        ["I'll book the adjusting entry today.", '수정 전표는 오늘 칠게요.'],
+        ['Who booked this entry last month?', '지난달에 이 전표 누가 쳤어요?'] ] },
+      { en: 'on an accrual basis', ko: '발생주의 기준으로', ex: [
+        ['Is this number on a cash basis or an accrual basis?', '이 숫자 현금주의예요, 발생주의예요?'],
+        ['On an accrual basis, revenue is actually higher.', '발생주의로 보면 매출이 오히려 더 높아요.'] ] },
+    ],
+    [
+      { en: 'sign off on', ko: '~을 승인하다', ex: [
+        ['The CFO needs to sign off on the budget.', '예산은 CFO 승인이 필요해요.'],
+        ['Has audit signed off on the numbers yet?', '감사 쪽에서 숫자 승인 났어요?'] ] },
+      { en: 'ballpark figure', ko: '대략적인 숫자', ex: [
+        ['Can you give me a ballpark figure for Q4 expenses?', '4분기 비용 대충 얼마쯤인지 알려 줄래요?'],
+        ['Just a ballpark figure is fine for now.', '지금은 대략적인 숫자면 충분해요.'] ] },
+      { en: 'fall short of', ko: '~에 못 미치다', ex: [
+        ['Sales fell short of our forecast.', '매출이 전망치에 못 미쳤어요.'],
+        ['If cash flow falls short, we can draw on the credit line.', '현금이 부족하면 한도대출을 쓰면 돼요.'] ] },
+    ],
+    [
+      { en: 'tie out', ko: '(숫자가) 일치하는지 맞추다', ex: [
+        ["The totals don't tie out to the trial balance.", '합계가 시산표랑 안 맞아요.'],
+        ['Can you tie out the schedule before sending it?', '보내기 전에 명세 숫자 맞는지 확인해 줄래요?'] ] },
+      { en: 'break even', ko: '손익분기를 맞추다', ex: [
+        ['We expect to break even by the third quarter.', '3분기까지 손익분기 맞출 걸로 봐요.'],
+        ['The project barely broke even.', '그 프로젝트는 겨우 본전이었어요.'] ] },
+      { en: 'cut costs', ko: '비용을 줄이다', ex: [
+        ['We need to cut costs by ten percent next year.', '내년에 비용을 10% 줄여야 해요.'],
+        ['Where can we cut costs without hurting operations?', '운영에 지장 없이 어디서 줄일 수 있을까요?'] ] },
+    ],
+    [
+      { en: 'be off by ~', ko: '~만큼 차이가 나다', ex: [
+        ['The balance is off by about two thousand dollars.', '잔액이 2천 달러 정도 안 맞아요.'],
+        ["We're off by one day on the cutoff.", '마감 기준일이 하루 어긋났어요.'] ] },
+      { en: 'push back the deadline', ko: '마감을 미루다', ex: [
+        ['Can we push back the deadline to Monday?', '마감을 월요일로 미룰 수 있을까요?'],
+        ['The auditors asked us to push back the deadline.', '감사인이 마감을 미뤄 달라고 했어요.'] ] },
+      { en: 'headcount', ko: '인원(수)', ex: [
+        ['Headcount costs are our biggest expense.', '인건비가 제일 큰 비용이에요.'],
+        ["We're freezing headcount until next year.", '내년까지 인원 동결이에요.'] ] },
+    ],
+    [
+      { en: 'year-over-year', ko: '전년 대비', ex: [
+        ['Revenue grew eight percent year-over-year.', '매출이 전년 대비 8% 늘었어요.'],
+        ['How does that compare year-over-year?', '전년이랑 비교하면 어때요?'] ] },
+      { en: 'walk me through', ko: '하나씩 설명해 주다', ex: [
+        ['Could you walk me through this adjustment?', '이 조정 건 하나씩 설명해 줄래요?'],
+        ['Let me walk you through the cash flow statement.', '현금흐름표 차근차근 설명드릴게요.'] ] },
+      { en: 'keep me in the loop', ko: '진행 상황 계속 공유해 주다', ex: [
+        ['Please keep me in the loop on the audit.', '감사 진행 상황 계속 공유해 주세요.'],
+        ["I'll keep you in the loop once we hear back.", '답 오면 바로 공유드릴게요.'] ] },
+    ],
+  ] },
+  ir: { name: 'IR', days: [
+    [
+      { en: 'guidance', ko: '(실적) 가이던스, 전망치', ex: [
+        ["We're reaffirming our full-year guidance.", '연간 가이던스는 그대로 유지합니다.'],
+        ['Analysts expected us to raise guidance.', '애널리스트들은 가이던스 상향을 기대했어요.'] ] },
+      { en: 'beat expectations', ko: '예상치를 웃돌다', ex: [
+        ['Our third-quarter results beat expectations.', '3분기 실적이 예상치를 웃돌았어요.'],
+        ['Did we beat consensus on earnings per share?', 'EPS 컨센서스 넘었어요?'] ] },
+      { en: 'take questions', ko: '질문을 받다', ex: [
+        ["We'll now take questions from analysts.", '이제 애널리스트분들 질문 받겠습니다.'],
+        ['We have time to take one more question.', '질문 하나 더 받을 시간 있습니다.'] ] },
+    ],
+    [
+      { en: 'headwinds / tailwinds', ko: '불리한 요인 / 유리한 요인', ex: [
+        ['Currency was a headwind this quarter.', '이번 분기엔 환율이 불리하게 작용했어요.'],
+        ['We see strong tailwinds in EV demand.', '전기차 수요 쪽은 우호적인 흐름이 강해요.'] ] },
+      { en: 'on track to', ko: '~할 순조로운 흐름이다', ex: [
+        ["We're on track to hit our margin target.", '마진 목표 달성 순조롭게 가고 있어요.'],
+        ['Is the plant expansion still on track?', '공장 증설은 계획대로 가고 있나요?'] ] },
+      { en: 'shareholder returns', ko: '주주환원', ex: [
+        ['We plan to increase shareholder returns through dividends.', '배당으로 주주환원을 늘릴 계획입니다.'],
+        ['Investors keep asking about our shareholder return policy.', '투자자들이 주주환원 정책을 계속 물어봐요.'] ] },
+    ],
+    [
+      { en: 'earnings call', ko: '실적 발표 컨퍼런스콜', ex: [
+        ['The earnings call is scheduled for Thursday morning.', '실적 콜은 목요일 오전이에요.'],
+        ["Let's finalize the script for the earnings call.", '실적 콜 스크립트 확정합시다.'] ] },
+      { en: "I'll circle back", ko: '확인하고 다시 연락드릴게요', ex: [
+        ["I don't have that number handy, but I'll circle back.", '그 숫자는 지금 없는데, 확인해서 다시 드릴게요.'],
+        ['Let me circle back after I check with finance.', '재무팀 확인하고 다시 연락드릴게요.'] ] },
+      { en: 'payout ratio', ko: '배당성향', ex: [
+        ["We're keeping the payout ratio at thirty percent.", '배당성향은 30%로 유지합니다.'],
+        ['Will the payout ratio change next year?', '내년에 배당성향이 바뀌나요?'] ] },
+    ],
+    [
+      { en: "We don't comment on ~", ko: '~에 대해서는 말씀드리지 않습니다', ex: [
+        ["We don't comment on market rumors.", '시장 루머에 대해서는 말씀드리지 않습니다.'],
+        ["We don't comment on individual customers.", '개별 고객사 관련해선 말씀드리기 어렵습니다.'] ] },
+      { en: 'margin expansion', ko: '마진 개선', ex: [
+        ['Margin expansion came mainly from cost savings.', '마진 개선은 주로 원가 절감 덕분이에요.'],
+        ['Do you expect further margin expansion next year?', '내년에도 마진이 더 좋아질까요?'] ] },
+      { en: 'roadshow', ko: '(투자자) 로드쇼', ex: [
+        ["We're doing a roadshow in Singapore next month.", '다음 달에 싱가포르 로드쇼 가요.'],
+        ['The roadshow went really well.', '로드쇼 아주 잘 끝났어요.'] ] },
+    ],
+    [
+      { en: 'going forward', ko: '앞으로는', ex: [
+        ["Going forward, we'll report segment results quarterly.", '앞으로는 부문별 실적을 분기마다 공개합니다.'],
+        ["What's your capex plan going forward?", '앞으로 설비투자 계획은 어떻게 되나요?'] ] },
+      { en: 'one-off', ko: '일회성(의)', ex: [
+        ['That was a one-off gain from the asset sale.', '그건 자산 매각에 따른 일회성 이익이었어요.'],
+        ['Excluding one-offs, profit rose five percent.', '일회성 요인 빼면 이익이 5% 늘었어요.'] ] },
+      { en: 'valuation', ko: '밸류에이션, 기업가치', ex: [
+        ['Many investors think our valuation is too low.', '투자자 상당수가 저평가라고 봐요.'],
+        ['How do you justify the current valuation?', '현재 밸류에이션의 근거는 뭔가요?'] ] },
+    ],
+    [
+      { en: 'in line with', ko: '~에 부합하는', ex: [
+        ['Revenue came in line with our guidance.', '매출은 가이던스에 부합했어요.'],
+        ['Results were in line with market expectations.', '실적은 시장 예상 수준이었어요.'] ] },
+      { en: 'visibility', ko: '(앞으로의) 가시성', ex: [
+        ['We have limited visibility into next year’s demand.', '내년 수요는 아직 가늠하기 어려워요.'],
+        ['Our order backlog gives us good visibility.', '수주잔고 덕분에 앞이 잘 보이는 편이에요.'] ] },
+      { en: 'key takeaway', ko: '핵심 요점', ex: [
+        ['The key takeaway is that cash flow improved.', '핵심은 현금흐름이 좋아졌다는 거예요.'],
+        ['What were the key takeaways from the meeting?', '미팅 핵심 내용이 뭐였어요?'] ] },
+    ],
+    [
+      { en: 'capital allocation', ko: '자본 배분', ex: [
+        ['Our top capital allocation priority is paying down debt.', '자본 배분 1순위는 부채 상환이에요.'],
+        ['Can you give us an update on capital allocation?', '자본 배분 계획 업데이트 해 주실 수 있나요?'] ] },
+      { en: 'follow up with', ko: '~에게 후속으로 연락하다', ex: [
+        ["I'll follow up with the deck after the call.", '콜 끝나고 자료 보내 드릴게요.'],
+        ['Let me follow up with you by email.', '메일로 다시 연락드릴게요.'] ] },
+      { en: "That's a fair question", ko: '충분히 궁금하실 만한 질문이에요', ex: [
+        ["That's a fair question, and here's how we see it.", '좋은 질문이에요. 저희는 이렇게 봅니다.'],
+        ["That's a fair question. Let me explain the background.", '충분히 궁금하실 만해요. 배경부터 설명드릴게요.'] ] },
+    ],
+  ] },
+  inno: { name: "이노션 IR", start: [2026, 10, 12], days: [
+    [
+      { en: "gross profit", ko: "매출총이익(GP). 광고회사 실적의 핵심 지표", ex: [
+        ["For an agency like us, gross profit is the most meaningful top-line metric.", "저희 같은 광고회사는 매출총이익이 가장 의미 있는 외형 지표예요."],
+        ["Gross profit rose ten percent year-on-year in the second quarter.", "2분기 매출총이익은 전년 대비 10% 늘었습니다."] ] },
+      { en: "year-on-year", ko: "전년 동기 대비", ex: [
+        ["Operating profit grew 22 percent year-on-year.", "영업이익은 전년 동기 대비 22% 성장했습니다."],
+        ["On a year-on-year basis, every region contributed to growth.", "전년 대비로 보면 모든 지역이 성장에 기여했어요."] ] },
+      { en: "earnings surprise", ko: "어닝 서프라이즈, 예상을 크게 웃돈 실적", ex: [
+        ["The first-quarter result was an earnings surprise for the market.", "1분기 실적은 시장 예상을 크게 웃돌았습니다."],
+        ["We don't think this quarter's earnings surprise was a one-time event.", "이번 분기 서프라이즈가 일회성이라고 보지는 않습니다."] ] },
+    ],
+    [
+      { en: "affiliated / non-affiliated clients", ko: "계열 / 비계열 광고주", ex: [
+        ["Non-affiliated clients now account for a larger share of our gross profit.", "이제 비계열 광고주가 매출총이익에서 차지하는 비중이 더 커졌어요."],
+        ["Growth came from both affiliated and non-affiliated clients.", "성장은 계열과 비계열 광고주 양쪽에서 나왔습니다."] ] },
+      { en: "captive business", ko: "캡티브(그룹 계열) 물량", ex: [
+        ["Our captive business gives us a stable earnings base.", "캡티브 물량이 실적의 안정적인 기반이 돼 줍니다."],
+        ["Investors often ask about our reliance on captive business.", "투자자들은 계열 물량 의존도를 자주 물어봐요."] ] },
+      { en: "client diversification", ko: "광고주 다변화", ex: [
+        ["Client diversification remains one of our top priorities.", "광고주 다변화는 여전히 최우선 과제 중 하나입니다."],
+        ["We've made steady progress on client diversification in Europe.", "유럽에서는 광고주 다변화가 꾸준히 진전되고 있어요."] ] },
+    ],
+    [
+      { en: "SG&A expenses", ko: "판매관리비", ex: [
+        ["Gross profit growth outpaced the increase in SG&A expenses.", "매출총이익 증가 속도가 판관비 증가 속도를 앞섰습니다."],
+        ["We're keeping a close eye on SG&A, especially labor costs.", "판관비, 특히 인건비를 꼼꼼히 관리하고 있어요."] ] },
+      { en: "operating margin", ko: "영업이익률", ex: [
+        ["Our operating margin improved by three percentage points.", "영업이익률이 3%포인트 개선됐습니다."],
+        ["We aim to keep the operating margin above fifteen percent.", "영업이익률을 15% 이상으로 유지하는 게 목표예요."] ] },
+      { en: "operating leverage", ko: "영업 레버리지(매출 증가 대비 이익이 더 크게 느는 효과)", ex: [
+        ["We're starting to see real operating leverage in the business.", "사업에서 영업 레버리지 효과가 본격적으로 나타나고 있어요."],
+        ["Operating leverage should improve as digital revenue scales up.", "디지털 매출이 커질수록 영업 레버리지는 더 좋아질 겁니다."] ] },
+    ],
+    [
+      { en: "CX (customer experience) business", ko: "CX(고객경험) 사업", ex: [
+        ["Our CX business continued to grow at home and abroad.", "CX 사업은 국내외에서 계속 성장했습니다."],
+        ["CX now drives a meaningful part of our earnings.", "이제 CX가 실적의 상당 부분을 이끌고 있어요."] ] },
+      { en: "below-the-line (BTL)", ko: "비매체 광고(이벤트·프로모션 등)", ex: [
+        ["Below-the-line work is less sensitive to the media cycle.", "비매체 사업은 매체 경기 영향을 덜 받습니다."],
+        ["Most of the growth this quarter came from below-the-line activities.", "이번 분기 성장 대부분은 비매체 쪽에서 나왔어요."] ] },
+      { en: "sports marketing", ko: "스포츠 마케팅", ex: [
+        ["Sports marketing tied to the World Cup boosted results in the Americas.", "월드컵 관련 스포츠 마케팅이 미주 실적을 끌어올렸습니다."],
+        ["We see sports marketing as a long-term growth engine.", "스포츠 마케팅을 장기 성장 동력으로 보고 있어요."] ] },
+    ],
+    [
+      { en: "programmatic buying", ko: "프로그래매틱 바잉(디지털 광고 자동 구매)", ex: [
+        ["Programmatic buying volume increased at Canvas, our U.S. subsidiary.", "미국 자회사 캔버스의 프로그래매틱 바잉 물량이 늘었습니다."],
+        ["Programmatic buying helped us win more non-affiliated clients.", "프로그래매틱 바잉 덕분에 비계열 광고주를 더 확보했어요."] ] },
+      { en: "digital services", ko: "디지털 서비스(웹·CRM·데이터 분석 등)", ex: [
+        ["We expanded digital services such as CRM and data analytics in Europe.", "유럽에서 CRM·데이터 분석 같은 디지털 서비스를 확대했습니다."],
+        ["Digital services carry higher margins than traditional media buying.", "디지털 서비스는 전통 매체 대행보다 마진이 높아요."] ] },
+      { en: "subsidiary", ko: "자회사", ex: [
+        ["Our U.S. subsidiary delivered solid growth this quarter.", "미국 자회사가 이번 분기 견조하게 성장했습니다."],
+        ["Each subsidiary reports its results to headquarters monthly.", "각 자회사는 매달 본사에 실적을 보고해요."] ] },
+    ],
+    [
+      { en: "regional breakdown", ko: "지역별 실적(구분)", ex: [
+        ["Let me walk you through the regional breakdown.", "지역별 실적을 순서대로 설명드리겠습니다."],
+        ["The regional breakdown is on page seven of the presentation.", "지역별 실적은 발표 자료 7페이지에 있어요."] ] },
+      { en: "drive growth", ko: "성장을 이끌다", ex: [
+        ["Europe drove most of the growth this quarter.", "이번 분기 성장은 주로 유럽이 이끌었습니다."],
+        ["What do you think will drive growth next year?", "내년 성장은 뭐가 이끌 거라고 보세요?"] ] },
+      { en: "surge", ko: "급증하다", ex: [
+        ["Gross profit in Europe surged nearly 42 percent.", "유럽 매출총이익이 42% 가까이 급증했어요."],
+        ["Demand for event marketing surged during the World Cup.", "월드컵 기간에 이벤트 마케팅 수요가 급증했습니다."] ] },
+    ],
+    [
+      { en: "non-operating income", ko: "영업외수익", ex: [
+        ["A swing to a gain in non-operating income lifted net profit.", "영업외손익이 흑자로 돌아서면서 순이익이 늘었어요."],
+        ["Non-operating income was mainly driven by interest income.", "영업외수익은 주로 이자수익 덕분이었습니다."] ] },
+      { en: "one-off item", ko: "일회성 요인", ex: [
+        ["Excluding one-off items, operating profit was flat.", "일회성 요인을 빼면 영업이익은 보합이었어요."],
+        ["There were no major one-off items this quarter.", "이번 분기엔 큰 일회성 요인이 없었습니다."] ] },
+      { en: "swing to a profit", ko: "흑자 전환하다", ex: [
+        ["The European unit swung to a profit last year.", "유럽 법인은 작년에 흑자 전환했어요."],
+        ["We expect the new business to swing to a profit next year.", "신사업은 내년에 흑자 전환할 것으로 예상합니다."] ] },
+    ],
+    [
+      { en: "dividend payout ratio", ko: "배당성향", ex: [
+        ["We're committed to a dividend payout ratio of at least 40 percent.", "배당성향 40% 이상을 지키겠다는 입장입니다."],
+        ["Will the payout ratio go up if earnings keep improving?", "실적이 계속 좋아지면 배당성향도 올라가나요?"] ] },
+      { en: "DPS (dividend per share)", ko: "주당배당금", ex: [
+        ["We plan to at least maintain last year's DPS.", "최소한 작년 주당배당금은 유지할 계획입니다."],
+        ["The board will decide the final DPS in February.", "최종 주당배당금은 2월에 이사회에서 결정해요."] ] },
+      { en: "dividend yield", ko: "배당수익률", ex: [
+        ["Our dividend yield is among the highest in the sector.", "저희 배당수익률은 업종 내 최상위권이에요."],
+        ["A high dividend yield helps support the share price.", "높은 배당수익률이 주가를 받쳐 주는 역할을 해요."] ] },
+    ],
+    [
+      { en: "mid-term target", ko: "중기 목표", ex: [
+        ["We set a mid-term target for gross profit back in 2023.", "2023년에 매출총이익 중기 목표를 제시했어요."],
+        ["We remain on track to reach our mid-term target.", "중기 목표는 계획대로 가고 있습니다."] ] },
+      { en: "on track", ko: "계획대로 순조로운", ex: [
+        ["The integration of the new acquisition is on track.", "신규 인수 회사 통합은 계획대로 진행 중입니다."],
+        ["Are you still on track for double-digit profit growth?", "두 자릿수 이익 성장은 여전히 순조로운가요?"] ] },
+      { en: "reaffirm", ko: "(기존 목표를) 재확인하다", ex: [
+        ["We'd like to reaffirm our full-year outlook.", "연간 전망은 그대로 유지한다는 점을 다시 말씀드립니다."],
+        ["Management reaffirmed its commitment to shareholder returns.", "경영진은 주주환원 의지를 재확인했습니다."] ] },
+    ],
+    [
+      { en: "headwind", ko: "불리한 요인, 역풍", ex: [
+        ["A slowdown in the domestic ad market is a headwind for us.", "국내 광고 경기 둔화는 저희에게 부담 요인이에요."],
+        ["Currency could be a headwind in the fourth quarter.", "4분기엔 환율이 불리하게 작용할 수 있어요."] ] },
+      { en: "tailwind", ko: "유리한 요인, 순풍", ex: [
+        ["The World Cup was a strong tailwind in the second quarter.", "월드컵이 2분기에 큰 순풍이 됐습니다."],
+        ["New vehicle launches should be a tailwind next year.", "신차 출시가 내년엔 우호적으로 작용할 거예요."] ] },
+      { en: "ad market slowdown", ko: "광고 시장 둔화", ex: [
+        ["How are you coping with the ad market slowdown?", "광고 시장 둔화에 어떻게 대응하고 계세요?"],
+        ["Our non-media business makes us less exposed to an ad market slowdown.", "비매체 사업 덕분에 광고 경기 둔화 영향을 덜 받아요."] ] },
+    ],
+    [
+      { en: "high-margin business", ko: "고마진 사업", ex: [
+        ["We're shifting our mix toward high-margin businesses.", "고마진 사업 쪽으로 사업 구성을 바꾸고 있어요."],
+        ["Creative and digital content are our high-margin businesses.", "크리에이티브와 디지털 콘텐츠가 고마진 사업입니다."] ] },
+      { en: "business mix", ko: "사업 구성(믹스)", ex: [
+        ["The improvement in margin reflects a better business mix.", "마진 개선은 사업 구성이 좋아진 덕분이에요."],
+        ["How do you expect the business mix to change over three years?", "3년 동안 사업 구성이 어떻게 바뀔 것으로 보세요?"] ] },
+      { en: "portfolio", ko: "사업 포트폴리오", ex: [
+        ["We continue to upgrade our business portfolio.", "사업 포트폴리오를 계속 고도화하고 있습니다."],
+        ["Our portfolio is now more balanced across regions.", "이제 포트폴리오가 지역별로 더 균형 잡혀 있어요."] ] },
+    ],
+    [
+      { en: "AI adoption", ko: "AI 도입·활용", ex: [
+        ["We're expanding AI adoption across planning, production and media.", "기획·제작·미디어 전반에 AI 활용을 넓히고 있어요."],
+        ["AI adoption is already improving our productivity.", "AI 도입으로 이미 생산성이 좋아지고 있습니다."] ] },
+      { en: "efficiency gains", ko: "효율 개선", ex: [
+        ["Efficiency gains allowed us to grow with fewer people.", "효율 개선 덕분에 더 적은 인원으로 성장했어요."],
+        ["Most of the margin improvement came from efficiency gains.", "마진 개선 대부분은 효율 개선에서 나왔습니다."] ] },
+      { en: "headcount", ko: "인원 수", ex: [
+        ["Headcount decreased slightly even as gross profit grew.", "매출총이익이 늘었는데도 인원은 조금 줄었어요."],
+        ["We don't plan any major headcount reductions.", "큰 규모의 인원 감축 계획은 없습니다."] ] },
+    ],
+    [
+      { en: "M&A (mergers and acquisitions)", ko: "인수합병", ex: [
+        ["We're looking at M&A opportunities in digital and data.", "디지털·데이터 분야 인수합병 기회를 보고 있어요."],
+        ["M&A will remain part of our growth strategy.", "인수합병은 계속 성장 전략의 한 축이 될 겁니다."] ] },
+      { en: "bolt-on acquisition", ko: "소규모 보완 인수", ex: [
+        ["We prefer bolt-on acquisitions to large deals.", "큰 거래보다 소규모 보완 인수를 선호해요."],
+        ["The bolt-on acquisition strengthens our data capabilities.", "이번 보완 인수로 데이터 역량이 강화됩니다."] ] },
+      { en: "strategic investment", ko: "전략적 투자", ex: [
+        ["We made a strategic investment in an AI start-up.", "AI 스타트업에 전략적 투자를 했어요."],
+        ["Strategic investments help us access new technology quickly.", "전략적 투자는 신기술을 빨리 확보하는 데 도움이 돼요."] ] },
+    ],
+    [
+      { en: "FX impact", ko: "환율 영향", ex: [
+        ["The FX impact on gross profit was about one percent.", "환율이 매출총이익에 준 영향은 1% 정도였어요."],
+        ["Could you quantify the FX impact this quarter?", "이번 분기 환율 영향을 수치로 말씀해 주실 수 있나요?"] ] },
+      { en: "in constant currency", ko: "고정환율 기준으로", ex: [
+        ["In constant currency, overseas growth was even stronger.", "고정환율 기준으로 보면 해외 성장은 더 강했어요."],
+        ["We'll also show the figures in constant currency.", "고정환율 기준 수치도 같이 보여 드릴게요."] ] },
+      { en: "translation effect", ko: "(해외 실적) 환산 효과", ex: [
+        ["A weaker won created a positive translation effect.", "원화 약세로 환산 효과가 긍정적으로 작용했어요."],
+        ["Excluding the translation effect, margins were stable.", "환산 효과를 빼면 마진은 안정적이었습니다."] ] },
+    ],
+    [
+      { en: "seasonality", ko: "계절성", ex: [
+        ["Our business has clear seasonality.", "저희 사업은 계절성이 뚜렷해요."],
+        ["Please keep seasonality in mind when comparing quarters.", "분기끼리 비교하실 땐 계절성을 감안해 주세요."] ] },
+      { en: "seasonally strongest quarter", ko: "계절적으로 가장 강한 분기", ex: [
+        ["The fourth quarter is usually our seasonally strongest quarter.", "4분기가 보통 계절적으로 가장 좋은 분기예요."],
+        ["The first quarter is seasonally weaker in Korea.", "국내는 1분기가 계절적으로 약한 편이에요."] ] },
+      { en: "timing difference", ko: "시점 차이", ex: [
+        ["Part of the decline is just a timing difference.", "감소분 일부는 단순한 시점 차이예요."],
+        ["Some campaigns shifted to the next quarter due to timing.", "일부 캠페인이 시점상 다음 분기로 넘어갔어요."] ] },
+    ],
+    [
+      { en: "new vehicle launch", ko: "신차 출시", ex: [
+        ["Several new vehicle launches are planned for next year.", "내년에 신차 출시가 여러 건 예정돼 있어요."],
+        ["New vehicle launches usually lead to bigger marketing budgets.", "신차가 나오면 보통 마케팅 예산이 커져요."] ] },
+      { en: "marketing spend", ko: "마케팅 집행(비용)", ex: [
+        ["Affiliate marketing spend in the Americas stayed strong.", "미주에서 계열사 마케팅 집행은 견조하게 유지됐어요."],
+        ["Clients are becoming more careful with marketing spend.", "광고주들이 마케팅 비용을 더 신중하게 쓰고 있어요."] ] },
+      { en: "pipeline", ko: "(예정된) 사업 물량, 파이프라인", ex: [
+        ["Our pipeline for next year looks healthy.", "내년 사업 물량은 탄탄해 보입니다."],
+        ["We have a solid pipeline of non-affiliated pitches.", "비계열 경쟁 PT 물량이 충분히 있어요."] ] },
+    ],
+    [
+      { en: "Thank you for joining our earnings call.", ko: "실적 발표 컨퍼런스콜에 참석해 주셔서 감사합니다", ex: [
+        ["Good afternoon, and thank you for joining our third-quarter earnings call.", "안녕하세요, 3분기 실적 발표에 참석해 주셔서 감사합니다."],
+        ["Thank you for joining us on such short notice.", "급하게 잡힌 자리에 와 주셔서 감사합니다."] ] },
+      { en: "prepared remarks", ko: "(미리 준비한) 발표 내용", ex: [
+        ["After our prepared remarks, we'll open the line for questions.", "준비한 발표가 끝나면 질문을 받겠습니다."],
+        ["The prepared remarks will take about fifteen minutes.", "발표는 15분 정도 걸릴 예정입니다."] ] },
+      { en: "open the line for questions", ko: "질의응답을 시작하다", ex: [
+        ["Operator, please open the line for questions.", "진행자분, 질의응답을 시작해 주세요."],
+        ["We'll now open the line for questions.", "이제 질문을 받겠습니다."] ] },
+    ],
+    [
+      { en: "Let me take that one.", ko: "그 질문은 제가 답변드리겠습니다", ex: [
+        ["Let me take that one, and then our CFO can add more detail.", "제가 먼저 답하고 CFO께서 보충 설명하시겠습니다."],
+        ["Thanks for the question. Let me take that one.", "질문 감사합니다. 제가 답변드릴게요."] ] },
+      { en: "To add to that", ko: "덧붙이자면", ex: [
+        ["To add to that, Europe also contributed strongly.", "덧붙이자면 유럽도 크게 기여했습니다."],
+        ["Just to add to that, our pipeline is also growing.", "보충하자면 사업 물량도 늘고 있어요."] ] },
+      { en: "As we mentioned earlier", ko: "앞서 말씀드린 것처럼", ex: [
+        ["As we mentioned earlier, the decline was mainly due to timing.", "앞서 말씀드렸듯 감소는 주로 시점 차이 때문이에요."],
+        ["As we mentioned earlier, we'll keep the dividend at least flat.", "앞서 말씀드린 대로 배당은 최소 유지합니다."] ] },
+    ],
+    [
+      { en: "We don't provide quarterly guidance.", ko: "분기 가이던스는 따로 제시하지 않습니다", ex: [
+        ["We don't provide quarterly guidance, but the trend is positive.", "분기 가이던스는 드리지 않지만 흐름은 긍정적입니다."],
+        ["As a policy, we don't provide quarterly guidance.", "방침상 분기 가이던스는 제시하지 않아요."] ] },
+      { en: "It's too early to say.", ko: "아직 말씀드리기 이릅니다", ex: [
+        ["It's too early to say how much the new deal will contribute.", "신규 계약이 얼마나 기여할지는 아직 말하기 일러요."],
+        ["Honestly, it's too early to say.", "솔직히 아직은 판단하기 이릅니다."] ] },
+      { en: "We'll share more details", ko: "자세한 내용은 추후 공유드리겠습니다", ex: [
+        ["We'll share more details at our next earnings call.", "다음 실적 발표 때 자세히 공유드리겠습니다."],
+        ["We'll share more details once the deal is finalized.", "거래가 확정되면 더 자세히 알려 드릴게요."] ] },
+    ],
+    [
+      { en: "If I understood your question correctly", ko: "질문을 제가 제대로 이해했다면", ex: [
+        ["If I understood your question correctly, you're asking about margins in Europe.", "제가 이해한 게 맞다면 유럽 마진에 대한 질문이시죠."],
+        ["If I understood your question correctly, the answer is yes.", "질문을 제대로 이해했다면 답은 '그렇다'입니다."] ] },
+      { en: "Could you repeat the question?", ko: "질문을 다시 한번 말씀해 주시겠어요?", ex: [
+        ["Sorry, the line was unclear. Could you repeat the question?", "죄송한데 연결 상태가 안 좋았어요. 다시 말씀해 주시겠어요?"],
+        ["Could you repeat the second part of your question?", "질문 두 번째 부분을 다시 말씀해 주시겠어요?"] ] },
+      { en: "Just to clarify", ko: "확실히 짚고 넘어가자면", ex: [
+        ["Just to clarify, those figures are on a consolidated basis.", "분명히 말씀드리면 그 숫자는 연결 기준입니다."],
+        ["Just to clarify, are you asking about gross profit or revenue?", "확인차 여쭤보면 매출총이익 말씀이세요, 매출 말씀이세요?"] ] },
+    ],
+    [
+      { en: "Following up on our call", ko: "통화(미팅) 관련 후속으로 연락드립니다", ex: [
+        ["Following up on our call, I've attached the data you asked for.", "통화 때 요청하신 자료 첨부드립니다."],
+        ["Following up on our call yesterday, here's a quick summary.", "어제 통화 내용 간단히 정리해 드려요."] ] },
+      { en: "Please find the IR deck attached.", ko: "IR 자료 첨부드립니다", ex: [
+        ["Please find the latest IR deck attached.", "최신 IR 자료 첨부드립니다."],
+        ["Please find the IR deck attached for your reference.", "참고하시도록 IR 자료 첨부합니다."] ] },
+      { en: "I'd be happy to set up a call.", ko: "통화 일정 잡아 드릴게요", ex: [
+        ["If you have more questions, I'd be happy to set up a call.", "추가 질문 있으시면 통화 일정 잡아 드릴게요."],
+        ["I'd be happy to set up a call with our CFO.", "CFO와 통화 일정 잡아 드릴 수 있어요."] ] },
+    ],
+    [
+      { en: "NDR (non-deal roadshow)", ko: "NDR, 거래 목적 없는 투자자 순회 미팅", ex: [
+        ["We're planning an NDR in Hong Kong and Singapore next month.", "다음 달 홍콩·싱가포르 NDR을 계획 중이에요."],
+        ["The NDR helped us meet several new long-only investors.", "NDR 덕분에 신규 장기 투자자 여러 곳을 만났어요."] ] },
+      { en: "one-on-one meeting", ko: "1:1 투자자 미팅", ex: [
+        ["We have six one-on-one meetings scheduled for Tuesday.", "화요일에 1:1 미팅이 6개 잡혀 있어요."],
+        ["Would you prefer a one-on-one meeting or a group session?", "1:1 미팅이 좋으세요, 그룹 미팅이 좋으세요?"] ] },
+      { en: "investor conference", ko: "투자자 컨퍼런스(증권사 주최)", ex: [
+        ["We'll be attending a brokerage investor conference in Seoul.", "서울에서 열리는 증권사 컨퍼런스에 참석해요."],
+        ["The investor conference is a good chance to meet foreign funds.", "투자자 컨퍼런스는 외국계 펀드를 만날 좋은 기회예요."] ] },
+    ],
+    [
+      { en: "undervalued", ko: "저평가된", ex: [
+        ["Many analysts believe our stock is undervalued.", "애널리스트 상당수가 저희 주식이 저평가돼 있다고 봐요."],
+        ["Why do you think the market still sees the stock as undervalued?", "시장이 아직 저평가로 보는 이유가 뭐라고 생각하세요?"] ] },
+      { en: "re-rating", ko: "(주가) 재평가", ex: [
+        ["Stronger non-affiliated growth could lead to a re-rating.", "비계열 성장이 강해지면 재평가로 이어질 수 있어요."],
+        ["What would it take for the stock to see a re-rating?", "주가가 재평가받으려면 뭐가 필요할까요?"] ] },
+      { en: "share price reaction", ko: "주가 반응", ex: [
+        ["The share price reaction to the results was positive.", "실적에 대한 주가 반응은 긍정적이었어요."],
+        ["We don't comment on short-term share price reactions.", "단기 주가 반응에는 따로 코멘트하지 않습니다."] ] },
+    ],
+    [
+      { en: "foreign ownership", ko: "외국인 지분율", ex: [
+        ["Foreign ownership has risen to about twenty percent.", "외국인 지분율이 20% 정도로 올라왔어요."],
+        ["We'd like to increase foreign ownership over time.", "외국인 지분율을 점차 높이고 싶어요."] ] },
+      { en: "free float", ko: "유통 주식(비율)", ex: [
+        ["Our free float is relatively limited.", "저희는 유통 주식 비율이 비교적 낮은 편이에요."],
+        ["A larger free float would improve trading liquidity.", "유통 주식이 늘면 거래 유동성이 좋아질 거예요."] ] },
+      { en: "major shareholder", ko: "최대(주요) 주주", ex: [
+        ["Our major shareholder has no plans to sell shares.", "주요 주주는 지분 매각 계획이 없습니다."],
+        ["Investors asked about the major shareholder's long-term intentions.", "투자자들이 주요 주주의 장기적인 의도를 물어봤어요."] ] },
+    ],
+    [
+      { en: "fair disclosure", ko: "공정공시", ex: [
+        ["We'll release the figures through a fair disclosure first.", "숫자는 공정공시로 먼저 공개하겠습니다."],
+        ["Under fair disclosure rules, we can't share that in advance.", "공정공시 규정상 미리 알려 드릴 수 없어요."] ] },
+      { en: "quiet period", ko: "실적 발표 전 침묵 기간", ex: [
+        ["We're in our quiet period until the results are announced.", "실적 발표 전까지는 침묵 기간이에요."],
+        ["Sorry, we can't take meetings during the quiet period.", "죄송하지만 침묵 기간에는 미팅이 어려워요."] ] },
+      { en: "publicly available information", ko: "공개된 정보", ex: [
+        ["I can only discuss publicly available information.", "공개된 정보 범위에서만 말씀드릴 수 있어요."],
+        ["All of this is publicly available in our annual report.", "이건 전부 사업보고서에 공개돼 있어요."] ] },
+    ],
+    [
+      { en: "net cash position", ko: "순현금 상태", ex: [
+        ["We have a strong net cash position with no major debt.", "큰 차입 없이 탄탄한 순현금 상태예요."],
+        ["Our net cash position gives us room for M&A.", "순현금 덕분에 인수합병 여력이 있어요."] ] },
+      { en: "free cash flow", ko: "잉여현금흐름", ex: [
+        ["Free cash flow remained solid this year.", "올해 잉여현금흐름은 견조했어요."],
+        ["Dividends are funded from free cash flow.", "배당은 잉여현금흐름으로 지급합니다."] ] },
+      { en: "working capital", ko: "운전자본", ex: [
+        ["Working capital can swing a lot between quarters.", "운전자본은 분기마다 변동이 커요."],
+        ["The change in working capital was mainly timing-related.", "운전자본 변동은 주로 시점 차이 때문이에요."] ] },
+    ],
+    [
+      { en: "consensus estimate", ko: "(증권사) 컨센서스 추정치", ex: [
+        ["Operating profit came in above the consensus estimate.", "영업이익이 컨센서스를 웃돌았어요."],
+        ["Where do you think consensus estimates are too low?", "컨센서스가 어디서 너무 낮다고 보세요?"] ] },
+      { en: "miss / beat consensus", ko: "컨센서스 하회 / 상회", ex: [
+        ["Third-quarter profit slightly missed consensus.", "3분기 이익이 컨센서스를 약간 밑돌았어요."],
+        ["We beat consensus for the second straight quarter.", "두 분기 연속 컨센서스를 넘었습니다."] ] },
+      { en: "earnings revision", ko: "실적 추정치 조정", ex: [
+        ["Several brokers made upward earnings revisions after the call.", "콜 이후 여러 증권사가 실적 추정치를 올렸어요."],
+        ["We expect some downward earnings revisions this quarter.", "이번 분기엔 추정치 하향이 좀 있을 것 같아요."] ] },
+    ],
+    [
+      { en: "peers", ko: "동종 업계 경쟁사", ex: [
+        ["Our margins compare well with global peers.", "저희 마진은 글로벌 경쟁사와 비교해도 좋은 편이에요."],
+        ["Investors usually value us against domestic peers.", "투자자들은 보통 국내 동종사와 비교해서 평가해요."] ] },
+      { en: "global holding companies", ko: "글로벌 광고 지주회사(옴니콤 등)", ex: [
+        ["Global holding companies are consolidating quickly.", "글로벌 광고 지주사들이 빠르게 합쳐지고 있어요."],
+        ["How do you compete with the global holding companies?", "글로벌 지주사들과 어떻게 경쟁하세요?"] ] },
+      { en: "differentiate", ko: "차별화하다", ex: [
+        ["Our CX capabilities differentiate us from competitors.", "CX 역량이 경쟁사와 차별화되는 점이에요."],
+        ["How do you differentiate yourselves in pitches?", "경쟁 PT에서 어떻게 차별화하세요?"] ] },
+    ],
+    [
+      { en: "account win", ko: "광고주(계정) 수주", ex: [
+        ["We had several new account wins in Europe this year.", "올해 유럽에서 신규 광고주를 여러 곳 수주했어요."],
+        ["That account win was a big boost for our team.", "그 수주가 팀에 큰 힘이 됐어요."] ] },
+      { en: "pitch", ko: "경쟁 PT(제안)", ex: [
+        ["We're currently in a pitch for a global beauty brand.", "지금 글로벌 뷰티 브랜드 경쟁 PT를 하고 있어요."],
+        ["Our win rate in pitches has improved.", "경쟁 PT 수주율이 좋아졌어요."] ] },
+      { en: "client retention", ko: "광고주 유지(재계약)", ex: [
+        ["Client retention remained very high this year.", "올해 광고주 유지율은 매우 높았어요."],
+        ["Client retention matters as much as new wins.", "기존 광고주 유지도 신규 수주만큼 중요해요."] ] },
+    ],
+    [
+      { en: "long-term growth story", ko: "장기 성장 스토리", ex: [
+        ["We want investors to focus on our long-term growth story.", "투자자들이 장기 성장 스토리에 주목해 주셨으면 해요."],
+        ["Global CX is at the heart of our long-term growth story.", "글로벌 CX가 장기 성장 스토리의 핵심이에요."] ] },
+      { en: "We remain committed to", ko: "~에 변함없이 힘쓰겠습니다", ex: [
+        ["We remain committed to enhancing shareholder value.", "주주가치 제고에 변함없이 힘쓰겠습니다."],
+        ["We remain committed to transparent communication with investors.", "투자자와의 투명한 소통을 계속 이어 가겠습니다."] ] },
+      { en: "Thank you for your continued support.", ko: "변함없는 관심에 감사드립니다", ex: [
+        ["That concludes our call. Thank you for your continued support.", "이것으로 마치겠습니다. 변함없는 관심에 감사드립니다."],
+        ["Thank you for your continued support and interest in our company.", "저희 회사에 대한 꾸준한 관심과 지지에 감사드립니다."] ] },
+    ],
+  ] },
+  biz: { name: '회의·이메일', days: [
+    [
+      { en: 'touch base', ko: '잠깐 이야기 나누다', ex: [
+        ["Let's touch base after lunch.", '점심 먹고 잠깐 얘기해요.'],
+        ['I just wanted to touch base on the project.', '프로젝트 건으로 잠깐 연락드렸어요.'] ] },
+      { en: 'a quick heads-up', ko: '미리 알려 드리는 것', ex: [
+        ['Just a quick heads-up, the meeting moved to three.', '미리 말씀드리면, 회의 3시로 바뀌었어요.'],
+        ['Thanks for the heads-up!', '미리 알려 줘서 고마워요!'] ] },
+      { en: 'get back to you', ko: '다시 연락드리다', ex: [
+        ["I'll get back to you by end of day.", '오늘 중으로 다시 연락드릴게요.'],
+        ['Can I get back to you on that?', '그건 확인하고 말씀드려도 될까요?'] ] },
+    ],
+    [
+      { en: 'on the same page', ko: '같은 걸 이해하고 있는', ex: [
+        ["Let's make sure we're on the same page.", '우리 같은 내용으로 이해한 건지 확인해요.'],
+        ['Are we all on the same page about the timeline?', '일정은 다들 같은 걸로 알고 계신 거죠?'] ] },
+      { en: 'bandwidth', ko: '(업무) 여유', ex: [
+        ["I don't have the bandwidth this week.", '이번 주는 여유가 없어요.'],
+        ['Do you have the bandwidth to help with this?', '이거 도와줄 여유 있어요?'] ] },
+      { en: 'follow up on', ko: '~을 다시 확인하다', ex: [
+        ["I'm following up on my email from Monday.", '월요일에 보낸 메일 건으로 다시 연락드려요.'],
+        ['Could you follow up on the contract?', '계약 건 진행 좀 확인해 줄래요?'] ] },
+    ],
+    [
+      { en: 'loop in', ko: '(대화에) 참여시키다', ex: [
+        ['Let me loop in my manager.', '제 팀장님도 같이 넣을게요.'],
+        ["I've looped in Sarah from legal.", '법무팀 사라도 참조로 넣었어요.'] ] },
+      { en: 'at your earliest convenience', ko: '편하실 때 가급적 빨리', ex: [
+        ['Please reply at your earliest convenience.', '편하실 때 가급적 빨리 회신 부탁드려요.'],
+        ['Could you review this at your earliest convenience?', '시간 되실 때 빨리 검토해 주실 수 있을까요?'] ] },
+      { en: 'wrap up', ko: '마무리하다', ex: [
+        ["Let's wrap up the meeting here.", '회의는 여기서 마무리할게요.'],
+        ["I'm wrapping up the report now.", '보고서 지금 마무리 중이에요.'] ] },
+    ],
+    [
+      { en: 'take it offline', ko: '따로 얘기하다', ex: [
+        ["Let's take this offline after the meeting.", '이건 회의 끝나고 따로 얘기해요.'],
+        ['Can we take that offline?', '그건 따로 얘기해도 될까요?'] ] },
+      { en: 'a quick question', ko: '짧은 질문 하나', ex: [
+        ['I have a quick question about the schedule.', '일정 관련해서 짧게 하나만 여쭤볼게요.'],
+        ['Sorry, just a quick question before we start.', '죄송한데 시작 전에 하나만 물어볼게요.'] ] },
+      { en: 'sounds good to me', ko: '저는 좋아요', ex: [
+        ['Friday at ten? Sounds good to me.', '금요일 10시요? 좋아요.'],
+        ['That plan sounds good to me.', '그 계획 괜찮네요.'] ] },
+    ],
+    [
+      { en: 'action items', ko: '해야 할 일(후속 과제)', ex: [
+        ["Let's go over the action items.", '해야 할 일 정리해 볼게요.'],
+        ["I'll send out the action items after the call.", '통화 끝나고 할 일 정리해서 보낼게요.'] ] },
+      { en: 'on hold', ko: '보류 중인', ex: [
+        ['The project is on hold for now.', '그 프로젝트는 지금 보류예요.'],
+        ['Can you put the order on hold?', '그 주문 잠깐 보류해 줄래요?'] ] },
+      { en: 'keep you posted', ko: '진행 상황 알려 드리다', ex: [
+        ["I'll keep you posted.", '진행되는 대로 알려 드릴게요.'],
+        ['Please keep us posted on any changes.', '바뀌는 거 있으면 계속 알려 주세요.'] ] },
+    ],
+    [
+      { en: 'Could you clarify ~?', ko: '~ 좀 명확히 해 주실래요?', ex: [
+        ['Could you clarify what you mean by that?', '그게 무슨 뜻인지 조금 더 설명해 주실래요?'],
+        ['Could you clarify the deadline?', '마감일 정확히 언제인지 알려 주실래요?'] ] },
+      { en: 'make it', ko: '(자리에) 참석하다, 시간 맞추다', ex: [
+        ["Sorry, I can't make it to the meeting.", '죄송한데 회의에 못 갈 것 같아요.'],
+        ['Can you make it at two?', '2시 괜찮으세요?'] ] },
+      { en: 'running late', ko: '(일정이) 늦어지다', ex: [
+        ["I'm running a few minutes late.", '저 몇 분 늦을 것 같아요.'],
+        ['Sorry, my last meeting is running late.', '죄송해요, 앞 회의가 길어지고 있어요.'] ] },
+    ],
+    [
+      { en: 'Please find attached', ko: '첨부 파일 확인 부탁드립니다', ex: [
+        ['Please find attached the updated file.', '수정한 파일 첨부드립니다.'],
+        ['Please find attached the meeting notes.', '회의록 첨부드려요.'] ] },
+      { en: 'point person', ko: '담당자, 창구', ex: [
+        ["Who's the point person for this project?", '이 프로젝트 담당자가 누구예요?'],
+        ['Jenny is the point person on our side.', '저희 쪽 창구는 제니예요.'] ] },
+      { en: 'Let me know if ~', ko: '~하면 알려 주세요', ex: [
+        ['Let me know if you have any questions.', '궁금한 거 있으면 말씀 주세요.'],
+        ['Let me know if anything is unclear.', '헷갈리는 부분 있으면 알려 주세요.'] ] },
+    ],
+  ] },
+};
+
+function dayIndex(d, len, base) {
+  const diff = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - (base || ENG_BASE)) / 864e5);
+  return ((diff % len) + len) % len;
+}
+
+async function loadEng() {
+  const who = current;
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(engCacheKey(who)) || 'null'); } catch (e) { /* 없어도 됨 */ }
+  engData = Object.assign(engDefault(), cached || {});
+  if (view === 'eng') renderEng(); else if (view === 'home') renderHome();
+  try {
+    const server = await call('getEng', pin, who);
+    if (who !== current) return;
+    if (server) {
+      const mergedDone = Object.assign({}, server.done || {}, engData.done);
+      engData = Object.assign(engDefault(), server, { done: mergedDone });
+    }
+    try { localStorage.setItem(engCacheKey(who), JSON.stringify(engData)); } catch (e) { /* 없어도 됨 */ }
+    if (view === 'eng') renderEng(); else if (view === 'home') renderHome();
+  } catch (e) { /* 폰 사본으로 계속 */ }
+}
+
+async function saveEng() {
+  const who = current, data = engData;
+  try { localStorage.setItem(engCacheKey(who), JSON.stringify(data)); } catch (e) { /* 없어도 됨 */ }
+  $('eng-error').textContent = '';
+  try {
+    await call('saveEng', pin, who, data);
+  } catch (e) {
+    $('eng-error').textContent = '기록을 드라이브에 못 남겼어요. 폰에는 저장돼 있어요.';
+  }
+}
+
+// 읽어주기 (폰·PC 브라우저에 있는 영어 음성)
+const TTS = 'speechSynthesis' in window;
+let voice = null, playingBtn = null;
+function pickVoice() {
+  if (!TTS) return;
+  const vs = speechSynthesis.getVoices().filter(v => /^en[-_]US/i.test(v.lang));
+  const pref = ['Samantha', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Ava', 'Allison', 'Alex'];
+  voice = pref.map(p => vs.find(v => v.name.includes(p))).find(Boolean) || vs[0] || null;
+}
+if (TTS) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) { /* 없어도 됨 */ } }
+function setPlaying(btn) {
+  if (playingBtn) playingBtn.classList.remove('playing');
+  playingBtn = btn;
+  if (btn) btn.classList.add('playing');
+}
+function stopSpeak() { if (TTS) { try { speechSynthesis.cancel(); } catch (e) { /* 없어도 됨 */ } } setPlaying(null); }
+function utter(text, btn) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  if (voice) u.voice = voice;
+  u.rate = engData && engData.slow ? 0.72 : 0.95;
+  u.onstart = () => setPlaying(btn);
+  u.onend = () => { if (playingBtn === btn) setPlaying(null); };
+  u.onerror = () => setPlaying(null);
+  return u;
+}
+function speakList(list) {
+  if (!TTS) { $('tts-notice').hidden = false; return; }
+  try { speechSynthesis.cancel(); list.forEach(([t, b]) => speechSynthesis.speak(utter(t, b))); } catch (e) { $('tts-notice').hidden = false; }
+}
+function sayBtn(text, small) {
+  const b = el('button', 'say' + (small ? ' small' : ''), '🔊');
+  b.type = 'button';
+  b.setAttribute('aria-label', '듣기: ' + text);
+  b.addEventListener('click', () => speakList([[text, b]]));
+  return b;
+}
+
+function highlight(sentence, expr) {
+  const core = expr.split('/')[0].replace(/~|\bA\b|\bB\b|\?/g, '').trim().split(/\s+/).filter(Boolean);
+  const p = el('p', 'ex-en');
+  const lower = sentence.toLowerCase();
+  let idx = -1, len = 0;
+  for (let n = core.length; n > 0 && idx < 0; n--) {
+    const piece = core.slice(0, n).join(' ').toLowerCase();
+    const i = lower.indexOf(piece);
+    if (i >= 0 && piece.length > 2) { idx = i; len = piece.length; }
+  }
+  if (idx < 0) { p.textContent = sentence; return p; }
+  p.append(sentence.slice(0, idx), el('b', '', sentence.slice(idx, idx + len)), sentence.slice(idx + len));
+  return p;
+}
+
+function renderEng() {
+  if (!engData) engData = engDefault();
+  const s = engData;
+  if (!FIELDS[s.field]) s.field = 'fin';
+  const now = new Date();
+  const field = FIELDS[s.field];
+  if (!LEVELS[s.level]) s.level = 'basic';
+  const base = field.start ? new Date(field.start[0], field.start[1], field.start[2]) : ENG_BASE;
+  const idx = dayIndex(now, field.days.length, base);
+  const dk = keyOf(now), ck = s.field + '-' + s.level + '-' + dk;
+  loadDay(s.field, s.level, dk);
+  const fromFile = dayCache[ck];
+  const items = fromFile || field.days[idx];
+  $('eng-source').textContent = fromFile ? '' : dayLoading[ck] ? '오늘 표현 불러오는 중이에요.'
+    : s.level === 'adv' ? '오늘 심화 표현이 아직 준비 안 돼서 기본 표현을 보여 드려요. 내일부터는 매일 새로 나와요.' : '';
+  const W = ['일', '월', '화', '수', '목', '금', '토'];
+  $('eng-date').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + W[now.getDay()] + '요일 · ' + field.name + ' · ' + LEVELS[s.level];
+  $('tts-notice').hidden = TTS;
+
+  $('fields').replaceChildren(...Object.entries(FIELDS).map(([k, f]) => {
+    const b = el('button', 'fchip', f.name);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(k === s.field));
+    b.addEventListener('click', () => { s.field = k; stopSpeak(); renderEng(); saveEng(); });
+    return b;
+  }));
+  $('slow').setAttribute('aria-pressed', String(!!s.slow));
+  $('levels').replaceChildren(...Object.entries(LEVELS).map(([k, name]) => {
+    const b = el('button', 'fchip', name);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(k === s.level));
+    b.addEventListener('click', () => { s.level = k; stopSpeak(); renderEng(); saveEng(); });
+    return b;
+  }));
+  $('hide-en').setAttribute('aria-pressed', String(!!s.hideEn));
+  $('exprs').classList.toggle('hide-en', !!s.hideEn);
+
+  const queue = [];
+  $('exprs').replaceChildren(...items.map((it, i) => {
+    const card = el('article', 'card expr');
+    const top = el('div', 'expr-top');
+    const main = el('div', 'expr-main');
+    main.append(el('p', 'expr-en', it.en), el('p', 'expr-ko', it.ko));
+    const spoken = it.en.replace(/~/g, '').trim();
+    const sb = sayBtn(spoken, false);
+    top.append(el('span', 'num', i + 1), main, sb);
+    queue.push([spoken, sb]);
+    const ul = el('ul', 'examples');
+    it.ex.forEach(([en, ko]) => {
+      const li = el('li', 'ex');
+      const t = el('div', 'ex-text');
+      t.append(highlight(en, it.en), el('p', 'ex-ko', ko));
+      const b = sayBtn(en, true);
+      queue.push([en, b]);
+      li.append(t, b);
+      ul.append(li);
+    });
+    card.append(top, ul);
+    return card;
+  }));
+  $('play-all').onclick = () => speakList(queue);
+
+  const done = !!s.done[keyOf(now)];
+  const db = $('done-btn');
+  db.textContent = done ? '✓ 오늘 공부 완료! 도장 쾅' : '오늘 공부했어요 ✍️';
+  db.classList.toggle('is-done', done);
+  $('undo').hidden = !done;
+  renderBoard(s, now);
+}
+
+function renderBoard(s, now) {
+  const y = now.getFullYear(), m = now.getMonth();
+  const days = new Date(y, m + 1, 0).getDate();
+  const first = new Date(y, m, 1).getDay();
+  let count = 0;
+  for (let d = 1; d <= days; d++) if (s.done[keyOf(new Date(y, m, d))]) count++;
+  let streak = 0;
+  const c = new Date(y, m, now.getDate());
+  if (!s.done[keyOf(c)]) c.setDate(c.getDate() - 1);
+  while (s.done[keyOf(c)]) { streak++; c.setDate(c.getDate() - 1); }
+
+  $('board-title').textContent = (m + 1) + '월 도장판';
+  $('board-meta').replaceChildren(el('b', '', count + '일'), ' / ' + days + '일' + (streak > 1 ? ' · 🔥 ' + streak + '일 연속' : ''));
+  const cells = ['일', '월', '화', '수', '목', '금', '토'].map(w => el('div', 'dow', w));
+  for (let i = 0; i < first; i++) cells.push(el('div'));
+  for (let d = 1; d <= days; d++) {
+    const isDone = !!s.done[keyOf(new Date(y, m, d))];
+    const cls = ['day'];
+    if (isDone) cls.push('done');
+    if (d === now.getDate()) cls.push('today');
+    if (d > now.getDate()) cls.push('future');
+    const cell = el('div', cls.join(' '), isDone ? '' : d);
+    if (isDone) {
+      const st = el('span', 'stamp');
+      st.append(String(d), el('br'), '참잘');
+      cell.append(st);
+      cell.setAttribute('aria-label', d + '일 완료');
+    }
+    cells.push(cell);
+  }
+  $('cal').replaceChildren(...cells);
+  $('complete').replaceChildren(...(count === days ? [el('div', 'complete', '🏅 ' + (m + 1) + '월 완주! 참 잘했어요')] : []));
+}
+
+$('done-btn').addEventListener('click', () => {
+  const k = keyOf(new Date());
+  if (engData.done[k]) return;
+  engData.done[k] = true;
+  renderEng();
+  saveEng();
+});
+$('undo').addEventListener('click', () => { delete engData.done[keyOf(new Date())]; renderEng(); saveEng(); });
+$('slow').addEventListener('click', () => { engData.slow = !engData.slow; renderEng(); saveEng(); });
+$('hide-en').addEventListener('click', () => { engData.hideEn = !engData.hideEn; renderEng(); saveEng(); });
+// 영어 가리기 중에는 문장을 누르면 그 문장만 잠깐 보인다
+$('exprs').addEventListener('click', e => {
+  const t = e.target.closest('.expr-en, .ex-en');
+  if (t && $('exprs').classList.contains('hide-en')) t.classList.toggle('peek');
+});
+
+['post', 'chat', 'guide'].forEach(n => $('tab-' + n).addEventListener('click', () => showTab(n)));
+$('chat-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = $('chat-text').value.trim();
+  if (!text) { $('chat-text').focus(); return; }
+  $('chat-send').disabled = true;
+  $('chat-error').textContent = '';
+  try {
+    await call('sendChat', pin, current, text);
+    $('chat-text').value = '';
+    await loadChat();
+  } catch (err) {
+    $('chat-error').textContent = '못 보냈어요. 다시 눌러 주세요.';
+  } finally {
+    $('chat-send').disabled = false;
+  }
+});
+$('guide').addEventListener('input', () => { guideDirty = true; $('guide-saved').textContent = ''; });
+$('guide-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('guide-save').disabled = true;
+  $('guide-error').textContent = '';
+  try {
+    await call('saveGuide', pin, current, $('guide').value);
+    guideDirty = false;
+    $('guide-saved').textContent = '저장했어요. 다음 글부터 반영돼요.';
+  } catch (err) {
+    $('guide-error').textContent = '저장하지 못했어요. 다시 눌러 주세요.';
+  } finally {
+    $('guide-save').disabled = false;
+  }
+});
+$('me').addEventListener('click', () => { if (!busy) { stopSpeak(); enter(null); } });
+$('home').addEventListener('click', () => { if (!busy) go('home'); });
+$('back').addEventListener('click', () => { if (!busy) go('home'); });
+$('photos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+const drop = $('drop');
+['dragover', 'dragenter'].forEach(n => drop.addEventListener(n, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(n => drop.addEventListener(n, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+$('place').addEventListener('input', () => { $('error').textContent = ''; });
+$('form').addEventListener('submit', submit);
+$('pin-form').addEventListener('submit', e => {
+  e.preventDefault();
+  pin = $('pin').value.trim();
+  try { localStorage.setItem('zz-pin', pin); } catch (err) { /* 저장 못 해도 동작 */ }
+  $('pin-error').textContent = '';
+  refresh();
+});
+
+renderAccounts();
+refresh();
+setInterval(() => { if (!busy) refresh(); }, 60000);
+// 채팅 화면에서 답을 기다릴 때만 자주 확인한다
+setInterval(() => { if (current && view === 'blog' && tab === 'chat' && chatWaiting) loadChat(); }, 8000);
+setInterval(() => { if (current && view === 'blog' && tab === 'chat' && !chatWaiting) loadChat(); }, 60000);
+
 </script>
 </body>
 </html>
