@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>짱짱이네</title>
+<meta name="theme-color" content="#f0f0f3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="짱짱이네">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  /* 짱짱이네 앱 껍데기: 구글 Apps Script 웹앱을 화면 가득 띄운다 (구글 안내 띠가 안 보이게) */
+  html, body { margin: 0; height: 100%; background: #f0f0f3; overflow: hidden; }
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing: border-box; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; }
+  .splash { position: fixed; inset: 0; display: grid; place-items: center; background: #f0f0f3; transition: opacity .3s; font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #5b5fc7; }
+  .splash img { width: 96px; height: 96px; display: block; margin: 0 auto 10px; }
+  .splash p { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
+  .splash.hide { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<iframe id="app" title="짱짱이네" allow="autoplay; clipboard-write"
+  src="https://script.google.com/macros/s/AKfycbwq4vdiYAzv1yI2LbwTTCjMXVoLCYMFGjeoBPOzHmmF8nIWEJk3QASSmybGHTA1Till/exec"></iframe>
+<div class="splash" id="splash"><div><img src="icons/logo.svg" alt=""><p>짱짱이네</p></div></div>
+<script>
+  const splash = document.getElementById('splash');
+  const hide = () => splash.classList.add('hide');
+  document.getElementById('app').addEventListener('load', () => setTimeout(hide, 600));
+  setTimeout(hide, 8000);
+</script>
+</body>
+</html>
