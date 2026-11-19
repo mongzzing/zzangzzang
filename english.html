@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="theme-color" content="#ffffff">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--p:#18b98a;--pd:#0e9a71;--pl:#e2f7ef;--ink:#1d2433;--sub:#6b7385;--line:#e7eaf0;--bg:#eef1f6;--red:#ff5a5f;--redd:#d9393e;--redl:#ffeceb;--yel:#ffb800;--blue:#4b7bff;--purple:#8b5cf6}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -169,6 +169,21 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .chip.minus::before{content:'−';background:var(--red)}
 .blk.plus{border-color:var(--p);box-shadow:0 3px 0 var(--p)}
 .blk.plus::before{content:'+';background:var(--p)}
+
+/* ===== 귀여움 추가 ===== */
+.wave{position:relative;display:inline-block;flex:none}
+.wave .paw{position:absolute;right:-7px;top:-4px;width:16px;height:20px;border-radius:50%;border:2px solid rgba(0,0,0,.12);transform-origin:50% 100%;animation:wv 1.6s ease-in-out infinite}
+@keyframes wv{0%,60%,100%{transform:rotate(0)}10%,30%,50%{transform:rotate(-25deg)}20%,40%{transform:rotate(18deg)}}
+.wave .wf{animation:bob 2.4s ease-in-out infinite;display:block}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.jump{display:inline-block;vertical-align:middle;margin-right:6px;animation:jmp .7s cubic-bezier(.3,1.6,.5,1) 2}
+@keyframes jmp{0%{transform:translateY(0) scale(1,1)}25%{transform:translateY(2px) scale(1.12,.88)}55%{transform:translateY(-14px) scale(.95,1.06)}100%{transform:translateY(0) scale(1)}}
+.pawst{display:block;width:78%;height:78%;margin:auto;transform:rotate(-12deg)}
+@media (prefers-reduced-motion:reduce){.wave .paw,.wave .wf,.jump{animation:none}}
+
+.top h1,.greet,.tile .nm,.today h3,.btn,.sheet h4,.hero h2,.pbtn,.big+h2,.lvup,.trophy{font-family:'Jua','Noto Sans KR',sans-serif;font-weight:400 !important;letter-spacing:0}
+.greet{font-size:21px}.tile .nm{font-size:19px}.today h3{font-size:18px}.btn{font-size:16px}.sheet h4{font-size:18px;display:flex;align-items:center}
+.tile .em{display:block;line-height:0}
 </style>
 </head>
 <body>
@@ -180,6 +195,10 @@ tiger:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx=
 rabbit:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="35" cy="24" rx="9" ry="21" fill="#fff" stroke="#f1dce3" stroke-width="2"/><ellipse cx="35" cy="26" rx="4.5" ry="14" fill="#ffc2d1"/><ellipse cx="65" cy="24" rx="9" ry="21" fill="#fff" stroke="#f1dce3" stroke-width="2"/><ellipse cx="65" cy="26" rx="4.5" ry="14" fill="#ffc2d1"/><ellipse cx="50" cy="62" rx="35" ry="31" fill="#fff" stroke="#f1dce3" stroke-width="2"/><ellipse cx="30" cy="70" rx="6.5" ry="4" fill="#ffc2d1"/><ellipse cx="70" cy="70" rx="6.5" ry="4" fill="#ffc2d1"/><circle cx="37" cy="59" r="4.8" fill="#2b1d14"/><circle cx="38.5" cy="57.5" r="1.6" fill="#fff"/><circle cx="63" cy="59" r="4.8" fill="#2b1d14"/><circle cx="64.5" cy="57.5" r="1.6" fill="#fff"/><ellipse cx="50" cy="66" rx="4" ry="3" fill="#ff8fab"/><path d="M50 69 q-3 5 -7 3 M50 69 q3 5 7 3" stroke="#2b1d14" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
 sloth:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="41" ry="38" fill="#c2a183"/><path d="M50 26 C28 26 14 40 15 57 C16 76 32 88 50 88 C68 88 84 76 85 57 C86 40 72 26 50 26Z" fill="#fff4e6"/><path d="M45 50 C41 45 29 46 25 53 C22 59 26 65 32 63 C38 61 44 57 45 50Z" fill="#8c674b"/><path d="M55 50 C59 45 71 46 75 53 C78 59 74 65 68 63 C62 61 56 57 55 50Z" fill="#8c674b"/><ellipse cx="25" cy="70" rx="6" ry="3.8" fill="#ffa3b1" opacity=".85"/><ellipse cx="75" cy="70" rx="6" ry="3.8" fill="#ffa3b1" opacity=".85"/><ellipse cx="50" cy="62" rx="4.5" ry="3.2" fill="#4a3324"/><circle cx="36" cy="54" r="4.6" fill="#1f1611"/><circle cx="37.6" cy="52.4" r="1.6" fill="#fff"/><circle cx="64" cy="54" r="4.6" fill="#1f1611"/><circle cx="65.6" cy="52.4" r="1.6" fill="#fff"/><path d="M42 68 q8 8 16 0" stroke="#4a3324" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M49 19 C46 10 52 4 60 4 C60 11 57 17 49 19Z" fill="#7cc26a"/><path d="M50 18 Q54 11 58 7" stroke="#5ea24e" stroke-width="1.3" fill="none"/></svg>`,
 bear:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="29" r="12" fill="#b07a4f"/><circle cx="25" cy="29" r="6" fill="#e8b98f"/><circle cx="75" cy="29" r="12" fill="#b07a4f"/><circle cx="75" cy="29" r="6" fill="#e8b98f"/><ellipse cx="50" cy="59" rx="37" ry="34" fill="#c48a5a"/><path d="M47 27 q0 -11 9 -10 q-6 3 -4 10z" fill="#c48a5a"/><ellipse cx="50" cy="70" rx="16" ry="12" fill="#f3d9b8"/><ellipse cx="29" cy="68" rx="6" ry="3.5" fill="#f4a29a" opacity=".85"/><ellipse cx="71" cy="68" rx="6" ry="3.5" fill="#f4a29a" opacity=".85"/><circle cx="37" cy="56" r="5.5" fill="#2b1d14"/><circle cx="38.8" cy="54.2" r="2" fill="#fff"/><circle cx="63" cy="56" r="5.5" fill="#2b1d14"/><circle cx="64.8" cy="54.2" r="2" fill="#fff"/><ellipse cx="50" cy="65" rx="5" ry="3.6" fill="#3b2416"/><path d="M50 68 q-3 5 -6 2.5 M50 68 q3 5 6 2.5" stroke="#3b2416" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`};
+const ICON={"blog": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"8\" y=\"7\" width=\"26\" height=\"34\" rx=\"6\" fill=\"#fff\"/><path d=\"M14 16h14M14 22h14M14 28h8\" stroke=\"#ff8a6a\" stroke-width=\"3\" stroke-linecap=\"round\"/><g transform=\"rotate(32 37 27)\"><rect x=\"33\" y=\"12\" width=\"8\" height=\"22\" rx=\"2\" fill=\"#ffd25a\"/><path d=\"M33 34l4 7 4-7z\" fill=\"#ffe9b0\"/><rect x=\"33\" y=\"9\" width=\"8\" height=\"5\" rx=\"2\" fill=\"#ff9fb0\"/></g></svg>", "eng": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M7 13a7 7 0 0 1 7-7h20a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7H22l-8 7v-7a7 7 0 0 1-7-7z\" fill=\"#fff\"/><text x=\"24\" y=\"25\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"14\" fill=\"#14a884\">Hi!</text></svg>", "vocab": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"22\" y=\"7\" width=\"20\" height=\"20\" rx=\"6\" fill=\"#fff\" opacity=\".8\"/><text x=\"32\" y=\"23\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"15\" fill=\"#ff8a6a\">b</text><rect x=\"6\" y=\"19\" width=\"22\" height=\"22\" rx=\"6\" fill=\"#fff\"/><text x=\"17\" y=\"36\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"17\" fill=\"#14a884\">A</text></svg>", "gram": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M10 14h8a5 5 0 1 1 10 0h8v8a5 5 0 1 1 0 10v8h-8a5 5 0 1 0-10 0h-8z\" fill=\"#fff\"/><circle cx=\"23\" cy=\"27\" r=\"4\" fill=\"#6a7bff\"/></svg>", "listen": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M10 29v-5a14 14 0 0 1 28 0v5\" stroke=\"#fff\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"6\" y=\"26\" width=\"10\" height=\"15\" rx=\"5\" fill=\"#fff\"/><rect x=\"32\" y=\"26\" width=\"10\" height=\"15\" rx=\"5\" fill=\"#fff\"/><circle cx=\"11\" cy=\"33.5\" r=\"2.5\" fill=\"#ff7a6a\"/><circle cx=\"37\" cy=\"33.5\" r=\"2.5\" fill=\"#ff7a6a\"/></svg>", "talk": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M5 11a6 6 0 0 1 6-6h15a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6h-8l-7 5v-5a6 6 0 0 1-6-6z\" fill=\"#fff\" opacity=\".8\"/><path d=\"M43 22a6 6 0 0 0-6-6H23a6 6 0 0 0-6 6v9a6 6 0 0 0 6 6h7l7 5v-5a6 6 0 0 0 6-6z\" fill=\"#fff\"/><circle cx=\"24\" cy=\"26.5\" r=\"2\" fill=\"#a34ce0\"/><circle cx=\"30\" cy=\"26.5\" r=\"2\" fill=\"#a34ce0\"/><circle cx=\"36\" cy=\"26.5\" r=\"2\" fill=\"#a34ce0\"/></svg>"};
+const PAW='<svg viewBox="0 0 40 40" width="100%" height="100%"><ellipse cx="20" cy="26" rx="9.5" ry="8" fill="#c48a5a"/><ellipse cx="9.5" cy="16" rx="3.8" ry="4.6" fill="#c48a5a"/><ellipse cx="16.3" cy="9.5" rx="3.8" ry="4.6" fill="#c48a5a"/><ellipse cx="23.7" cy="9.5" rx="3.8" ry="4.6" fill="#c48a5a"/><ellipse cx="30.5" cy="16" rx="3.8" ry="4.6" fill="#c48a5a"/><ellipse cx="20" cy="27.5" rx="5.2" ry="3.6" fill="#e8b98f"/></svg>';
+const PAWC={"tiger": "#f7a440", "sloth": "#c39d7b", "rabbit": "#ffffff", "bear": "#c48a5a"};
+const wave=(k,s)=>`<span class="wave"><span class="wf">${face(k,s)}</span><span class="paw" style="background:${PAWC[k]}"></span></span>`;
 const face=(k,s)=>FACE[k].replace('<svg ',`<svg width="${s}" height="${s}" style="display:block" `);
 const PEOPLE=[{id:'suwoon',name:'수운',ch:'tiger',c:'#ffe7c2'},{id:'yewon',name:'예원',ch:'sloth',c:'#e3f1dc'},{id:'surim',name:'수림',ch:'rabbit',c:'#ffe0ec'}];
 const dispName=p=>p.name+'님';
@@ -473,16 +492,16 @@ function vHome(){
  const p=me();
  app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1 style="display:flex;align-items:center;gap:6px">${face('bear',28)}짱짱이네 영어</h1><button class="av" style="background:${p.c}" onclick="vProfile()">${face(p.ch,30)}</button><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
  <div class="body">
-  <div class="greet">${dispName(p)}, 오늘도<br>영어 한 걸음 가볼까요? 👋</div>
+  <div class="row" style="gap:14px">${wave(p.ch,56)}<div class="greet">${dispName(p)}, 오늘도<br>영어 한 걸음 가볼까요?</div></div>
   <div class="streakbar">
    <div class="sbox"><span class="muted">연속 학습</span><b>🔥 ${streak()}일</b></div>
    <div class="sbox"><span class="muted">외운 단어</span><b>📚 ${masterCnt()}개</b></div>
   </div>
   <div class="tiles">
-   <button class="tile" style="background:linear-gradient(140deg,#18b98a,#0fa3a0)" onclick="vVocab()"><span class="em">🔤</span><div><div class="nm">어휘</div><div class="ds">${D.days[today()]?'오늘 완료 ✅':'오늘의 단어 '+goal()+'개'}</div></div></button>
-   <button class="tile" style="background:linear-gradient(140deg,#4b7bff,#6a5cff)" onclick="vGram()"><span class="em">🧩</span><div><div class="nm">문법</div><div class="ds">대화 문장 만들기</div></div></button>
-   <button class="tile off" style="background:linear-gradient(140deg,#ff8a3d,#ff5f6d)" onclick="soon()"><span class="badge">준비 중</span><span class="em">🎧</span><div><div class="nm">리스닝</div><div class="ds">듣고 이해하기</div></div></button>
-   <button class="tile off" style="background:linear-gradient(140deg,#8b5cf6,#c04cf0)" onclick="soon()"><span class="badge">준비 중</span><span class="em">💬</span><div><div class="nm">회화</div><div class="ds">말하며 대화하기</div></div></button>
+   <button class="tile" style="background:linear-gradient(140deg,#18b98a,#0fa3a0)" onclick="vVocab()"><span class="em">${ICON.vocab}</span><div><div class="nm">어휘</div><div class="ds">${D.days[today()]?'오늘 완료 ✅':'오늘의 단어 '+goal()+'개'}</div></div></button>
+   <button class="tile" style="background:linear-gradient(140deg,#4b7bff,#6a5cff)" onclick="vGram()"><span class="em">${ICON.gram}</span><div><div class="nm">문법</div><div class="ds">대화 문장 만들기</div></div></button>
+   <button class="tile off" style="background:linear-gradient(140deg,#ff8a3d,#ff5f6d)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.listen}</span><div><div class="nm">리스닝</div><div class="ds">듣고 이해하기</div></div></button>
+   <button class="tile off" style="background:linear-gradient(140deg,#8b5cf6,#c04cf0)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.talk}</span><div><div class="nm">회화</div><div class="ds">말하며 대화하기</div></div></button>
   </div>
   <p class="note" id="toast"></p>
  </div>`;
@@ -530,7 +549,7 @@ function setGoal(g){D.goal=g;save();vVocab()}
 function calendar(){
  const n=new Date(),y=n.getFullYear(),m=n.getMonth(),first=new Date(y,m,1).getDay(),last=new Date(y,m+1,0).getDate(),t=today();
  let cnt=0,h='';for(let i=0;i<first;i++)h+='<div class="d e"></div>';
- for(let d=1;d<=last;d++){const k=fmt(new Date(y,m,d));const st=D.days[k];if(st)cnt++;h+=`<div class="d ${st?'st':''} ${k===t?'td':''}">${st?'🐾':d}</div>`}
+ for(let d=1;d<=last;d++){const k=fmt(new Date(y,m,d));const st=D.days[k];if(st)cnt++;h+=`<div class="d ${st?'st':''} ${k===t?'td':''}">${st?`<span class="pawst">${PAW}</span>`:d}</div>`}
  return `<div class="row"><b style="flex:1">${m+1}월 출석 도장</b><span class="muted">${cnt}일 출석</span></div>
  <div class="cal">${'일월화수목금토'.split('').map(x=>`<div class="h">${x}</div>`).join('')}${h}</div>`;
 }
@@ -629,7 +648,7 @@ function done(ok,shown){
  if(ok)S.doneN++;else S.queue.push(c.id);
  speak(c.w.ex);
  const msg=ok?(c.wrongTry?'맞았어요! 👍':['정답이에요! 🎉','완벽해요! ✨','좋아요! 👏'][Math.random()*3|0]):(shown?'정답을 확인하세요':'아쉬워요! 다시 나올 거예요');
- $('#sh').innerHTML=`<div class="sheet ${ok?'g':'r'}"><h4>${msg}</h4>
+ $('#sh').innerHTML=`<div class="sheet ${ok?'g':'r'}"><h4>${ok?`<span class="jump">${face(me().ch,34)}</span>`:''}${msg}</h4>
  <p><b style="font-size:17px">${c.w.w}</b> <span class="muted">${c.w.pos}</span> · ${c.w.m}<br><span class="muted">🔊 ${c.w.ex}</span></p>
  <div class="row"><button class="btn ghost" style="width:auto;padding:14px 16px" onclick="speak(S.c.w.ex)">🔊</button><button class="btn ${ok?'':'red'}" onclick="S.qi++;vCard()">계속</button></div></div>`;
 }
@@ -665,7 +684,7 @@ function finish(){
  if(D.level<3&&((D.hist.length>=3&&D.hist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.level++;D.hist=[];up=true}
  save();
  app.innerHTML=`<div class="body">
- <div style="text-align:center;padding-top:20px"><div class="big stampPop">${wasDone?'💪':'🐾'}</div>
+ <div style="text-align:center;padding-top:20px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
  <h2 style="font-size:24px;font-weight:900;margin-top:6px">${wasDone?'한 세트 더 완료!':'오늘 출석 도장 쾅!'}</h2>
  ${up?`<div class="lvup">⬆️ 레벨업! 이제 <b>${LV_NAME[D.level]}</b> 단어가 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 단어 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
  <div class="card rlist">${ids.map(id=>{const w=W[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><b>${w.w}</b><span class="muted">${w.m}</span><button class="iconbtn" style="font-size:18px" onclick="speak(W['${id}'].ex)">🔊</button></div>`}).join('')}</div>
@@ -868,7 +887,7 @@ function gDone(ok){
  if(!(g.id in S.first))S.first[g.id]=!c.wrongTry&&!c.hints;
  S.doneN++;speak(g.be);
  const clean=!c.wrongTry&&!c.hints;
- $('#sh').innerHTML=`<div class="sheet g"><h4>${clean?['정답이에요! 🎉','완벽해요! ✨','좋아요! 👏'][Math.random()*3|0]:'맞았어요! 내일 한 번 더 복습해요 👍'}</h4>
+ $('#sh').innerHTML=`<div class="sheet g"><h4><span class="jump">${face(me().ch,34)}</span>${clean?['정답이에요! 🎉','완벽해요! ✨','좋아요! 👏'][Math.random()*3|0]:'맞았어요! 내일 한 번 더 복습해요 👍'}</h4>
  <p><b>B: ${g.be}</b><br><span class="tag" style="margin:6px 0 4px">📌 ${g.pt}</span><br><span class="muted">${g.tip}</span></p>
  <div class="row"><button class="btn ghost" style="width:auto;padding:13px 16px" onclick="speak(S.c.g.be)">🔊</button><button class="btn" onclick="S.qi++;vGCard()">계속</button></div></div>`;
 }
@@ -904,7 +923,7 @@ function gFinish(){
  if(D.glevel<3&&((D.ghist.length>=3&&D.ghist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.glevel++;D.ghist=[];up=true}
  save();
  app.innerHTML=`<div class="body">
- <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':'🐾'}</div>
+ <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
  <h2 style="font-size:20px;font-weight:900;margin-top:6px">${wasDone?'문법 완료!':'오늘 출석 도장 쾅!'}</h2>
  ${up?`<div class="lvup">⬆️ 레벨업! 이제 <b>${LV_NAME[D.glevel]}</b> 문법이 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 문제 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
  <div class="card rlist">${ids.map(id=>{const g=G[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><div style="flex:1"><b style="font-size:14px">${g.be}</b><div class="muted">📌 ${g.pt}</div></div><button class="iconbtn" style="font-size:18px" onclick="speak(G['${id}'].be)">🔊</button></div>`}).join('')}</div>

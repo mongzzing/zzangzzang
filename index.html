@@ -278,6 +278,26 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 .tiles > .tile:nth-child(3):not(.soon) { background: linear-gradient(140deg, #4b7bff, #6a5cff); }
 .tile.soon { color: var(--soft); background: transparent; border: 2px dashed var(--line); }
 .rail-btn[aria-pressed="true"] { color: var(--brand-dark); }
+
+/* ===== 귀여움 추가 ===== */
+.wave{position:relative;display:inline-block;flex:none}
+.wave .paw{position:absolute;right:-7px;top:-4px;width:16px;height:20px;border-radius:50%;border:2px solid rgba(0,0,0,.12);transform-origin:50% 100%;animation:wv 1.6s ease-in-out infinite}
+@keyframes wv{0%,60%,100%{transform:rotate(0)}10%,30%,50%{transform:rotate(-25deg)}20%,40%{transform:rotate(18deg)}}
+.wave .wf{animation:bob 2.4s ease-in-out infinite;display:block}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.jump{display:inline-block;vertical-align:middle;margin-right:6px;animation:jmp .7s cubic-bezier(.3,1.6,.5,1) 2}
+@keyframes jmp{0%{transform:translateY(0) scale(1,1)}25%{transform:translateY(2px) scale(1.12,.88)}55%{transform:translateY(-14px) scale(.95,1.06)}100%{transform:translateY(0) scale(1)}}
+.pawst{display:block;width:78%;height:78%;margin:auto;transform:rotate(-12deg)}
+@media (prefers-reduced-motion:reduce){.wave .paw,.wave .wf,.jump{animation:none}}
+
+.logo, .hello, .tile .t-name, .section-title, .btn, .tab, .account, .back { font-family: "Jua", var(--font); font-weight: 400 !important; }
+.logo { font-size: 22px; }
+.hello { display: flex; align-items: center; gap: 14px; font-size: 21px; }
+.hello small { font-family: var(--font); }
+.tile .t-name { font-size: 19px; }
+.tile .t-ico { line-height: 0; }
+.tile .t-ico svg { width: 44px; height: 44px; stroke: none; }
+.btn { font-size: 16px; }
 </style>
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -429,6 +449,8 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 <script>
 const STEPS = ['맡김', '글 쓰는 중', '임시저장 끝'];
 const PEOPLE = { '수운': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZTdjMiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxjaXJjbGUgY3g9IjI3IiBjeT0iMjciIHI9IjEzIiBmaWxsPSIjZjM5NTMyIi8+PGNpcmNsZSBjeD0iMjciIGN5PSIyNyIgcj0iNyIgZmlsbD0iI2ZmZTJjNCIvPjxjaXJjbGUgY3g9IjczIiBjeT0iMjciIHI9IjEzIiBmaWxsPSIjZjM5NTMyIi8+PGNpcmNsZSBjeD0iNzMiIGN5PSIyNyIgcj0iNyIgZmlsbD0iI2ZmZTJjNCIvPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjU3IiByeD0iMzkiIHJ5PSIzNSIgZmlsbD0iI2Y3YTQ0MCIvPjxnIGZpbGw9IiM0YTJjMWEiPjxwYXRoIGQ9Ik01MCAyMiBsLTQuNSAxMiBoOXoiLz48cGF0aCBkPSJNMzcgMjYgbC0xIDEwIGw3IC0zeiIvPjxwYXRoIGQ9Ik02MyAyNiBsMSAxMCBsLTcgLTN6Ii8+PHBhdGggZD0iTTExIDUyIGwxMyAyLjUgbC0xMyAzLjV6Ii8+PHBhdGggZD0iTTEyIDYzIGwxMiAtMSBsLTExIDV6Ii8+PHBhdGggZD0iTTg5IDUyIGwtMTMgMi41IGwxMyAzLjV6Ii8+PHBhdGggZD0iTTg4IDYzIGwtMTIgLTEgbDExIDV6Ii8+PC9nPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMTkiIHJ5PSIxNCIgZmlsbD0iI2ZmZjRlNiIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iNTMiIHI9IjUiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSIzNy42IiBjeT0iNTEuNCIgcj0iMS43IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNjQiIGN5PSI1MyIgcj0iNSIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjY1LjYiIGN5PSI1MS40IiByPSIxLjciIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDQgNjIgaDEyIGwtNiA2eiIgZmlsbD0iI2UwNjQ0YSIgc3Ryb2tlPSIjZTA2NDRhIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNTAgNjggcS00IDcgLTkgMyBNNTAgNjggcTQgNyA5IDMiIHN0cm9rZT0iIzJiMWQxNCIgc3Ryb2tlLXdpZHRoPSIyLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4=', '예원': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2UzZjFkYyIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjU1IiByeD0iNDEiIHJ5PSIzOCIgZmlsbD0iI2MyYTE4MyIvPjxwYXRoIGQ9Ik01MCAyNiBDMjggMjYgMTQgNDAgMTUgNTcgQzE2IDc2IDMyIDg4IDUwIDg4IEM2OCA4OCA4NCA3NiA4NSA1NyBDODYgNDAgNzIgMjYgNTAgMjZaIiBmaWxsPSIjZmZmNGU2Ii8+PHBhdGggZD0iTTQ1IDUwIEM0MSA0NSAyOSA0NiAyNSA1MyBDMjIgNTkgMjYgNjUgMzIgNjMgQzM4IDYxIDQ0IDU3IDQ1IDUwWiIgZmlsbD0iIzhjNjc0YiIvPjxwYXRoIGQ9Ik01NSA1MCBDNTkgNDUgNzEgNDYgNzUgNTMgQzc4IDU5IDc0IDY1IDY4IDYzIEM2MiA2MSA1NiA1NyA1NSA1MFoiIGZpbGw9IiM4YzY3NGIiLz48ZWxsaXBzZSBjeD0iMjUiIGN5PSI3MCIgcng9IjYiIHJ5PSIzLjgiIGZpbGw9IiNmZmEzYjEiIG9wYWNpdHk9Ii44NSIvPjxlbGxpcHNlIGN4PSI3NSIgY3k9IjcwIiByeD0iNiIgcnk9IjMuOCIgZmlsbD0iI2ZmYTNiMSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjIiIHJ4PSI0LjUiIHJ5PSIzLjIiIGZpbGw9IiM0YTMzMjQiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjU0IiByPSI0LjYiIGZpbGw9IiMxZjE2MTEiLz48Y2lyY2xlIGN4PSIzNy42IiBjeT0iNTIuNCIgcj0iMS42IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNjQiIGN5PSI1NCIgcj0iNC42IiBmaWxsPSIjMWYxNjExIi8+PGNpcmNsZSBjeD0iNjUuNiIgY3k9IjUyLjQiIHI9IjEuNiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik00MiA2OCBxOCA4IDE2IDAiIHN0cm9rZT0iIzRhMzMyNCIgc3Ryb2tlLXdpZHRoPSIyLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00OSAxOSBDNDYgMTAgNTIgNCA2MCA0IEM2MCAxMSA1NyAxNyA0OSAxOVoiIGZpbGw9IiM3Y2MyNmEiLz48cGF0aCBkPSJNNTAgMTggUTU0IDExIDU4IDciIHN0cm9rZT0iIzVlYTI0ZSIgc3Ryb2tlLXdpZHRoPSIxLjMiIGZpbGw9Im5vbmUiLz48L2c+PC9zdmc+', '수림': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZTBlYyIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxlbGxpcHNlIGN4PSIzNSIgY3k9IjI0IiByeD0iOSIgcnk9IjIxIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNmMWRjZTMiIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN4PSIzNSIgY3k9IjI2IiByeD0iNC41IiByeT0iMTQiIGZpbGw9IiNmZmMyZDEiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIyNCIgcng9IjkiIHJ5PSIyMSIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZjFkY2UzIiBzdHJva2Utd2lkdGg9IjIiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIyNiIgcng9IjQuNSIgcnk9IjE0IiBmaWxsPSIjZmZjMmQxIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjIiIHJ4PSIzNSIgcnk9IjMxIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNmMWRjZTMiIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN4PSIzMCIgY3k9IjcwIiByeD0iNi41IiByeT0iNCIgZmlsbD0iI2ZmYzJkMSIvPjxlbGxpcHNlIGN4PSI3MCIgY3k9IjcwIiByeD0iNi41IiByeT0iNCIgZmlsbD0iI2ZmYzJkMSIvPjxjaXJjbGUgY3g9IjM3IiBjeT0iNTkiIHI9IjQuOCIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjM4LjUiIGN5PSI1Ny41IiByPSIxLjYiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI2MyIgY3k9IjU5IiByPSI0LjgiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSI2NC41IiBjeT0iNTcuNSIgcj0iMS42IiBmaWxsPSIjZmZmIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjYiIHJ4PSI0IiByeT0iMyIgZmlsbD0iI2ZmOGZhYiIvPjxwYXRoIGQ9Ik01MCA2OSBxLTMgNSAtNyAzIE01MCA2OSBxMyA1IDcgMyIgc3Ryb2tlPSIjMmIxZDE0IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4=' };
+const PAW_COLOR = { '수운': '#f7a440', '예원': '#c39d7b', '수림': '#ffffff' };
+const TILE_ICON = {"blog": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"8\" y=\"7\" width=\"26\" height=\"34\" rx=\"6\" fill=\"#fff\"/><path d=\"M14 16h14M14 22h14M14 28h8\" stroke=\"#ff8a6a\" stroke-width=\"3\" stroke-linecap=\"round\"/><g transform=\"rotate(32 37 27)\"><rect x=\"33\" y=\"12\" width=\"8\" height=\"22\" rx=\"2\" fill=\"#ffd25a\"/><path d=\"M33 34l4 7 4-7z\" fill=\"#ffe9b0\"/><rect x=\"33\" y=\"9\" width=\"8\" height=\"5\" rx=\"2\" fill=\"#ff9fb0\"/></g></svg>", "eng": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M7 13a7 7 0 0 1 7-7h20a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7H22l-8 7v-7a7 7 0 0 1-7-7z\" fill=\"#fff\"/><text x=\"24\" y=\"25\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"14\" fill=\"#14a884\">Hi!</text></svg>"};
 const MAX_LONG_SIDE = 2400;
 const MAX_FILE_MB = 40;
 
@@ -765,11 +787,16 @@ function go(v) {
 }
 
 function renderHome() {
-  $('hello').replaceChildren(current + '님, 안녕하세요', el('small', '', '오늘 뭐 할까요?'));
+  const wv = el('span', 'wave'), wf = el('span', 'wf'), pw = el('span', 'paw'), txt = el('span');
+  const img = photo(current); img.style.cssText = 'width:56px;height:56px;border-radius:18px;display:block';
+  wf.append(img); pw.style.background = PAW_COLOR[current] || '#c48a5a'; wv.append(wf, pw);
+  txt.append(current + '님, 안녕하세요', el('small', '', '오늘 뭐 할까요?'));
+  $('hello').replaceChildren(wv, txt);
   const tiles = APPS.map(a => {
     const b = el('button', 'card tile');
     b.type = 'button';
-    b.append(el('span', 't-ico', a.icon), el('span', 't-name', a.name), el('span', 't-desc', a.desc));
+    const ic = el('span', 't-ico'); ic.innerHTML = TILE_ICON[a.id] || a.icon;
+    b.append(ic, el('span', 't-name', a.name), el('span', 't-desc', a.desc));
     if (a.id === 'blog') {
       const n = state ? todo(state[current] || []) : 0;
       if (n) b.append(el('span', 't-status todo', '● 확인할 글 ' + n + '개'));
