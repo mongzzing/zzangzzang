@@ -196,6 +196,12 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .kr .ksp{flex:4;max-width:none}
 .kr .kok{flex:2;max-width:none;background:var(--p);color:#fff;box-shadow:0 2px 0 var(--pd);font-family:'Jua',sans-serif;font-weight:400}
 .bx{height:34px;line-height:34px;font-size:16px;padding:0 8px;margin:2px 0}
+.lvseg.l5 button{font-size:12px;padding:7px 2px}
+.master{border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,#1d2433,#3a4566);color:#ffd76a;font-family:'Jua',sans-serif;font-size:18px}
+.master small{display:block;color:#cfd6e6;font-family:'Noto Sans KR',sans-serif;font-size:12px;margin-top:2px}
+.units{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.unit{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.unit .un{font-size:11px;font-weight:800;color:var(--sub);background:var(--bg);border-radius:6px;padding:2px 6px;min-width:38px;text-align:center}
 </style>
 </head>
 <body>
@@ -214,7 +220,18 @@ const wave=(k,s)=>`<span class="wave"><span class="wf">${face(k,s)}</span><span 
 const face=(k,s)=>FACE[k].replace('<svg ',`<svg width="${s}" height="${s}" style="display:block" `);
 const PEOPLE=[{id:'suwoon',name:'수운',ch:'tiger',c:'#ffe7c2'},{id:'yewon',name:'예원',ch:'sloth',c:'#e3f1dc'},{id:'surim',name:'수림',ch:'rabbit',c:'#ffe0ec'}];
 const dispName=p=>p.name+'님';
-const LV_NAME={1:'기초',2:'중급',3:'고급'};
+const LV_NAME={1:'왕기초',2:'기초',3:'중급',4:'중상급',5:'고급'};
+const UNITS={1:['be동사','일반동사 현재','3인칭 -s','현재진행','부정문','의문문','의문사','명령문','there is','can'],
+2:['과거','과거 부정·의문','will','be going to','비교급','최상급','have to','should','부정의문문 대답','부가의문문'],
+3:['현재완료','for / since','수동태','동명사','to부정사','조건문 if','used to','too / enough','간접의문문','접속사'],
+4:['관계대명사','관계부사','현재완료진행','가정법 과거','가정법 과거완료','간접화법','사역동사','분사','be supposed to','wish'],
+5:['should have p.p.','had better','would rather','강조 구문','도치','회의 진행 표현','반대·완곡하게 말하기','협상 표현','실적 설명 표현','메일 정중 표현']};
+const MASTER_UNITS=['실적 발표 오프닝','실적 설명','가이던스·전망','애널리스트 Q&A 방어','주주환원','NDR·투자자 미팅','공시·컴플라이언스','광고업 특화'];
+const isMaster=()=>cur==='surim';
+/* 하루 5문제 이상 맞히면 그 날 출석 */
+function tally(sec){const t=today();D.cnt=D.cnt||{};const c=D.cnt[t]=D.cnt[t]||{v:0,g:0};c[sec]=(c[sec]||0)+1;
+ if(c[sec]>=5&&!D.days[t]){D.days[t]=true;setTimeout(()=>toast('🐾 오늘 출석 도장 쾅! (5문제 달성)'),900)}save()}
+const todayCnt=sec=>((D.cnt||{})[today()]||{})[sec]||0;
 
 /* ===== 단어 데이터 (비즈니스 영어) 단어|품사|뜻|예문|해석 ===== */
 const RAW={
@@ -449,8 +466,51 @@ shareholder return|명사|주주환원|We will expand [shareholder return].|[주
 undervalued|형용사|저평가된|We believe our stock is [undervalued].|우리 주식이 [저평가됐다고] 봐요.
 headwind|명사|역풍, 악재|Currency was a [headwind] this quarter.|이번 분기엔 환율이 [악재]였어요.`}};
 const WORDS=[];
-FIELDS.forEach(({k})=>[1,2,3].forEach(lv=>RAWF[k][lv].trim().split('\n').forEach((l,i)=>{const [w,pos,m,exr,exkr]=l.split('|');const mt=exr.match(/\[(.+?)\]/);
- WORDS.push({id:(k==='biz'?'':k+'-')+lv+'-'+i,f:k,lv,w,pos,m,ans:mt[1],toks:mt[1].split(' '),pre:exr.slice(0,mt.index),post:exr.slice(mt.index+mt[0].length),
+RAWF.ir[5]=`sell-side|명사|증권사(셀사이드)|Most [sell-side] analysts raised their targets.|대부분의 [증권사] 애널리스트가 목표가를 올렸어요.
+buy-side|명사|운용사(바이사이드)|We met several [buy-side] investors in London.|런던에서 여러 [운용사] 투자자를 만났어요.
+target price|명사|목표주가|Two brokers raised their [target price] this week.|이번 주 증권사 두 곳이 [목표주가]를 올렸어요.
+earnings beat|명사|어닝 서프라이즈|The [earnings beat] was driven by overseas growth.|[어닝 서프라이즈]는 해외 성장 덕분이었어요.
+visibility|명사|(실적) 가시성|We have limited [visibility] into the fourth quarter.|4분기는 [가시성]이 제한적이에요.
+normalize|동사|정상화되다|We expect margins to [normalize] next year.|내년에는 마진이 [정상화될] 걸로 봐요.
+top line|명사|매출(톱라인)|The [top line] grew faster than expected.|[매출]이 예상보다 빠르게 늘었어요.
+bottom line|명사|순이익|Cost savings helped our [bottom line].|비용 절감이 [순이익]에 도움이 됐어요.
+tailwind|명사|순풍, 호재|The weak won was a [tailwind] for overseas revenue.|원화 약세가 해외 매출에 [호재]였어요.
+de-rating|명사|밸류에이션 하락|The sector has gone through a [de-rating] this year.|올해 업종 [밸류에이션]이 낮아졌어요.
+re-rating|명사|재평가|We believe a [re-rating] is long overdue.|[재평가]가 이미 한참 늦었다고 봐요.
+free cash flow|명사|잉여현금흐름|[Free cash flow] covers our dividend comfortably.|[잉여현금흐름]으로 배당을 충분히 감당해요.
+capital allocation|명사|자본 배분|Investors asked about our [capital allocation] priorities.|투자자들이 [자본 배분] 우선순위를 물었어요.
+treasury shares|명사|자사주|We will cancel all of our [treasury shares].|[자사주]를 전량 소각할 거예요.
+value-up|명사|밸류업(기업가치 제고)|We announced our [value-up] plan last month.|지난달 [밸류업] 계획을 발표했어요.
+non-deal roadshow|명사|NDR(비거래 로드쇼)|We are hosting a [non-deal roadshow] in Singapore.|싱가포르에서 [NDR]을 진행해요.
+fair disclosure|명사|공정공시|Under [fair disclosure] rules, we can't share that.|[공정공시] 규정상 그건 말씀드릴 수 없어요.
+quiet period|명사|침묵 기간|We are in our [quiet period] until earnings.|실적 발표 전까지 [침묵 기간]이에요.
+street estimates|명사|시장 추정치|We came in well above [street estimates].|[시장 추정치]를 크게 웃돌았어요.
+organic growth|명사|유기적 성장|[Organic growth] was six percent this quarter.|이번 분기 [유기적 성장률]은 6%였어요.
+dilutive|형용사|(주주가치를) 희석하는|The deal will not be [dilutive] to shareholders.|이번 거래는 주주가치를 [희석하지] 않아요.
+secular|형용사|구조적인(장기 추세의)|Digital advertising remains a [secular] growth trend.|디지털 광고는 여전히 [구조적인] 성장 추세예요.
+cyclical|형용사|경기 순환적인|Part of the slowdown is [cyclical].|둔화의 일부는 [경기적인] 요인이에요.
+drill down|표현|자세히 파고들다|Let me [drill down] into the regional numbers.|지역별 숫자를 [자세히 살펴볼게요].
+walk you through|표현|하나씩 설명하다|Let me [walk you through] the results.|실적을 [하나씩 설명드릴게요].
+color|명사|추가 설명, 뉘앙스|Could you give us more [color] on Europe?|유럽 쪽 [추가 설명] 부탁드려요.
+flat|형용사|보합의, 변동 없는|Revenue was [flat] compared to last year.|매출은 작년과 [비슷했어요].
+soft|형용사|부진한|Demand was [soft] in the first half.|상반기 수요가 [부진했어요].
+robust|형용사|견조한|We saw [robust] demand from new clients.|신규 광고주 수요가 [견조했어요].
+pipeline|명사|수주 파이프라인|Our new business [pipeline] remains strong.|신규 수주 [파이프라인]이 탄탄해요.
+win rate|명사|수주율|Our pitch [win rate] improved this year.|올해 경쟁 PT [수주율]이 올랐어요.
+pitch|명사|경쟁 PT|We won the [pitch] for a global brand.|글로벌 브랜드 [경쟁 PT]를 따냈어요.
+billings|명사|취급고|Total [billings] increased by twelve percent.|총 [취급고]가 12% 늘었어요.
+media spend|명사|매체 집행비|Clients cut their [media spend] in the third quarter.|광고주들이 3분기에 [매체비]를 줄였어요.
+forward-looking statements|명사|미래예측 진술|Today's call contains [forward-looking statements].|오늘 콜에는 [미래예측 진술]이 포함돼 있어요.
+constant currency|명사|고정환율 기준|On a [constant currency] basis, revenue grew seven percent.|[고정환율] 기준으로 매출이 7% 늘었어요.
+high base|명사|높은 기저|Growth slowed due to a [high base] last year.|작년 [높은 기저] 때문에 성장이 둔화됐어요.
+downside risk|명사|하방 리스크|We see limited [downside risk] to our targets.|목표치에 대한 [하방 리스크]는 제한적이라고 봐요.
+buffer|명사|완충 장치|Our captive business acts as a [buffer] in downturns.|계열 물량이 불황기에 [완충] 역할을 해요.
+on track|표현|목표대로 진행 중인|We remain [on track] to meet our margin target.|마진 목표 달성 [궤도에] 있어요.
+intrinsic value|명사|내재가치|The share price doesn't reflect our [intrinsic value].|주가가 [내재가치]를 반영하지 못해요.`;
+const LVMAP={biz:{1:1,2:3,3:4},fin:{1:2,2:3,3:4},mtg:{1:2,2:3,3:4},ir:{1:3,2:4,3:5,5:5}};
+FIELDS.forEach(({k})=>Object.keys(RAWF[k]).map(Number).forEach(ol=>RAWF[k][ol].trim().split('\n').forEach((l,i)=>{const [w,pos,m,exr,exkr]=l.split('|');const mt=exr.match(/\[(.+?)\]/);
+ const lv=LVMAP[k][ol];
+ WORDS.push({id:(k==='biz'?'':k+'-')+ol+'-'+i,f:k,lv,ms:k==='ir'&&lv>=4,w,pos,m,ans:mt[1],toks:mt[1].split(' '),pre:exr.slice(0,mt.index),post:exr.slice(mt.index+mt[0].length),
   ex:exr.replace(/[\[\]]/g,''),exk:exkr.replace(/[\[\]]/g,''),ko:exkr.replace(/\[(.+?)\]/,'<span class="hl">$1</span>')})})));
 const W=Object.fromEntries(WORDS.map(x=>[x.id,x]));
 
@@ -528,8 +588,8 @@ function vHome(){
    <div class="sbox"><span class="muted">외운 단어</span><b>📚 ${masterCnt()}개</b></div>
   </div>
   <div class="tiles">
-   <button class="tile" style="background:linear-gradient(140deg,#18b98a,#0fa3a0)" onclick="vVocab()"><span class="em">${ICON.vocab}</span><div><div class="nm">어휘</div><div class="ds">${D.days[today()]?'오늘 완료 ✅':'오늘의 단어 '+goal()+'개'}</div></div></button>
-   <button class="tile" style="background:linear-gradient(140deg,#4b7bff,#6a5cff)" onclick="vGram()"><span class="em">${ICON.gram}</span><div><div class="nm">문법</div><div class="ds">대화 문장 만들기</div></div></button>
+   <button class="tile" style="background:linear-gradient(140deg,#18b98a,#0fa3a0)" onclick="vVocab()"><span class="em">${ICON.vocab}</span><div><div class="nm">어휘</div><div class="ds">오늘 ${Math.min(5,todayCnt('v'))}/5 ${todayCnt('v')>=5?'✅':''}</div></div></button>
+   <button class="tile" style="background:linear-gradient(140deg,#4b7bff,#6a5cff)" onclick="vGram()"><span class="em">${ICON.gram}</span><div><div class="nm">문법</div><div class="ds">오늘 ${Math.min(5,todayCnt('g'))}/5 ${todayCnt('g')>=5?'✅':''}</div></div></button>
    <button class="tile off" style="background:linear-gradient(140deg,#ff8a3d,#ff5f6d)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.listen}</span><div><div class="nm">리스닝</div><div class="ds">듣고 이해하기</div></div></button>
    <button class="tile off" style="background:linear-gradient(140deg,#8b5cf6,#c04cf0)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.talk}</span><div><div class="nm">회화</div><div class="ds">말하며 대화하기</div></div></button>
   </div>
@@ -558,11 +618,11 @@ function vVocab(){lastView='vocab';
  const t=today(),done=!!D.days[t];
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>어휘</h1><button class="iconbtn" onclick="vBook()">📒</button></div>
  <div class="body">
-  <div class="lvseg">${[1,2,3].map(l=>`<button class="${D.level===l?'on':''}" onclick="setLv(${l})">${LV_NAME[l]}</button>`).join('')}</div>
-  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>
+  ${isMaster()?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅에서 쓰는 실전 용어만 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.level===l?'on':''}" onclick="setLv(${l})">${LV_NAME[l]}</button>`).join('')}</div>
+  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>`}
   <div class="today">
-   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">${done?'오늘 완료 🎉':'오늘의 학습'}</span>
-   <h3 style="margin-top:10px">${done?'잘했어요! 한 세트 더 할까요?':'오늘 목표 '+goal()+'개'}</h3>
+   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('v')}/5문제 ${todayCnt('v')>=5?'✅':''}</span>
+   <h3 style="margin-top:10px">${done?'잘했어요! 한 세트 더 할까요?':'한 세트 '+goal()+'문제'}</h3>
    <p style="font-size:14px;opacity:.9;margin-top:4px">복습 대기 ${dueCnt()}개 · 학습한 단어 ${learnedCnt()}개</p>
    <button class="btn" onclick="startSession()">${done?'한 세트 더 하기':'시작하기'}</button>
   </div>
@@ -570,7 +630,7 @@ function vVocab(){lastView='vocab';
    <div class="sbox"><span class="muted">연속 학습</span><b>🔥 ${streak()}일</b></div>
    <div class="sbox"><span class="muted">외운 단어</span><b>⭐ ${masterCnt()}개</b></div>
   </div>
-  <div class="card"><div class="row"><b style="flex:1">하루 목표</b><span class="muted">다 하면 출석 도장 🐾</span></div>
+  <div class="card"><div class="row"><b style="flex:1">한 세트 문제 수</b><span class="muted">하루 5문제 맞히면 출석 🐾</span></div>
    <div class="lvseg" style="margin-top:10px">${[5,10,20,30].map(g=>`<button class="${goal()===g?'on':''}" onclick="setGoal(${g})">${g}개</button>`).join('')}</div></div>
   <div class="card">${calendar()}</div>
  </div>`;
@@ -627,8 +687,8 @@ function startSession(){
  const t=today();
  const rev=Object.entries(D.words).filter(([,v])=>v.due<=t).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
  const need=goal()-rev.length;
- const fresh=w=>!D.words[w.id]&&myF().includes(w.f);
- const pool=[...shuffle(WORDS.filter(w=>fresh(w)&&w.lv===D.level)),...WORDS.filter(w=>fresh(w)&&w.lv>D.level),...WORDS.filter(w=>fresh(w)&&w.lv<D.level)];
+ const M=isMaster(),fresh=w=>!D.words[w.id]&&(M?w.ms:myF().includes(w.f));
+ const pool=M?shuffle(WORDS.filter(fresh)):[...shuffle(WORDS.filter(w=>fresh(w)&&w.lv===D.level)),...shuffle(WORDS.filter(w=>fresh(w)&&w.lv>D.level)).sort((a,b)=>a.lv-b.lv),...WORDS.filter(w=>fresh(w)&&w.lv<D.level)];
  const nw=pool.slice(0,need).map(w=>w.id);
  if(!nw.length&&!rev.length){alertBox('모든 단어를 학습했어요! 🎉','새 단어는 곧 추가될 예정이에요.');return}
  S={rev,nw,first:{},queue:shuffle([...rev,...nw]),qi:0,doneN:0};
@@ -656,7 +716,7 @@ function vCard(){
  const fd=FIELDS.find(f=>f.k===w.f);
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="quitAsk()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
  <div class="body">
-  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${fd.e} ${LV_NAME[w.lv]}</span>${tag}<div style="flex:1"></div>
+  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${w.ms&&isMaster()?'🏆 IR 마스터':fd.e+' 레벨 '+w.lv}</span>${tag}<div style="flex:1"></div>
    <button class="tool" onclick="speak(S.c.w.ex)">🔊 듣기</button></div>
   <div class="qc" id="vqc"><div class="k">${w.ko}</div><div class="e" id="ven"></div></div>
  </div>
@@ -698,7 +758,7 @@ function toast(m){const s=$('#sh');s.innerHTML=`<div class="toastm">${m}</div>`;
 function done(ok,shown){
  const c=S.c;c.locked=true;c.res=ok;vDraw();const kb=$('#kb');if(kb)kb.style.display='none';
  const first=!(c.id in S.first);if(first)S.first[c.id]=ok&&!c.wrongTry;
- if(ok)S.doneN++;else S.queue.push(c.id);
+ if(ok){S.doneN++;tally('v')}else S.queue.push(c.id);
  speak(c.w.ex);
  const msg=ok?(c.wrongTry?'맞았어요! 👍':['정답이에요! 🎉','완벽해요! ✨','좋아요! 👏'][Math.random()*3|0]):(shown?'정답을 확인하세요':'아쉬워요! 다시 나올 거예요');
  $('#sh').innerHTML=`<div class="sheet ${ok?'g':'r'}"><h4>${ok?`<span class="jump">${face(me().ch,34)}</span>`:''}${msg}</h4>
@@ -734,7 +794,7 @@ function finish(){
  const ids=Object.keys(res),okN=ids.filter(id=>res[id]).length;
  let up=false;D.hist=[...(D.hist||[]),okN/Math.max(1,ids.length)].slice(-3);
  const left=WORDS.filter(w=>w.lv===D.level&&myF().includes(w.f)&&!D.words[w.id]).length;
- if(D.level<3&&((D.hist.length>=3&&D.hist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.level++;D.hist=[];up=true}
+ if(!isMaster()&&D.level<5&&((D.hist.length>=3&&D.hist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.level++;D.hist=[];up=true}
  save();
  app.innerHTML=`<div class="body">
  <div style="text-align:center;padding-top:20px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
@@ -792,37 +852,281 @@ would rather|'차라리 ~하겠다'는 would rather + 동사원형.|커피 드�
 It's time|'~할 때다'는 It is time + 주어 + 과거형.|더 기다릴까요?|아니요, 이제 결정할 때예요.|Should we wait more?|No, it is time we made a decision.|make making
 as soon as|'~하자마자'는 as soon as + 현재형.|결과 언제 알 수 있어요?|나오자마자 알려드릴게요.|When can we know the result?|I will let you know as soon as it comes out.|came when`};
 const GR=[];
-[1,2,3].forEach(lv=>GRAW[lv].trim().split('\n').forEach((l,i)=>{const[pt,tip,ak,bk,ae,be,dx]=l.split('|');
- const punct=(be.match(/[.?!]$/)||[''])[0];const toks=be.replace(/[.?!]$/,'').split(' ').map(t=>t.replace(/,$/,''));
+const OLDU={"부정의문문 대답": [2, 9], "be동사": [1, 1], "현재진행": [1, 4], "과거": [2, 1], "미래 will": [2, 3], "조동사 can": [1, 10], "3인칭 단수": [1, 3], "부정문": [2, 2], "there is": [1, 9], "have to": [2, 7], "비교급": [2, 5], "want to": [1, 2], "take (시간)": [1, 3], "감사 응답": [1, 1], "의문사 답": [1, 7], "현재완료": [3, 1], "현재완료 경험": [3, 1], "수동태": [3, 3], "should": [2, 8], "be going to": [2, 4], "부가의문문 대답": [2, 10], "동명사": [3, 4], "to부정사 목적": [3, 5], "조건문 if": [3, 6], "관계대명사 who": [4, 1], "used to": [3, 7], "간접의문문": [3, 9], "too": [3, 8], "for + 기간": [3, 2], "최상급": [2, 6], "가정법 과거": [4, 4], "가정법 과거완료": [4, 5], "현재완료진행": [4, 3], "진행형 수동태": [3, 3], "should have": [5, 1], "be supposed to": [4, 9], "강조 구문": [5, 4], "wish": [4, 10], "관계부사 where": [4, 2], "간접화법": [4, 6], "had better": [5, 2], "사역동사 have": [4, 7], "would rather": [5, 3], "It's time": [4, 4], "as soon as": [3, 10]};
+const GNEW=`#1
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|어디 출신이세요?|저는 한국 사람이에요.|Where are you from?|I am from Korea.|is are
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|팀장님 계세요?|아니요, 지금 회의 중이세요.|Is your manager here?|No, she is in a meeting.|are am
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|이 자리 비었어요?|네, 비어 있어요.|Is this seat free?|Yes, it is free.|are am
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|두 분 같은 팀이세요?|네, 우리는 같은 팀이에요.|Are you two on the same team?|Yes, we are on the same team.|is am
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|오늘 바빠요?|아니요, 오늘은 한가해요.|Are you busy today?|No, I am free today.|is are
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|보고서 준비됐어요?|네, 다 됐어요.|Is the report ready?|Yes, it is ready.|are am
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|회의실이 어디예요?|2층에 있어요.|Where is the meeting room?|It is on the second floor.|are in
+1|I는 am, you·복수는 are, 그 밖에는 is를 써요.|여기 새로 오셨어요?|네, 새로 왔어요.|Are you new here?|Yes, I am new here.|is are
+2|습관이나 사실은 동사 현재형으로 말해요.|몇 시에 일 시작해요?|보통 8시에 시작해요.|What time do you start work?|I usually start at eight.|starts starting
+2|습관이나 사실은 동사 현재형으로 말해요.|커피 마셔요?|네, 매일 아침 마셔요.|Do you drink coffee?|Yes, I drink it every morning.|drinks drank
+2|습관이나 사실은 동사 현재형으로 말해요.|어디 살아요?|시흥에 살아요.|Where do you live?|I live in Siheung.|lives living
+2|습관이나 사실은 동사 현재형으로 말해요.|점심 보통 어디서 먹어요?|구내식당에서 먹어요.|Where do you usually eat lunch?|We eat in the cafeteria.|eats ate
+2|습관이나 사실은 동사 현재형으로 말해요.|운동해요?|주말마다 테니스 쳐요.|Do you exercise?|I play tennis on weekends.|plays playing
+2|습관이나 사실은 동사 현재형으로 말해요.|출근 어떻게 해요?|차로 출근해요.|How do you get to work?|I drive to work.|drives drove
+2|습관이나 사실은 동사 현재형으로 말해요.|엑셀 써요?|네, 매일 써요.|Do you use Excel?|Yes, I use it every day.|uses used
+2|습관이나 사실은 동사 현재형으로 말해요.|영어 공부해요?|네, 매일 조금씩 해요.|Do you study English?|Yes, I study a little every day.|studies studied
+2|습관이나 사실은 동사 현재형으로 말해요.|이 노래 알아요?|네, 정말 좋아해요.|Do you know this song?|Yes, I really love it.|loves loved
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|김 대리님은 어디서 일해요?|영업팀에서 일해요.|Where does Mr. Kim work?|He works in the sales team.|work working
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|지수 씨 커피 마셔요?|아니요, 차만 마셔요.|Does Jisu drink coffee?|No, she only drinks tea.|drink drinking
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|이 버스 공항 가요?|네, 공항에 가요.|Does this bus go to the airport?|Yes, it goes to the airport.|go going
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|사장님 몇 시에 퇴근하세요?|보통 7시에 퇴근하세요.|When does the boss leave?|He usually leaves at seven.|leave left
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|그 가게 일요일에 열어요?|아니요, 평일에만 열어요.|Does the shop open on Sundays?|No, it only opens on weekdays.|open opening
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|예원 씨는 무슨 일 해요?|회계 일을 해요.|What does Yewon do?|She works in accounting.|work worked
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|이 기계 잘 돼요?|네, 아주 잘 작동해요.|Does this machine work well?|Yes, it works very well.|work working
+3|주어가 he·she·it이면 동사에 -s를 붙여요.|그 사람 한국어 해요?|네, 조금 해요.|Does he speak Korean?|Yes, he speaks a little Korean.|speak spoke
+4|지금 하고 있는 일은 be + 동사ing.|어디 가요?|점심 먹으러 가고 있어요.|Where are you going?|I am going to lunch.|go went
+4|지금 하고 있는 일은 be + 동사ing.|뭐 보고 있어요?|판매 데이터 보고 있어요.|What are you looking at?|I am looking at the sales data.|look looked
+4|지금 하고 있는 일은 be + 동사ing.|민수 씨 통화 중이에요?|네, 고객이랑 통화하고 있어요.|Is Minsu on the phone?|Yes, he is talking to a client.|talks talk
+4|지금 하고 있는 일은 be + 동사ing.|비 와요?|네, 지금 많이 와요.|Is it raining?|Yes, it is raining a lot.|rains rained
+4|지금 하고 있는 일은 be + 동사ing.|누구 기다리세요?|네, 김 과장님 기다리고 있어요.|Are you waiting for someone?|Yes, I am waiting for Mr. Kim.|wait waited
+4|지금 하고 있는 일은 be + 동사ing.|다들 뭐 해요?|회의 준비하고 있어요.|What is everyone doing?|They are preparing for the meeting.|prepare is
+4|지금 하고 있는 일은 be + 동사ing.|듣고 있어요?|네, 듣고 있어요.|Are you listening?|Yes, I am listening.|listen listened
+4|지금 하고 있는 일은 be + 동사ing.|시스템 돼요?|지금 업데이트 중이에요.|Is the system working?|It is updating right now.|updates updated
+4|지금 하고 있는 일은 be + 동사ing.|아기 자요?|네, 자고 있어요.|Is the baby sleeping?|Yes, he is sleeping.|sleeps slept
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|고기 드세요?|아니요, 고기 안 먹어요.|Do you eat meat?|No, I don't eat meat.|doesn't not
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|그 사람 알아요?|아니요, 몰라요.|Do you know him?|No, I don't know him.|doesn't knows
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|오늘 회의 있어요?|아니요, 오늘은 회의 없어요.|Do we have a meeting today?|No, we don't have a meeting today.|doesn't has
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|프린터 돼요?|아니요, 작동 안 해요.|Does the printer work?|No, it doesn't work.|don't works
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|피곤해요?|아니요, 안 피곤해요.|Are you tired?|No, I am not tired.|don't doesn't
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|그분 운전해요?|아니요, 운전 안 해요.|Does she drive?|No, she doesn't drive.|don't drives
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|그거 비싸요?|아니요, 별로 안 비싸요.|Is it expensive?|No, it is not very expensive.|don't are
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|주말에도 일해요?|아니요, 주말엔 일 안 해요.|Do you work on weekends?|No, I don't work on weekends.|doesn't works
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|이거 맞아요?|아니요, 그거 아니에요.|Is this right?|No, that is not right.|don't doesn't
+5|일반동사 부정은 don't·doesn't, be동사는 뒤에 not.|커피 좋아해요?|아니요, 별로 안 좋아해요.|Do you like coffee?|No, I don't like it much.|doesn't likes
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|피곤해 보여요.|괜찮아요?|You look tired.|Are you okay?|is do
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|새 노트북 샀어요.|그거 좋아요?|I bought a new laptop.|Is it good?|does are
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|오늘 회식 있어요.|팀장님도 오세요?|We have a team dinner tonight.|Is the manager coming?|does are
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|파일 보내 드릴게요.|엑셀 파일이에요?|I will send you the file.|Is it an Excel file?|does are
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|일본어 배우고 있어요.|어렵지 않아요?|I am learning Japanese.|Is it difficult?|does are
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|주말에 등산 가요.|자주 가세요?|I am going hiking this weekend.|Do you go often?|does are
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|회사에서 새 앱을 써요.|그거 잘 돼요?|We use a new app at work.|Does it work well?|do is
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|김 과장님이 전화하셨어요.|저랑 얘기하고 싶으시대요?|Mr. Kim called you.|Does he want to talk to me?|do is
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|얘가 제 동생이에요.|여기서 일해요?|This is my sister.|Does she work here?|do is
+6|질문은 Do·Does나 be동사를 맨 앞에 둬요.|회의 3시예요.|오늘이에요?|The meeting is at three.|Is it today?|does are
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|내일 출장 가요.|어디로 가요?|I have a business trip tomorrow.|Where are you going?|what when
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|늦어서 죄송해요.|무슨 일 있었어요?|Sorry I am late.|What happened?|who where
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|새 팀원이 와요.|누구예요?|A new member is joining our team.|Who is it?|what where
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|회의가 길어지네요.|언제 끝나요?|The meeting is running long.|When does it end?|what where
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|이 프로젝트 진짜 어려워요.|왜 어려워요?|This project is really hard.|Why is it hard?|what how
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|새 프린터 왔어요.|어떻게 써요?|The new printer is here.|How do I use it?|what why
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|점심 같이 먹어요.|어디 가고 싶어요?|Let's have lunch together.|Where do you want to go?|what how
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|선물이에요.|이게 뭐예요?|This is a gift for you.|What is it?|who where
+7|의문사(what·where·when·who·why·how)는 문장 맨 앞에.|새 주문이 들어왔어요.|몇 개예요?|We got a new order.|How many are there?|much what
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|어떻게 가요?|쭉 가서 왼쪽으로 도세요.|How do I get there?|Go straight and turn left.|goes going
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|파일 어디로 보내요?|저한테 메일로 보내 주세요.|Where should I send the file?|Please email it to me.|emails emailing
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|들어가도 돼요?|네, 들어오세요.|Can I come in?|Yes, please come in.|comes coming
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|좀 늦을 것 같아요.|걱정하지 마세요.|I think I will be late.|Don't worry about it.|doesn't worries
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|비밀번호를 잊어버렸어요.|이 버튼을 눌러 보세요.|I forgot my password.|Click this button.|clicks clicking
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|이 상자 무거워요.|조심하세요.|This box is heavy.|Be careful.|is being
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|회의 시작해요?|잠깐만 기다려 주세요.|Are we starting the meeting?|Please wait a moment.|waits waiting
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|문이 열려 있어요.|문 좀 닫아 주세요.|The door is open.|Please close the door.|closes closed
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|발표가 떨려요.|천천히 말하세요.|I am nervous about my presentation.|Speak slowly.|speaks speaking
+8|명령문은 동사원형으로 시작해요. 부정은 Don't.|이거 버려도 돼요?|아니요, 버리지 마세요.|Can I throw this away?|No, don't throw it away.|doesn't throws
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|근처에 주차장 있어요?|네, 건물 뒤에 하나 있어요.|Is there a parking lot nearby?|Yes, there is one behind the building.|are it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|회의실에 누구 있어요?|네, 세 명 있어요.|Is anyone in the meeting room?|Yes, there are three people.|is it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|냉장고에 뭐 있어요?|우유가 좀 있어요.|What is in the fridge?|There is some milk.|are it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|문제 있어요?|아니요, 문제 없어요.|Is there a problem?|No, there is no problem.|are it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|이 근처에 식당 많아요?|네, 많이 있어요.|Are there many restaurants around here?|Yes, there are a lot.|is it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|오늘 새 메일 있어요?|네, 두 통 있어요.|Any new emails today?|Yes, there are two new emails.|is it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|남은 표 있어요?|아니요, 하나도 없어요.|Are there any tickets left?|No, there are none left.|is it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|엘리베이터 있어요?|네, 오른쪽에 있어요.|Is there an elevator?|Yes, there is one on the right.|are it
+9|'~이 있다'는 하나면 there is, 여럿이면 there are.|오늘 회식 있어요?|네, 7시에 있어요.|Is there a team dinner tonight?|Yes, there is one at seven.|are it
+10|can 뒤에는 동사원형, 부정은 can't.|영어 할 줄 알아요?|네, 조금 할 수 있어요.|Can you speak English?|Yes, I can speak a little.|speaks could
+10|can 뒤에는 동사원형, 부정은 can't.|내일 올 수 있어요?|아니요, 내일은 못 가요.|Can you come tomorrow?|No, I can't come tomorrow.|comes don't
+10|can 뒤에는 동사원형, 부정은 can't.|운전할 줄 알아요?|네, 할 수 있어요.|Can you drive?|Yes, I can.|do am
+10|can 뒤에는 동사원형, 부정은 can't.|여기 앉아도 돼요?|네, 앉으셔도 돼요.|Can I sit here?|Yes, you can sit here.|sits are
+10|can 뒤에는 동사원형, 부정은 can't.|창문 열어도 될까요?|네, 그럼요.|Can I open the window?|Sure, you can.|do are
+10|can 뒤에는 동사원형, 부정은 can't.|이 파일 열려요?|아니요, 못 열겠어요.|Can you open this file?|No, I can't open it.|opens don't
+10|can 뒤에는 동사원형, 부정은 can't.|이거 들 수 있어요?|네, 혼자 들 수 있어요.|Can you carry this?|Yes, I can carry it alone.|carries carried
+10|can 뒤에는 동사원형, 부정은 can't.|그분 한국어 할 줄 알아요?|네, 아주 잘해요.|Can he speak Korean?|Yes, he can speak it very well.|speaks could
+10|can 뒤에는 동사원형, 부정은 can't.|몇 시에 만날 수 있어요?|3시에 만날 수 있어요.|What time can you meet?|I can meet at three.|meets meeting
+#5
+1|'~했어야 했는데'는 should have + 과거분사.|컨센서스를 크게 밑돌았어요.|가이던스를 더 일찍 조정했어야 했어요.|We missed consensus by a wide margin.|We should have revised our guidance earlier.|revise must
+1|'~했어야 했는데'는 should have + 과거분사.|투자자들이 많이 놀랐어요.|미리 신호를 줬어야 했어요.|Investors were caught off guard.|We should have signaled it in advance.|signal could
+1|'~했어야 했는데'는 should have + 과거분사.|그 질문에 제대로 답을 못 했어요.|숫자를 미리 준비했어야 했어요.|I couldn't answer that question well.|I should have prepared the numbers beforehand.|prepare will
+1|'~했어야 했는데'는 should have + 과거분사.|자료에 오타가 있었어요.|한 번 더 검토했어야 했어요.|There was a typo in the deck.|We should have reviewed it once more.|review must
+1|'~했어야 했는데'는 should have + 과거분사.|그 애널리스트가 서운해했어요.|먼저 연락했어야 했어요.|That analyst seemed upset.|We should have reached out to him first.|reach would
+1|'~했어야 했는데'는 should have + 과거분사.|발표 후 주가가 급락했어요.|발표 시점을 더 신중히 정했어야 했어요.|The stock dropped sharply after the release.|We should have timed the announcement more carefully.|time can
+1|'~했어야 했는데'는 should have + 과거분사.|질문이 너무 많았어요.|질의응답 시간을 더 잡았어야 했어요.|There were too many questions.|We should have allowed more time for questions.|allow must
+1|'~했어야 했는데'는 should have + 과거분사.|해외 투자자가 거의 안 들어왔어요.|시간대를 고려했어야 했어요.|Few overseas investors joined the call.|We should have considered the time zones.|consider would
+1|'~했어야 했는데'는 should have + 과거분사.|배당 발표가 묻혔어요.|따로 강조했어야 했어요.|The dividend news got buried.|We should have highlighted it separately.|highlight must
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|공시 전에 언급해도 될까요?|공시될 때까지 기다리는 게 좋겠어요.|Can we mention it before the filing?|We had better wait until it is disclosed.|waiting have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|그 질문 또 나올 거예요.|답변을 미리 맞춰 두는 게 좋겠어요.|That question will come up again.|We had better align our answer in advance.|aligning have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|숫자가 아직 확정이 아니에요.|추정치라고 분명히 해 두는 게 좋겠어요.|The numbers aren't final yet.|We had better make it clear they are estimates.|making have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|그 펀드매니저 꼼꼼해요.|자료를 철저히 준비하는 게 좋겠어요.|That fund manager is very detail-oriented.|We had better prepare the materials thoroughly.|preparing have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|침묵 기간이 시작됐어요.|미팅은 다음 주 이후로 잡는 게 좋겠어요.|The quiet period has started.|We had better schedule meetings after next week.|scheduling have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|환율이 크게 움직였어요.|환 영향은 따로 설명하는 게 좋겠어요.|The exchange rate moved a lot.|We had better explain the currency impact separately.|explaining have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|루머가 돌고 있어요.|빨리 입장을 내는 게 좋겠어요.|There is a rumor going around.|We had better issue a statement quickly.|issuing have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|내일 콜이 일찍 시작해요.|오늘은 일찍 들어가는 게 좋겠어요.|Tomorrow's call starts early.|I had better leave work early today.|leaving have
+2|'~하는 게 좋겠다(안 하면 곤란)'는 had better + 동사원형.|그 슬라이드 너무 복잡해요.|더 단순하게 만드는 게 좋겠어요.|That slide is too complicated.|We had better simplify it.|simplifying have
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|구체적인 숫자 주실 수 있나요?|구체적인 수치는 말씀드리지 않는 게 좋겠습니다.|Can you give us a specific number?|I would rather not give a specific figure.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|대면 미팅 괜찮으세요?|가능하면 화상으로 하고 싶어요.|Would an in-person meeting work?|I would rather do it by video call.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|다음 분기 얘기해 주실 수 있나요?|그 부분은 추측하지 않겠습니다.|Can you comment on next quarter?|I would rather not speculate on that.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|오늘 저녁 회식 가요?|저는 일찍 들어가고 싶어요.|Are you joining the dinner tonight?|I would rather go home early.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|지금 바로 답변 가능하세요?|내부 확인 후 답변드리는 게 좋겠어요.|Can you answer that now?|I would rather confirm internally first.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|보도자료 금요일에 낼까요?|월요일에 내는 게 낫겠어요.|Should we release it on Friday?|I would rather release it on Monday.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|그냥 메일로 보낼까요?|직접 설명드리는 게 낫겠어요.|Should I just email it?|I would rather explain it in person.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|애널리스트 이름 밝힐까요?|익명으로 하는 게 좋겠어요.|Should we name the analyst?|I would rather keep it anonymous.|than prefer
+3|'차라리 ~하겠다'는 would rather + 동사원형, 부정은 would rather not.|오늘 할까요, 내일 할까요?|오늘 끝내는 게 좋겠어요.|Should we do it today or tomorrow?|I would rather finish it today.|than prefer
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|무엇이 개선을 이끌었나요?|성장을 이끈 건 바로 비계열 광고주였어요.|What drove the improvement?|It was non-captive clients that drove the growth.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|어느 지역이 제일 잘했어요?|가장 크게 성장한 건 북미였어요.|Which region performed best?|It was North America that grew the most.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|마진이 왜 줄었어요?|마진을 누른 건 일회성 비용이었어요.|Why did margins decline?|It was one-off costs that weighed on margins.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|이 결정 누가 했어요?|최종 결정은 이사회가 했어요.|Who made this decision?|It was the board that made the final call.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|지금 뭐에 집중하고 계세요?|저희가 집중하는 건 수익성이에요.|What are you focusing on?|It is profitability that we are focusing on.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|언제부터 좋아졌어요?|회복이 시작된 건 2분기부터였어요.|When did things turn around?|It was in the second quarter that the recovery began.|which when
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|이 캠페인 누가 맡았어요?|그걸 맡은 건 유럽 법인이에요.|Who handled this campaign?|It was our European subsidiary that handled it.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|투자자들이 제일 많이 묻는 게 뭐예요?|가장 많이 묻는 건 배당 정책이에요.|What do investors ask about most?|It is our dividend policy that they ask about most.|which what
+4|'바로 ~이 …했다'는 It is·was + 강조할 말 + that·who.|주가가 왜 올랐어요?|주가를 끌어올린 건 자사주 매입 발표예요.|Why did the stock go up?|It was the buyback announcement that lifted the stock.|which what
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|이번 분기 어땠어요?|매출만 는 게 아니라 마진도 개선됐어요.|How was this quarter?|Not only did revenue grow, but margins also improved.|grew does
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|이런 수요 본 적 있어요?|이렇게 강한 수요는 처음 봐요.|Have you seen demand like this before?|Never have we seen such strong demand.|we had
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|그런 질문 자주 받아요?|그런 질문은 거의 안 받아요.|Do you often get that question?|Rarely do we get that kind of question.|we does
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|그거 언제 확정됐어요?|이사회 승인 후에야 확정됐어요.|When was it finalized?|Only after board approval was it finalized.|it did
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|그 계약 금방 따냈어요?|그렇게 빨리 수주한 건 처음이에요.|Did you win that contract quickly?|Never before have we won a deal so fast.|we had
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|그 결과 예상했어요?|그렇게 좋을 줄은 전혀 몰랐어요.|Did you expect that?|Little did we expect such a strong result.|we expected
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|원인을 언제 알았어요?|그때서야 근본 원인을 알았어요.|When did you understand the cause?|Only then did we realize the root cause.|we realized
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|이 정도 마진 흔해요?|업계에서 이런 마진은 보기 드물어요.|Is this margin common?|Seldom do we see margins like this in the industry.|we sees
+5|부정어(Not only·Never·Rarely·Only then)가 앞에 오면 주어와 조동사 순서가 바뀌어요.|비용만 줄였어요?|비용을 줄였을 뿐 아니라 효율도 높였어요.|Did you only cut costs?|Not only did we cut costs, but we also improved efficiency.|cutting does
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|시작할까요?|네, 바로 시작하죠.|Shall we get started?|Yes, let's get right into it.|start go
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|다음 안건 뭐예요?|다음은 3분기 실적으로 넘어가겠습니다.|What's next on the agenda?|Let's move on to our third quarter results.|moving go
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|이제 질문해도 될까요?|네, 이제 질문 받겠습니다.|Can we take questions now?|Yes, let's open the floor to questions.|opening take
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|시간이 얼마 안 남았어요.|그럼 여기서 마무리하죠.|We are running out of time.|Then let's wrap it up here.|wrapping close
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|그건 오늘 다룰 얘기가 아닌 것 같아요.|그건 따로 얘기하죠.|I don't think that is for today.|Let's take that offline.|taking discuss
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|지난번 논의 기억나세요?|지난번 말씀하신 부분으로 돌아가 볼게요.|Do you remember our last discussion?|Let me go back to the point you raised last time.|going rose
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|요약해 주시겠어요?|핵심 세 가지로 정리할게요.|Could you summarize?|Let me sum it up in three key points.|summing summary
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|다들 동의하시죠?|그럼 합의된 걸로 하겠습니다.|Is everyone on board?|Then I will take that as agreed.|taking agree
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|잠깐 끼어들어도 될까요?|물론이죠, 말씀하세요.|May I jump in for a second?|Of course, go ahead.|goes going
+6|회의를 이끌 때는 Let's / Let me로 부드럽게 진행해요.|죄송한데 질문이 뭐였죠?|질문을 다시 정리해 볼게요.|Sorry, what was the question?|Let me rephrase the question.|rephrasing repeat
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|마진이 나빠지는 거 아니에요?|꼭 그렇게 보지는 않습니다.|Aren't margins getting worse?|I wouldn't necessarily put it that way.|won't necessary
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|가이던스가 너무 보수적이지 않아요?|저희는 현실적인 수준이라고 봅니다.|Isn't your guidance too conservative?|We see it as a realistic level.|realistically saw
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|경쟁사가 앞서는 것 같은데요.|일부 동의하지만 조금 다르게 봅니다.|Your competitor seems to be ahead.|I partly agree, but I see it a bit differently.|partial different
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|이번 분기 실망스러웠어요.|우려는 이해하지만 일회성 요인이 컸습니다.|This quarter was disappointing.|I understand the concern, but one-off factors played a big role.|understanding concerns
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|배당 더 늘릴 수 있지 않나요?|죄송하지만 지금으로선 어렵습니다.|Couldn't you raise the dividend further?|I'm afraid that's difficult at this point.|difficulty scared
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|그 숫자 틀린 것 같아요.|다시 확인하겠지만 맞는 숫자로 알고 있습니다.|I think that number is wrong.|I will double-check, but I believe it is correct.|believing correctly
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|비용 절감이 부족하지 않나요?|결과를 보여드릴 시간을 조금 더 주셨으면 합니다.|Isn't cost cutting falling short?|We would ask for a bit more time to show results.|asking will
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|그 전략 실수 아니에요?|그렇게 결론 내리기엔 이른 것 같습니다.|Isn't that strategy a mistake?|It may be too early to draw that conclusion.|draws late
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|이 회의 너무 길어요.|좋은 지적이에요, 줄여 보겠습니다.|This meeting is too long.|Fair point, we will try to keep it shorter.|fairly short
+7|반대할 땐 바로 No 대신 완곡하게: I wouldn't…, I see it a bit differently.|지금 결정하시죠.|검토할 시간을 조금 더 주실 수 있을까요?|Let's decide now.|Could we have a little more time to review it?|reviewing much
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|가격 낮춰 주실 수 있나요?|물량을 늘려 주시면 검토해 볼 수 있어요.|Can you lower the price?|If you increase the volume, we can consider it.|increased considering
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|이 조건 어떠세요?|중간에서 만나면 어떨까요?|What do you think of these terms?|How about we meet halfway?|meeting half
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|계약 기간 늘려 주세요.|그렇다면 단가 조정이 필요합니다.|Please extend the contract period.|In that case, we would need to adjust the price.|adjusting needed
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|이게 최종 제안인가요?|네, 저희가 드릴 수 있는 최선입니다.|Is this your final offer?|Yes, this is the best we can do.|better did
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|결제 조건 바꿔 주실 수 있나요?|60일까지는 가능합니다.|Can you change the payment terms?|We can go up to sixty days.|going until
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|다른 업체가 더 싸게 줬어요.|대신 저희는 품질과 납기를 보장합니다.|Another supplier offered a lower price.|But we guarantee quality and delivery.|guaranteed quantity
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|언제까지 답 주실 수 있어요?|금요일까지 답변드리겠습니다.|When can you get back to us?|We will get back to you by Friday.|until got
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|이 부분은 양보 못 해요.|그럼 다른 조건을 조정해 보죠.|We can't move on this point.|Then let's adjust the other terms.|adjusting others
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|조건 정리해 주시겠어요?|합의한 내용을 메일로 정리해 드릴게요.|Can you summarize the terms?|I will put what we agreed on in an email.|agree putting
+8|협상은 조건(If…)과 대안(How about…)으로 풀어요.|계약 진행할 수 있을까요?|그 조건이면 진행할 수 있습니다.|Can we close the deal?|On those terms, we can move forward.|forwards moving
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|매출 어땠어요?|매출은 전년 대비 8% 늘었습니다.|How was revenue?|Revenue grew eight percent year over year.|grow years
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|마진은요?|영업이익률이 1%p 개선됐습니다.|What about margins?|Operating margin improved by one percentage point.|improving points
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|무엇이 성장을 이끌었나요?|성장은 주로 디지털 사업이 이끌었습니다.|What drove growth?|Growth was mainly driven by our digital business.|drove main
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|비용은 어땠어요?|인건비 증가로 비용이 늘었습니다.|How did costs develop?|Costs rose due to higher personnel expenses.|raised because
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|하반기 전망은요?|하반기에는 회복을 예상합니다.|What is your outlook for the second half?|We expect a recovery in the second half.|expecting recover
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|예상보다 좋았나요?|시장 예상치를 웃돌았습니다.|Did you beat expectations?|We came in ahead of market expectations.|above beat
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|환율 영향은요?|환율 효과를 빼면 성장률은 5%입니다.|What was the currency impact?|Excluding currency effects, growth was five percent.|excluded including
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|계열 비중은요?|비계열 비중이 계속 커지고 있습니다.|What about the captive share?|The share of non-captive clients keeps rising.|rise raising
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|일회성 요인 있었어요?|일회성 비용을 빼면 이익은 늘었습니다.|Were there any one-off items?|Excluding one-off costs, profit increased.|including increasing
+9|실적은 숫자 + 비교 기준(year over year 등) + 원인 순서로.|4분기는 어때요?|4분기는 계절적으로 가장 강한 분기입니다.|How does the fourth quarter look?|The fourth quarter is seasonally our strongest.|season strong
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|자료 받으셨을까요?|수령 확인해 주시면 감사하겠습니다.|Did you receive the materials?|I would appreciate it if you could confirm receipt.|appreciated can
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|미팅 날짜 잡을까요?|가능하신 시간 몇 개 알려 주시겠어요?|Shall we set a meeting date?|Could you share a few times that work for you?|sharing works
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|메일 못 봤어요, 죄송해요.|답변이 늦어 죄송합니다.|Sorry, I missed your email.|Apologies for the delayed response.|apologize delay
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|파일 첨부했어요?|요청하신 자료를 첨부합니다.|Did you attach the file?|Please find the requested materials attached.|requesting attach
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|추가 질문이 있으면요?|궁금한 점 있으시면 편하게 연락 주세요.|What if they have more questions?|Please feel free to reach out with any questions.|freely reaching
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|마감 다시 알려 줄까요?|마감이 다가와서 다시 한번 알려드립니다.|Should I remind them of the deadline?|Just a gentle reminder that the deadline is approaching.|gently approach
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|감사 메일 보낼까요?|오늘 시간 내주셔서 감사합니다.|Should I send a thank-you note?|Thank you for taking the time to meet today.|took meeting
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|일정 바꿔야 해요.|죄송하지만 미팅 일정을 변경해야 합니다.|We need to reschedule.|We apologize, but we need to reschedule our meeting.|apology rescheduled
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|담당자 연결해 드릴까요?|관련 담당자를 참조로 넣었습니다.|Should I introduce the right person?|I have copied the relevant team member.|copy relevantly
+10|업무 메일은 I would appreciate…, Could you…로 정중하게.|답장 와야 해요.|회신 기다리겠습니다.|We need their reply.|I look forward to hearing from you.|looking hear
+#M
+1|본론 전에 미래예측 진술(forward-looking statements) 안내부터.|시작해 주시죠.|시작하기 전에 오늘 내용에 미래예측 진술이 포함돼 있음을 안내드립니다.|Please go ahead.|Before we begin, let me remind you that today's discussion includes forward-looking statements.|remember began
+1|순서 안내는 walk you through, open the line.|오늘 순서가 어떻게 되나요?|먼저 실적을 설명드리고 이어서 질의응답을 받겠습니다.|What is the agenda for today?|I will first walk you through our results, and then we will open the line for questions.|walking opened
+1|숫자 기준(연결·별도)을 먼저 밝혀 둬요.|별도 기준 숫자인가요?|별도 언급이 없으면 모든 수치는 연결 기준입니다.|Are these standalone figures?|Unless otherwise noted, all figures are on a consolidated basis.|noting consolidate
+1|콜은 감사 인사로 열어요.|연결됐습니다.|바쁘신 중에도 참석해 주셔서 감사합니다.|You are now connected.|Thank you all for joining us despite your busy schedules.|join busily
+1|핵심 메시지는 In short로 먼저 던져요.|한마디로 이번 분기는요?|한마디로 이번 분기는 수익성이 의미 있게 개선된 분기였습니다.|How would you sum up the quarter?|In short, this was a quarter of meaningful margin improvement.|shortly meaning
+2|원인은 was driven by로 연결해요.|매출총이익이 왜 늘었나요?|주로 북미 비계열 광고주 수주 덕분이었습니다.|What drove the increase in gross profit?|The increase was largely driven by non-captive wins in North America.|drove large
+2|성장 둔화는 기저 효과(high base)로 설명할 수 있어요.|성장이 둔화된 것 같은데요.|대부분 작년의 높은 기저 때문입니다.|Growth seems to have slowed.|That largely reflects a high base from last year.|reflecting basis
+2|일회성 요인을 떼어 내고 보여줘요.|영업이익이 왜 줄었죠?|일회성 비용을 빼면 영업이익은 오히려 늘었습니다.|Why did operating profit decline?|Excluding one-off costs, operating profit actually increased.|including actual
+2|전 분기 대비는 on a sequential basis.|전 분기와 비교하면요?|전 분기 대비로는 모든 지역이 개선됐습니다.|How does it compare with last quarter?|On a sequential basis, every region showed improvement.|sequence showing
+2|환율 효과를 뺀 성장은 on a constant currency basis.|환율 효과를 빼면요?|고정환율 기준으로 7% 성장했습니다.|What about excluding currency effects?|On a constant currency basis, we grew seven percent.|constantly grow
+2|마진 개선은 mix shift로 설명해요.|마진 개선 요인이 뭔가요?|고마진 디지털 쪽으로 구성이 바뀐 게 핵심이었습니다.|What drove the margin improvement?|A favorable mix shift toward high-margin digital work was the key factor.|favor keys
+3|공식 가이던스는 안 주되 방향성은 공유해요.|내년 가이던스 주실 수 있나요?|공식 가이던스는 드리지 않지만 대략적인 방향은 말씀드릴 수 있습니다.|Can you give us guidance for next year?|We don't provide formal guidance, but I can share the general direction.|giving formally
+3|불확실성 속 긍정은 cautiously optimistic.|하반기 전망은요?|거시 불확실성에도 하반기는 조심스럽게 낙관합니다.|What is your outlook for the second half?|Despite macro uncertainty, we remain cautiously optimistic about the second half.|although caution
+3|on track으로 자신감을, although로 여지를 남겨요.|마진 목표 달성 가능하세요?|목표 달성 궤도에 있다고 보지만 변수는 남아 있습니다.|Can you hit your margin target?|We believe we are on track, although some variables remain.|believing tracks
+3|가정 질문엔 would로 답하고 완충 요인을 제시해요.|광고 경기가 꺾이면요?|하방 리스크는 있지만 계열 물량이 완충 역할을 합니다.|What if the ad market slows?|There would be some downside risk, but our captive business provides a buffer.|is provide
+3|한 분기로 추세를 단정하지 않아요.|이 성장세가 이어질까요?|한 분기 숫자로 추세를 판단하기는 이릅니다.|Will this growth continue?|It is too early to call a trend based on a single quarter.|calling basing
+4|날 선 질문은 먼저 인정하고 받아요.|계열 의존도 너무 높지 않나요?|좋은 질문입니다, 계열 의존도에 대한 우려로 이해하겠습니다.|Isn't your reliance on captive clients too high?|That's a fair question, and I understand the concern about captive reliance.|fairly concerned
+4|비공개 숫자는 범위로만 답해요.|그 광고주 매출 비중이 얼마예요?|개별 광고주 수치는 공개하지 않지만 한 자릿수 비중입니다.|What share of revenue comes from that client?|We don't disclose client-level figures, but it is in the single digits.|disclosing digit
+4|모르는 숫자는 확인 후 follow up.|그 지역 마진 정확히 몇 %죠?|정확한 수치는 확인해서 콜 이후 따로 말씀드리겠습니다.|What exactly was the margin in that region?|Let me confirm the exact figure and follow up with you after the call.|confirming following
+4|틀린 전제는 Contrary to로 바로잡아요.|점유율을 잃고 있는 거 아닌가요?|말씀하신 전제와 달리 점유율은 오히려 늘었습니다.|Aren't you losing market share?|Contrary to that assumption, our share has actually expanded.|opposite expanding
+4|여러 질문은 one at a time으로 나눠 답해요.|비용이랑 인력, 두 가지 여쭤봐도 될까요?|네, 하나씩 답변드리겠습니다.|May I ask two questions on costs and headcount?|Sure, let me take those one at a time.|taking once
+4|추측성 질문은 방침을 이유로 정중히 거절해요.|인수합병 계획 있으세요?|시장의 추측에 대해서는 언급하지 않는 것이 저희 방침입니다.|Are you planning any acquisitions?|As a matter of policy, we don't comment on market speculation.|policies commenting
+5|정책 유지는 remains unchanged.|배당 정책이 바뀌나요?|배당성향 30% 이상 유지 정책은 변함없습니다.|Is your dividend policy changing?|Our policy of maintaining a payout ratio above thirty percent remains unchanged.|maintain changed
+5|자사주 소각은 cancel treasury shares.|자사주는 어떻게 하실 건가요?|보유 자사주는 전량 소각할 계획입니다.|What will you do with the treasury shares?|We plan to cancel all of our treasury shares.|cancelling planned
+5|공시 예정은 expect to disclose.|밸류업 공시 계획 있으세요?|연내 기업가치 제고 계획을 공시할 예정입니다.|Do you plan to announce a value-up program?|We expect to disclose our corporate value-up plan within the year.|expecting disclosure
+5|우선순위는 comes first, 균형은 balance with.|현금은 어디에 먼저 쓰시나요?|성장 투자가 먼저지만 주주환원과 균형을 맞추겠습니다.|What are your priorities for cash?|Growth investment comes first, but we will balance it with shareholder returns.|came balancing
+5|저평가 주장은 does not fully reflect로 점잖게.|주가가 저평가됐다고 보세요?|현재 주가는 내재가치를 충분히 반영하지 못한다고 봅니다.|Do you think the stock is undervalued?|We believe the current share price does not fully reflect our intrinsic value.|reflects full
+6|초대받은 쪽은 Thank you for having us.|시간 내주셔서 감사합니다.|저희야말로 초대해 주셔서 감사합니다, 정말 귀한 기회예요.|Thank you for taking the time to meet us.|Thank you for having us, we really appreciate the opportunity.|had appreciating
+6|투자 포인트는 세 기둥(pillars)으로 정리해요.|투자 포인트가 뭔가요?|비계열 성장, 디지털 전환, 주주환원 세 가지입니다.|What is your investment thesis?|There are three pillars, non-captive growth, digital transformation, and shareholder returns.|pillar is
+6|차별점은 what set us apart.|경쟁사 대비 강점이 뭔가요?|글로벌 네트워크와 데이터 역량이 저희를 차별화합니다.|What sets you apart from competitors?|Our global network and data capabilities are what set us apart.|sets setting
+6|후속 자료는 바로 보내겠다고 약속해요.|관련 자료 받을 수 있을까요?|미팅 직후 IR 자료를 메일로 보내드리겠습니다.|Could we get some materials on that?|I will email you our IR deck right after the meeting.|emailed decks
+6|장기 목표는 aim to로 말해요.|5년 뒤엔 어떤 회사가 되어 있을까요?|비계열 광고주가 사업의 절반 이상을 차지하는 회사를 목표로 합니다.|Where do you see the company in five years?|We aim to have non-captive clients account for more than half of our business.|aiming accounts
+7|미공개 정보는 fair disclosure를 이유로 거절해요.|다음 분기 숫자 귀띔해 주실 수 있나요?|공정공시 규정상 미공개 정보는 말씀드릴 수 없습니다.|Could you give us a hint about next quarter?|Under fair disclosure rules, we cannot share any non-public information.|can publicly
+7|침묵 기간엔 일정을 발표 이후로 미뤄요.|다음 주에 미팅 가능할까요?|침묵 기간이라 실적 발표 이후로 일정을 잡아야 합니다.|Can we meet next week?|We are in our quiet period, so we will need to schedule it after earnings.|schedules quietly
+7|공시 범위 밖은 speak to what has been disclosed로 선을 그어요.|그 계약 규모가 얼마나 되나요?|공시된 범위 안에서만 말씀드릴 수 있는 점 양해 부탁드립니다.|How large is that contract?|I hope you understand that I can only speak to what has been disclosed.|understood disclosing
+7|정정 공시는 filed a correction.|숫자가 왜 바뀌었죠?|회계 처리 변경으로 정정 공시를 했습니다.|Why did the numbers change?|We filed a correction due to a change in accounting treatment.|filing treat
+7|루머는 짧고 단호하게 부인해요.|매각설이 돌던데요.|해당 보도는 사실이 아니며 검토 중인 사안도 없습니다.|There are rumors of a sale.|Those reports are not accurate, and nothing of that kind is under review.|accurately reviewing
+8|지속 가능성은 근거(as we continue to…)와 함께.|비계열 성장이 지속 가능한가요?|대형 글로벌 광고주 수주가 이어지고 있어 그렇다고 봅니다.|Is non-captive growth sustainable?|We think so, as we continue to win large global accounts.|winning continued
+8|비중은 accounts for.|이제 디지털 비중은 얼마나 돼요?|디지털이 이제 매출총이익의 절반 이상을 차지합니다.|What share is digital now?|Digital now accounts for more than half of our gross profit.|account accounting
+8|영향은 which is positive for로 이어 붙여요.|AI가 마진에 어떤 영향을 주나요?|AI로 제작 효율이 높아지고 있어 마진에 긍정적입니다.|How is AI affecting your margins?|AI is improving production efficiency, which is positive for margins.|improve efficient
+8|경향은 tend to.|월드컵이 실적에 도움이 될까요?|대형 스포츠 이벤트가 있는 해에는 실적이 일시적으로 좋아지는 경향이 있습니다.|Will the World Cup help results?|Results tend to get a temporary boost in years with major sporting events.|tends temporarily
+8|리스크 질문엔 given으로 근거를 붙여요.|주요 광고주가 떠나면요?|특정 광고주 의존도가 낮아 영향은 제한적일 겁니다.|What if a major client leaves?|The impact would be limited, given our low dependence on any single client.|limit depending
+8|사업별 마진 비교는 carry higher margins than.|어느 사업 마진이 더 높아요?|제작과 디지털 솔루션 마진이 매체 대행보다 높습니다.|Which business has higher margins?|Creative and digital solutions carry higher margins than media buying.|carries highest`;
+function gItem(id,lv,u,ord,tip,ak,bk,ae,be,dx){const punct=(be.match(/[.?!]$/)||[''])[0];const toks=be.replace(/[.?!]$/,'').split(' ').map(t=>t.replace(/,$/,''));
  if(toks[0]!=='I')toks[0]=toks[0][0].toLowerCase()+toks[0].slice(1);
- GR.push({id:'g'+lv+'-'+i,lv,pt,tip,ak,bk,ae,be,punct,toks,dx:dx.split(' ')})}));
+ GR.push({id,lv,u,ord,pt:lv==='M'?MASTER_UNITS[u-1]:UNITS[lv][u-1],tip,ak,bk,ae,be,punct,toks,dx:dx.split(' ')})}
+/* 예전 문제(아이디 유지) → 새 커리큘럼 레벨·유닛으로 */
+[1,2,3].forEach(ol=>GRAW[ol].trim().split('\n').forEach((l,i)=>{const[pt,tip,ak,bk,ae,be,dx]=l.split('|');const[lv,u]=OLDU[pt]||[ol,1];gItem('g'+ol+'-'+i,lv,u,100+i,tip,ak,bk,ae,be,dx)}));
+/* 새 문제: #레벨 블록, 줄마다 유닛|팁|A한글|B한글|A영어|B영어|함정 */
+{let lv=null,n=0;GNEW.split('\n').forEach(l=>{if(l.startsWith('#')){lv=l.slice(1)==='M'?'M':+l.slice(1);n=0;return}if(!l.trim())return;
+ const[u,tip,ak,bk,ae,be,dx]=l.split('|');gItem((lv==='M'?'m':'n'+lv)+'-'+n,lv,+u,n,tip,ak,bk,ae,be,dx);n++})}
+GR.sort((a,b)=>(a.lv===b.lv?0:a.lv==='M'?1:b.lv==='M'?-1:a.lv-b.lv)||a.u-b.u||a.ord-b.ord);
 const G=Object.fromEntries(GR.map(x=>[x.id,x]));
 
+function unitList(lv){const gs=D.gram||{};const names=lv==='M'?MASTER_UNITS:UNITS[lv];
+ return names.map((nm,i)=>{const its=GR.filter(x=>x.lv===lv&&x.u===i+1);const seen=its.filter(x=>gs[x.id]).length,good=its.filter(x=>gs[x.id]&&gs[x.id].box>=1).length;
+  const st=!its.length?'<span class="muted">준비 중</span>':good===its.length?'✅':`<span class="muted">${seen}/${its.length}</span>`;
+  return `<div class="unit"><span class="un">${lv==='M'?'IR':lv}-${i+1}</span><span style="flex:1">${nm}</span>${st}</div>`}).join('')}
 function vGram(){lastView='gram';
  if(!D.glevel){D.glevel=1;save()}
- const t=today(),gs=D.gram||{},seen=Object.keys(gs).length,mast=Object.values(gs).filter(v=>v.box>=3).length;
+ const gs=D.gram||{},seen=Object.keys(gs).length,mast=Object.values(gs).filter(v=>v.box>=3).length,M=isMaster(),lv=M?'M':D.glevel;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>문법</h1></div>
  <div class="body">
-  <div class="lvseg">${[1,2,3].map(l=>`<button class="${D.glevel===l?'on':''}" onclick="D.glevel=${l};save();vGram()">${LV_NAME[l]}</button>`).join('')}</div>
-  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>
+  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜 · NDR · 공시 실전 대화만 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.glevel===l?'on':''}" onclick="D.glevel=${l};save();vGram()">${LV_NAME[l]}</button>`).join('')}</div>
+  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>`}
   <div class="today" style="background:linear-gradient(135deg,#4b7bff,#6a5cff)">
-   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">대화 문장 만들기</span>
-   <h3 style="margin-top:10px">단어 카드를 눌러 문장을 완성해요</h3>
-   <p style="font-size:13px;opacity:.9;margin-top:4px">오늘 목표 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
+   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('g')}/5문제 ${todayCnt('g')>=5?'✅':''}</span>
+   <h3 style="margin-top:10px">단어 카드로 대화 문장을 완성해요</h3>
+   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
    <button class="btn" style="color:#4b5bff" onclick="startGram()">시작하기</button>
   </div>
+  <div class="card"><div class="row"><b style="flex:1">${M?'IR 마스터 과정':'레벨 '+lv+' · '+LV_NAME[lv]+' 과정'}</b><span class="muted">유닛 순서대로 나와요</span></div><div class="units">${unitList(lv)}</div></div>
   <div class="card">${calendar()}</div>
  </div>`;
 }
 function startGram(){
  if(!D.glevel)D.glevel=1;
  const t=today(),gs=D.gram=D.gram||{};
- const rev=Object.entries(gs).filter(([,v])=>v.due<=t).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
+ const rev=Object.entries(gs).filter(([id,v])=>v.due<=t&&G[id]&&((G[id].lv==='M')===isMaster())).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
  const fresh=x=>!gs[x.id];
- const pool=[...shuffle(GR.filter(x=>fresh(x)&&x.lv===D.glevel)),...GR.filter(x=>fresh(x)&&x.lv>D.glevel),...GR.filter(x=>fresh(x)&&x.lv<D.glevel)];
+ const M=isMaster(),inMy=x=>M?x.lv==='M':x.lv!=='M';
+ const pool=M?GR.filter(x=>fresh(x)&&x.lv==='M'):[...GR.filter(x=>fresh(x)&&x.lv===D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv>D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv<D.glevel)];
  let ids=[...rev,...pool.slice(0,goal()-rev.length).map(x=>x.id)];
- if(ids.length<goal())ids=[...ids,...shuffle(GR.map(x=>x.id).filter(id=>!ids.includes(id))).slice(0,goal()-ids.length)];
- S={mode:'g',first:{},queue:shuffle(ids),qi:0,doneN:0};S.total=S.queue.length;vGCard();
+ if(ids.length<goal())ids=[...ids,...shuffle(GR.filter(inMy).map(x=>x.id).filter(id=>!ids.includes(id))).slice(0,goal()-ids.length)];
+ S={mode:'g',first:{},queue:ids,qi:0,doneN:0};S.total=S.queue.length;vGCard();
 }
 function vGCard(){
  if(S.qi>=S.queue.length)return gFinish();
@@ -831,7 +1135,7 @@ function vGCard(){
  const tag=r?`<span class="tag rv">${daysAgo(r.last)}일 전</span>`:`<span class="tag">New</span>`;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="gQuit()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
  <div class="body">
-  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${LV_NAME[g.lv]}</span>${tag}<div style="flex:1"></div>
+  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${g.lv==='M'?'IR 마스터 '+g.u:'레벨 '+g.lv+'-'+g.u}</span>${tag}<div style="flex:1"></div>
    <button class="tool" onclick="speak(S.c.g.ae)">🔊 A 듣기</button><button class="tool" onclick="gVoice()" id="micI">🎤</button></div>
   <div class="qc" id="gqc"><div class="k" style="font-size:14px;padding:10px 14px"><div class="dl"><span class="ab">A</span>${g.ak}</div><div class="dl"><span class="ab">B</span>${g.bk}</div></div>
    <div id="gmsg"></div><div class="e2"><div class="dl"><span class="ab">A</span><span>${g.ae}</span></div><div class="dl"><span class="ab">B</span><div class="line" id="gl" onpointerdown="gPD(event)" onpointermove="gPM(event)" onpointerup="gPU(event)" onpointercancel="gPU(event)" onclick="gClick(event)"></div><span>${g.punct}</span></div></div></div>
@@ -948,7 +1252,7 @@ function gHint(){const c=S.c;if(c.locked)return;
 function gDone(ok){
  const c=S.c,g=c.g;c.locked=true;c.res=ok;gDraw();
  if(!(g.id in S.first))S.first[g.id]=!c.wrongTry&&!c.hints;
- S.doneN++;speak(g.be);
+ S.doneN++;tally('g');speak(g.be);
  const clean=!c.wrongTry&&!c.hints;
  $('#sh').innerHTML=`<div class="sheet g"><h4><span class="jump">${face(me().ch,34)}</span>${clean?['정답이에요! 🎉','완벽해요! ✨','좋아요! 👏'][Math.random()*3|0]:'맞았어요! 내일 한 번 더 복습해요 👍'}</h4>
  <p><b>B: ${g.be}</b><br><span class="tag" style="margin:6px 0 4px">📌 ${g.pt}</span><br><span class="muted">${g.tip}</span></p>
@@ -983,7 +1287,7 @@ function gFinish(){
  const ids=Object.keys(res),okN=ids.filter(id=>res[id]).length;
  let up=false;D.ghist=[...(D.ghist||[]),okN/Math.max(1,ids.length)].slice(-3);
  const left=GR.filter(x=>x.lv===D.glevel&&!D.gram[x.id]).length;
- if(D.glevel<3&&((D.ghist.length>=3&&D.ghist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.glevel++;D.ghist=[];up=true}
+ if(!isMaster()&&D.glevel<5&&((D.ghist.length>=3&&D.ghist.reduce((a,b)=>a+b,0)/3>=0.8)||left===0)){D.glevel++;D.ghist=[];up=true}
  save();
  app.innerHTML=`<div class="body">
  <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
