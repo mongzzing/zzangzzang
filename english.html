@@ -691,8 +691,7 @@ function vVocab(){lastView='vocab';
  const t=today(),done=!!D.days[t];
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>어휘</h1><button class="iconbtn" onclick="vBook()">📒</button></div>
  <div class="body">
-  ${isMaster()?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅에서 쓰는 실전 용어만 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.level===l?'on':''}" onclick="setLv(${l})">${LV_NAME[l]}</button>`).join('')}</div>
-  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>`}
+  ${isMaster()?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅에서 쓰는 실전 용어만 나와요</small></div>`:``}
   <div class="today">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('v')}/5문제 ${todayCnt('v')>=5?'✅':''}</span>
    <h3 style="margin-top:10px">${done?'잘했어요! 한 세트 더 할까요?':'한 세트 '+goal()+'문제'}</h3>
@@ -872,7 +871,7 @@ function finish(){
  app.innerHTML=`<div class="body">
  <div style="text-align:center;padding-top:20px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
  <h2 style="font-size:24px;font-weight:900;margin-top:6px">${wasDone?'한 세트 더 완료!':'오늘 출석 도장 쾅!'}</h2>
- ${up?`<div class="lvup">⬆️ 레벨업! 이제 <b>${LV_NAME[D.level]}</b> 단어가 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 단어 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
+ ${up?`<div class="lvup">⬆️ 레벨업! 이제 더 어려운 단어가 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 단어 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
  <div class="card rlist">${ids.map(id=>{const w=W[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><b>${w.w}</b><span class="muted">${w.m}</span><button class="iconbtn" style="font-size:18px" onclick="speak(W['${id}'].ex)">🔊</button></div>`}).join('')}</div>
  <p class="note">🔁 단어는 내일 복습으로 다시 나와요</p>
  <button class="btn" onclick="vVocab()">완료</button></div>`;
@@ -1431,15 +1430,14 @@ function vGram(){lastView='gram';
  const gs=D.gram||{},seen=Object.keys(gs).length,mast=Object.values(gs).filter(v=>v.box>=3).length,M=isMaster(),lv=M?'M':D.glevel;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>문법</h1></div>
  <div class="body">
-  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜 · NDR · 공시 실전 대화가 섞여서 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.glevel===l?'on':''}" onclick="D.glevel=${l};save();vGram()">${LV_NAME[l]}</button>`).join('')}</div>
-  <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>`}
+  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜 · NDR · 공시 실전 대화가 섞여서 나와요</small></div>`:``}
   <div class="today" style="background:linear-gradient(135deg,#4b7bff,#6a5cff)">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('g')}/5문제 ${todayCnt('g')>=5?'✅':''}</span>
    <h3 style="margin-top:10px">단어 카드로 대화 문장을 완성해요</h3>
    <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
    <button class="btn" style="color:#4b5bff" onclick="startGram()">시작하기</button>
   </div>
-  ${M?'':`<div class="card"><div class="row"><b style="flex:1">레벨 ${lv} · ${LV_NAME[lv]} 과정</b><span class="muted">유닛 순서대로 나와요</span></div><div class="units">${unitList(lv)}</div></div>`}
+  ${M?'':`<div class="card"><div class="row"><b style="flex:1">지금 배우는 과정</b><span class="muted">유닛 순서대로 나와요</span></div><div class="units">${unitList(lv)}</div></div>`}
   <div class="card">${calendar()}</div>
  </div>`;
 }
@@ -1618,7 +1616,7 @@ function gFinish(){
  app.innerHTML=`<div class="body">
  <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
  <h2 style="font-size:20px;font-weight:900;margin-top:6px">${wasDone?'문법 완료!':'오늘 출석 도장 쾅!'}</h2>
- ${up?`<div class="lvup">⬆️ 레벨업! 이제 <b>${LV_NAME[D.glevel]}</b> 문법이 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 문제 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
+ ${up?`<div class="lvup">⬆️ 레벨업! 이제 더 어려운 문법이 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 문제 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
  <div class="card rlist">${ids.map(id=>{const g=G[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><div style="flex:1"><b style="font-size:14px">${g.be}</b><div class="muted">📌 ${g.pt}</div></div><button class="iconbtn" style="font-size:18px" onclick="speak(G['${id}'].be)">🔊</button></div>`}).join('')}</div>
  <button class="btn" onclick="vGram()">완료</button></div>`;
 }
