@@ -698,10 +698,12 @@ async function submit(e) {
 // 앱 목록. 새 기능은 여기에 한 줄 추가하고 view-<id> 화면을 만들면 된다
 const APPS = [
   { id: 'blog', icon: '📝', name: '블로그 글 맡기기', short: '블로그', desc: '사진·메모 올리면 글을 써 드려요' },
-  { id: 'eng', icon: '🗣️', name: '오늘의 비즈니스 영어', short: '영어', desc: '하루 표현 3개 · 원어민 발음' },
+  { id: 'eng', icon: '🗣️', name: '짱짱이네 영어', short: '영어', desc: '어휘 · 문법 · 매일 출석 도장' },
 ];
 
 function go(v) {
+  // 영어는 새로 만든 별도 화면(english.html)으로 연다
+  if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
   view = v;
   stopSpeak();
   ['home', 'blog', 'eng'].forEach(x => { $('view-' + x).hidden = x !== v; });
@@ -732,7 +734,7 @@ function renderHome() {
       const n = state ? todo(state[current] || []) : 0;
       if (n) b.append(el('span', 't-status todo', '● 확인할 글 ' + n + '개'));
     }
-    if (a.id === 'eng' && engData) {
+    if (a.id === 'eng' && false) {
       const done = !!engData.done[keyOf(new Date())];
       b.append(el('span', 't-status ' + (done ? 'done' : 'todo'), done ? '✓ 오늘 공부 완료' : '● 오늘 아직 안 했어요'));
       const fam = familyDoneToday();
@@ -1733,6 +1735,11 @@ $('pin-form').addEventListener('submit', e => {
 
 renderAccounts();
 refresh();
+// 영어 화면에서 돌아오면(?u=이름) 그 계정으로 바로 들어간다
+try {
+  const u = new URLSearchParams(location.search).get('u');
+  if (u && PEOPLE[u]) { enter(u); history.replaceState(null, '', location.pathname); }
+} catch (e) { /* 없어도 동작 */ }
 setInterval(() => { if (!busy) refresh(); }, 60000);
 // 채팅 화면에서 답을 기다릴 때만 자주 확인한다
 setInterval(() => { if (current && view === 'blog' && tab === 'chat' && chatWaiting) loadChat(); }, 8000);
