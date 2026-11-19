@@ -658,10 +658,12 @@ function vDraw(){
 }
 function kKey(e,k){e.preventDefault();const c=S.c;if(!c||c.locked)return;
  const tt=c.typed.split(' ');
- if(k==='del'){c.typed=c.typed.slice(0,-1)}
+ if(k==='del'){c.typed=c.typed.endsWith(' ')?c.typed.slice(0,-2):c.typed.slice(0,-1)}
  else if(k==='ok'){if(c.typed.trim())check(c.typed.trim());return}
  else if(k===' '){if(tt[tt.length-1]&&tt.length<c.w.toks.length)c.typed+=' ';else return}
- else{if(tt[tt.length-1].length>=24)return;c.typed+=k}
+ else{if(tt[tt.length-1].length>=24)return;c.typed+=k;
+  /* 그 단어 글자 수만큼 치면 다음 빈칸으로 자동으로 넘어감 */
+  const n=tt.length-1,cur=tt[n]+k;if(n<c.w.toks.length-1&&cur.length===c.w.toks[n].length)c.typed+=' '}
  vDraw();
 }
 function hint(){const c=S.c;if(c.locked)return;
