@@ -760,8 +760,8 @@ async function submit(e) {
 /* ───────── 홈 / 화면 전환 ───────── */
 // 앱 목록. 새 기능은 여기에 한 줄 추가하고 view-<id> 화면을 만들면 된다
 const APPS = [
-  { id: 'blog', icon: '📝', name: '블로그 글 맡기기', short: '블로그', desc: '사진·메모 올리면 글을 써 드려요' },
-  { id: 'eng', icon: '🗣️', name: '짱짱이네 영어', short: '영어', desc: '어휘 · 문법 · 매일 출석 도장' },
+  { id: 'blog', icon: '📝', name: '블로그 쓰기', short: '블로그', desc: '' },
+  { id: 'eng', icon: '🗣️', name: '영어 공부', short: '영어', desc: '' },
 ];
 
 function go(v) {
@@ -797,7 +797,8 @@ function renderHome() {
     const b = el('button', 'card tile');
     b.type = 'button';
     const ic = el('span', 't-ico'); ic.innerHTML = TILE_ICON[a.id] || a.icon;
-    b.append(ic, el('span', 't-name', a.name), el('span', 't-desc', a.desc));
+    b.append(ic, el('span', 't-name', a.name));
+    if (a.desc) b.append(el('span', 't-desc', a.desc));
     if (a.id === 'blog') {
       const n = state ? todo(state[current] || []) : 0;
       if (n) b.append(el('span', 't-status todo', '● 확인할 글 ' + n + '개'));
@@ -812,7 +813,7 @@ function renderHome() {
     return b;
   });
   const soon = el('div', 'card tile soon');
-  soon.append(el('span', 't-ico', '＋'), el('span', 't-desc', '새 기능이 곧 추가돼요'));
+  soon.append(el('span', 't-ico', '＋'));
   $('tiles').replaceChildren(...tiles, soon);
 }
 
