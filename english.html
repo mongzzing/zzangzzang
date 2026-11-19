@@ -781,7 +781,7 @@ function vGCard(){
   <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${LV_NAME[g.lv]}</span>${tag}<div style="flex:1"></div>
    <button class="tool" onclick="speak(S.c.g.ae)">🔊 A 듣기</button><button class="tool" onclick="gVoice()" id="micI">🎤</button></div>
   <div class="qc" id="gqc"><div class="k" style="font-size:14px;padding:10px 14px"><div class="dl"><span class="ab">A</span>${g.ak}</div><div class="dl"><span class="ab">B</span>${g.bk}</div></div>
-   <div id="gmsg"></div><div class="e2"><div class="dl"><span class="ab">A</span><span>${g.ae}</span></div><div class="dl"><span class="ab">B</span><div class="line" id="gl" onpointerdown="gPD(event)" onpointermove="gPM(event)" onpointerup="gPU(event)" onpointercancel="gPU(event)"></div><span>${g.punct}</span></div></div></div>
+   <div id="gmsg"></div><div class="e2"><div class="dl"><span class="ab">A</span><span>${g.ae}</span></div><div class="dl"><span class="ab">B</span><div class="line" id="gl" onpointerdown="gPD(event)" onpointermove="gPM(event)" onpointerup="gPU(event)" onpointercancel="gPU(event)" onclick="gClick(event)"></div><span>${g.punct}</span></div></div></div>
   <div class="blocks" id="gb"></div>
   <div style="flex:1"></div>
   <div class="row"><button class="btn ghost" style="width:auto;flex:none;padding:13px 14px;font-size:14px;white-space:nowrap" onclick="gHint()">💡 힌트</button><button class="btn" id="gok" onclick="gCheck()">확인</button></div>
@@ -813,23 +813,28 @@ function gTap(i){const c=S.c;if(c.noClick||c.locked||!c.blocks[i]||c.blocks[i].u
 function gUn(i){const c=S.c;if(c.locked||!c.fill[i])return;const bi=c.fill[i].bi;const ce=document.querySelector(`#gl .chip[data-i="${i}"]`);if(ce)c.flyBack={b:bi,r:ce.getBoundingClientRect()};c.blocks[bi].used=false;c.fill.splice(i,1);gFix(bi);gDraw()}
 /* 드래그: 들어서 옮기는 느낌 */
 let ghost=null;
+/* 살짝 누르면 빼기, 살짝 길게 누르면 들어서 옮기기 */
 function gPD(e){const c=S.c;const ch=e.target.closest&&e.target.closest('.chip');if(!ch||c.locked)return;
- c.dragI=+ch.dataset.i;c.sx=e.clientX;c.sy=e.clientY;c.dragging=false;c.moved=false;try{$('#gl').setPointerCapture(e.pointerId)}catch(_){}}
-function gPM(e){const c=S.c;if(c.dragI==null)return;
- if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<7)return;
-  const el=document.querySelector(`#gl .chip[data-i="${c.dragI}"]`),r=el.getBoundingClientRect();
-  c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gFix(c.fill[c.dragI].bi);
-  ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.fill[c.dragI].t;document.body.appendChild(ghost);
-  gDraw()}
+ c.dragI=+ch.dataset.i;c.sx=c.lx=e.clientX;c.sy=c.ly=e.clientY;c.dragging=false;c.moved=false;c.cancelTap=false;c.pid=e.pointerId;
+ clearTimeout(c.hold);c.hold=setTimeout(gLift,160)}
+function gLift(){const c=S.c;if(c.dragI==null||c.dragging||c.cancelTap)return;
+ const el=document.querySelector(`#gl .chip[data-i="${c.dragI}"]`);if(!el)return;const r=el.getBoundingClientRect();
+ c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gFix(c.fill[c.dragI].bi);
+ try{$('#gl').setPointerCapture(c.pid)}catch(_){}
+ ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.fill[c.dragI].t;document.body.appendChild(ghost);
+ ghost.style.transform=`translate(${c.lx-c.ox}px,${c.ly-c.oy}px) scale(1.12) rotate(-3deg)`;
+ gDraw(true)}
+function gPM(e){const c=S.c;if(c.dragI==null)return;c.lx=e.clientX;c.ly=e.clientY;
+ if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)>10){c.cancelTap=true;clearTimeout(c.hold)}return}
  if(ghost)ghost.style.transform=`translate(${e.clientX-c.ox}px,${e.clientY-c.oy}px) scale(1.12) rotate(-3deg)`;
  const j=insIdx(e.clientX,e.clientY);
  if(j>=0&&j!==c.dragI){const[m]=c.fill.splice(c.dragI,1);c.fill.splice(j,0,m);c.dragI=j;c.moved=true;gDraw(true)}}
+function gClick(e){const c=S.c;if(c.locked||c.justDragged)return;const ch=e.target.closest&&e.target.closest('.chip');if(!ch)return;gUn(+ch.dataset.i)}
 function inLine(x,y){const r=$('#gl').getBoundingClientRect();return x>r.left-24&&x<r.right+24&&y>r.top-30&&y<r.bottom+30}
 function flyGhost(g,el,cb){if(g&&el){const r=el.getBoundingClientRect();try{const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1) rotate(0)`}],{duration:180,easing:'ease-out',fill:'forwards'});a.onfinish=()=>{g.remove();cb&&cb()};return}catch(_){}}if(g)g.remove();cb&&cb()}
-function gPU(e){const c=S.c;if(c.dragI==null)return;const i=c.dragI,was=c.dragging;
- if(e.type==='pointercancel'&&!was){c.dragI=null;return}
- const small=Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<14&&!c.moved;
- if(!was||small){if(ghost){ghost.remove();ghost=null}c.dragI=null;c.dragging=false;return gUn(i)}
+function gPU(e){const c=S.c;if(c.dragI==null)return;clearTimeout(c.hold);const i=c.dragI,was=c.dragging;
+ if(!was){c.dragI=null;return}
+ c.justDragged=true;setTimeout(()=>c.justDragged=false,120);
  const g=ghost;ghost=null;c.dragI=null;c.dragging=false;
  if(!inLine(e.clientX,e.clientY)){const bi=c.fill[i].bi;c.blocks[bi].used=false;c.fill.splice(i,1);gFix(bi);gDraw();
   return flyHome(g,bi)}
