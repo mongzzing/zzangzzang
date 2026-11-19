@@ -202,6 +202,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .units{display:flex;flex-direction:column;gap:4px;margin-top:8px}
 .unit{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:14px}
 .unit .un{font-size:11px;font-weight:800;color:var(--sub);background:var(--bg);border-radius:6px;padding:2px 6px;min-width:38px;text-align:center}
+.bx.vb{text-align:left}
 </style>
 </head>
 <body>
@@ -804,8 +805,9 @@ function vDraw(){
  const cur=c.locked?-1:tt.length-1;
  const boxes=w.toks.map((t,i)=>{const v=c.locked?t:(tt[i]||'');const wd=Math.max(40,t.length*11+18);
   const cls=c.res===true?'ok':c.res===false?'no':(i===cur?'cur':'');
-  const txt=v?v:(c.hint?`<span class="hh">${t[0]}${'_'.repeat(Math.max(0,t.length-1))}</span>`:'');
-  return `<span class="bx ${cls}" style="min-width:${wd}px">${txt}</span>`}).join(' ');
+  const rest=c.hint&&!c.locked?`<span class="hh">${(v?'':t[0])+'_'.repeat(Math.max(0,t.length-Math.max(v.length,1)))}</span>`:'';
+  const txt=(v||'')+rest;
+  return `<span class="bx vb ${cls}" style="min-width:${wd}px">${txt}</span>`}).join(' ');
  $('#ven').innerHTML=`${w.pre}${boxes}${w.post}`;
 }
 function kKey(e,k){e.preventDefault();const c=S.c;if(!c||c.locked)return;
