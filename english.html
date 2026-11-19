@@ -1431,7 +1431,7 @@ function vGram(){lastView='gram';
  const gs=D.gram||{},seen=Object.keys(gs).length,mast=Object.values(gs).filter(v=>v.box>=3).length,M=isMaster(),lv=M?'M':D.glevel;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>문법</h1></div>
  <div class="body">
-  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜 · NDR · 공시 실전 대화만 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.glevel===l?'on':''}" onclick="D.glevel=${l};save();vGram()">${LV_NAME[l]}</button>`).join('')}</div>
+  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜 · NDR · 공시 실전 대화가 섞여서 나와요</small></div>`:`<div class="lvseg l5">${[1,2,3,4,5].map(l=>`<button class="${D.glevel===l?'on':''}" onclick="D.glevel=${l};save();vGram()">${LV_NAME[l]}</button>`).join('')}</div>
   <p class="note" style="margin-top:-6px">잘 맞히면 자동으로 레벨업돼요 ⬆️</p>`}
   <div class="today" style="background:linear-gradient(135deg,#4b7bff,#6a5cff)">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('g')}/5문제 ${todayCnt('g')>=5?'✅':''}</span>
@@ -1439,7 +1439,7 @@ function vGram(){lastView='gram';
    <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
    <button class="btn" style="color:#4b5bff" onclick="startGram()">시작하기</button>
   </div>
-  <div class="card"><div class="row"><b style="flex:1">${M?'IR 마스터 과정':'레벨 '+lv+' · '+LV_NAME[lv]+' 과정'}</b><span class="muted">유닛 순서대로 나와요</span></div><div class="units">${unitList(lv)}</div></div>
+  <div class="card"><div class="row"><b style="flex:1">${M?'IR 마스터 과정':'레벨 '+lv+' · '+LV_NAME[lv]+' 과정'}</b><span class="muted">${M?'과정 섞어서 나와요':'유닛 순서대로 나와요'}</span></div><div class="units">${unitList(lv)}</div></div>
   <div class="card">${calendar()}</div>
  </div>`;
 }
@@ -1449,10 +1449,10 @@ function startGram(){
  const rev=Object.entries(gs).filter(([id,v])=>v.due<=t&&G[id]&&((G[id].lv==='M')===isMaster())).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
  const fresh=x=>!gs[x.id];
  const M=isMaster(),inMy=x=>M?x.lv==='M':x.lv!=='M';
- const pool=M?GR.filter(x=>fresh(x)&&x.lv==='M'):[...GR.filter(x=>fresh(x)&&x.lv===D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv>D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv<D.glevel)];
+ const pool=M?shuffle(GR.filter(x=>fresh(x)&&x.lv==='M')):[...GR.filter(x=>fresh(x)&&x.lv===D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv>D.glevel),...GR.filter(x=>fresh(x)&&x.lv!=='M'&&x.lv<D.glevel)];
  let ids=[...rev,...pool.slice(0,goal()-rev.length).map(x=>x.id)];
  if(ids.length<goal())ids=[...ids,...shuffle(GR.filter(inMy).map(x=>x.id).filter(id=>!ids.includes(id))).slice(0,goal()-ids.length)];
- S={mode:'g',first:{},queue:ids,qi:0,doneN:0};S.total=S.queue.length;vGCard();
+ S={mode:'g',first:{},queue:M?shuffle(ids):ids,qi:0,doneN:0};S.total=S.queue.length;vGCard();
 }
 function vGCard(){
  if(S.qi>=S.queue.length)return gFinish();
