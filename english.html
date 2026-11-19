@@ -460,7 +460,24 @@ const store={get(k,d){try{const v=localStorage.getItem(k);if(v)return JSON.parse
  set(k,v){mem[k]=JSON.stringify(v);try{localStorage.setItem(k,mem[k])}catch(e){}}};
 let cur=store.get('zz_cur',null), D=null;
 function load(){D=store.get('zz_vocab_'+cur,null)||{level:0,words:{},days:{}}}
-function save(){store.set('zz_vocab_'+cur,D)}
+/* ===== 구글 드라이브 저장 (짱짱이네 서버 → 사람 폴더의 english.json 안 v2) ===== */
+const ZZ_API='https://script.google.com/macros/s/AKfycbwq4vdiYAzv1yI2LbwTTCjMXVoLCYMFGjeoBPOzHmmF8nIWEJk3QASSmybGHTA1Till/exec';
+let R=null,cloud='',saveT=null;
+const pinOf=()=>{try{return localStorage.getItem('zz-pin')||''}catch(e){return ''}};
+const nameOf=id=>(PEOPLE.find(p=>p.id===id)||{}).name;
+function api(fn,...args){return fetch(ZZ_API,{method:'POST',body:JSON.stringify({fn,args}),headers:{'Content-Type':'text/plain;charset=utf-8'},credentials:'omit',redirect:'follow'}).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.error);return d.result})}
+function save(){D.updatedAt=Date.now();store.set('zz_vocab_'+cur,D);clearTimeout(saveT);saveT=setTimeout(pushCloud,800)}
+function pushCloud(){const who=nameOf(cur),pin=pinOf();if(!who||!pin||!R)return;
+ const data={...R,v2:D,done:{...(R.done||{}),...D.days}};
+ api('saveEng',pin,who,data).then(()=>{R=data;cloud='ok';cloudMark()}).catch(()=>{cloud='err';cloudMark()})}
+function pullCloud(){const who=nameOf(cur),pin=pinOf(),me=cur;if(!who||!pin){cloud='local';cloudMark();return}
+ api('getEng',pin,who).then(r=>{if(me!==cur)return;R=r||{};const v=R.v2;
+  if(v&&(v.updatedAt||0)>(D.updatedAt||0)){D=v;store.set('zz_vocab_'+cur,D);if(!S||!S.c)refreshView()}
+  else if(!v||(D.updatedAt||0)>(v.updatedAt||0))pushCloud();
+  cloud='ok';cloudMark()}).catch(()=>{cloud='err';cloudMark()})}
+function cloudMark(){const e=document.getElementById('cloud');if(e)e.textContent=cloud==='ok'?'☁️ 기록이 구글 드라이브에 저장돼요':cloud==='err'?'⚠️ 드라이브 연결이 안 돼서 이 폰에만 저장 중이에요':cloud==='local'?'⚠️ 이 폰에만 저장 중이에요 (짱짱이네에서 비밀번호로 한 번 들어와 주세요)':''}
+let lastView='home';
+function refreshView(){if(lastView==='vocab')vVocab();else if(lastView==='gram')vGram();else vHome()}
 if(cur)load();
 
 /* ===== 날짜 ===== */
@@ -496,11 +513,12 @@ function vProfile(){
  app.innerHTML=`<div class="hero"><div class="logo" style="display:flex;justify-content:center">${face('bear',84)}</div><h2>짱짱이네</h2><p class="muted" style="margin-top:6px">누가 공부할까요?</p>
  <div class="plist">${PEOPLE.map(p=>`<button class="pbtn" onclick="setP('${p.id}')"><div class="face" style="background:${p.c}">${face(p.ch,68)}</div>${p.name}</button>`).join('')}</div></div>`;
 }
-function setP(id){cur=id;store.set('zz_cur',id);load();vHome()}
+function setP(id){cur=id;store.set('zz_cur',id);load();R=null;cloud='';S=null;vHome();pullCloud()}
 const me=()=>PEOPLE.find(p=>p.id===cur);
 
 /* ===== 화면: 홈 (4개 영역) ===== */
 function vHome(){
+ lastView='home';
  const p=me();
  app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1 style="display:flex;align-items:center;gap:6px">${face('bear',28)}짱짱이네 영어</h1><button class="av" style="background:${p.c}" onclick="vProfile()">${face(p.ch,30)}</button><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
  <div class="body">
@@ -516,7 +534,9 @@ function vHome(){
    <button class="tile off" style="background:linear-gradient(140deg,#8b5cf6,#c04cf0)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.talk}</span><div><div class="nm">회화</div><div class="ds">말하며 대화하기</div></div></button>
   </div>
   <p class="note" id="toast"></p>
+  <p class="note" id="cloud"></p>
  </div>`;
+ cloudMark();
 }
 function soon(){const t=$('#toast');t.textContent='리스닝·회화는 곧 추가돼요 🙂';setTimeout(()=>t.textContent='',1800)}
 
@@ -533,7 +553,7 @@ function vSettings(first){
 function togF(k,first){tmpF=tmpF.includes(k)?tmpF.filter(x=>x!==k):[...tmpF,k];vSettings(first)}
 
 /* ===== 화면: 어휘 홈 ===== */
-function vVocab(){
+function vVocab(){lastView='vocab';
  if(!D.level){D.level=1;save()}
  const t=today(),done=!!D.days[t];
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>어휘</h1><button class="iconbtn" onclick="vBook()">📒</button></div>
@@ -778,7 +798,7 @@ const GR=[];
  GR.push({id:'g'+lv+'-'+i,lv,pt,tip,ak,bk,ae,be,punct,toks,dx:dx.split(' ')})}));
 const G=Object.fromEntries(GR.map(x=>[x.id,x]));
 
-function vGram(){
+function vGram(){lastView='gram';
  if(!D.glevel){D.glevel=1;save()}
  const t=today(),gs=D.gram||{},seen=Object.keys(gs).length,mast=Object.values(gs).filter(v=>v.box>=3).length;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>문법</h1></div>
