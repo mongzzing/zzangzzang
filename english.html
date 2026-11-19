@@ -157,10 +157,10 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 #gl{touch-action:none}
 .chip{user-select:none;-webkit-user-select:none;cursor:grab;touch-action:none}
 .chip.lift{opacity:.3;border-style:dashed;transition:opacity .15s}
-.chip.ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;opacity:.92;border-color:var(--blue);box-shadow:0 10px 22px rgba(0,0,0,.22);background:#fff}
+.chip.ghost{position:fixed;left:0;top:0;z-index:50;will-change:transform;transition:none;pointer-events:none;opacity:.92;border-color:var(--blue);box-shadow:0 10px 22px rgba(0,0,0,.22);background:#fff}
 .blk.back{animation:pop2 .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes pop2{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
-.chip.bad{border-color:var(--red);color:var(--redd);background:var(--redl);animation:shk .35s}
+.chip.bad{border-color:var(--red);color:var(--redd);background:var(--redl)}
 .chip.hinted{border-color:var(--yel);background:#fff7df}
 .gmsg{margin:0 10px 8px;padding:10px 12px;border-radius:12px;background:#ffe9a8;color:#6b4e00;font-size:14px;font-weight:700;line-height:1.4;animation:up .2s ease}
 .chip.minus,.chip.move,.blk.plus{position:relative}
@@ -790,16 +790,16 @@ function vGCard(){
  gDraw();speak(g.ae);
 }
 function chipRects(){const m={};document.querySelectorAll('#gl .chip').forEach(x=>m[x.dataset.k]=x.getBoundingClientRect());return m}
-function gDraw(){
+function gDraw(lineOnly){
  const c=S.c,gl=$('#gl'),prev=chipRects();
  gl.className='line'+(c.res===true?' ok':'');
  gl.innerHTML=c.fill.map((f,i)=>`<span class="chip${c.minusB&&c.minusB.has(f.bi)?' bad minus':''}${c.moveB&&c.moveB.has(f.bi)?' bad move':''}${(c.dragging&&c.dragI===i)||f.ph?' lift':''}${f.h?' hinted':''}" data-i="${i}" data-k="${f.bi}">${f.t}</span>`).join('')||'<span class="muted" style="font-weight:500">여기에 문장을 만들어요</span>';
- $('#gb').innerHTML=c.blocks.map((b,i)=>`<button class="blk ${b.used?'used':''}${c.plusB&&c.plusB.has(i)&&!b.used?' plus':''}" onpointerdown="bPD(event,${i})" onclick="gTap(${i})">${b.t}</button>`).join('');
+ if(!lineOnly){$('#gb').innerHTML=c.blocks.map((b,i)=>`<button class="blk ${b.used?'used':''}${c.plusB&&c.plusB.has(i)&&!b.used?' plus':''}" onpointerdown="bPD(event,${i})" onclick="gTap(${i})">${b.t}</button>`).join('');
  $('#gmsg').innerHTML=c.msg?`<div class="gmsg">💡 ${c.msg}</div>`:'';
- $('#gok').disabled=c.locked||!c.fill.length;
+ $('#gok').disabled=c.locked||!c.fill.length;}
  /* 자리 이동 애니메이션 (FLIP) */
  document.querySelectorAll('#gl .chip').forEach(x=>{const p=prev[x.dataset.k],r=x.getBoundingClientRect();try{
-  if(p){const dx=p.left-r.left,dy=p.top-r.top;if(Math.abs(dx)+Math.abs(dy)>1)x.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'})}
+  if(p){const dx=p.left-r.left,dy=p.top-r.top;if(Math.abs(dx)+Math.abs(dy)>1)x.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:140,easing:'cubic-bezier(.2,.8,.2,1)'})}
   else if(c.fly&&c.fly.k===x.dataset.k){const f=c.fly.r,dx=f.left-r.left,dy=f.top-r.top;x.animate([{transform:`translate(${dx}px,${dy}px) scale(1.05)`,boxShadow:'0 10px 20px rgba(0,0,0,.18)'},{transform:'none',boxShadow:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'})}
   else x.animate([{transform:'translateY(14px) scale(.7)',opacity:0},{transform:'none',opacity:1}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}});
  c.fly=null;
@@ -815,14 +815,14 @@ let ghost=null;
 function gPD(e){const c=S.c;const ch=e.target.closest&&e.target.closest('.chip');if(!ch||c.locked)return;
  c.dragI=+ch.dataset.i;c.sx=e.clientX;c.sy=e.clientY;c.dragging=false;try{$('#gl').setPointerCapture(e.pointerId)}catch(_){}}
 function gPM(e){const c=S.c;if(c.dragI==null)return;
- if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<8)return;
+ if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<4)return;
   const el=document.querySelector(`#gl .chip[data-i="${c.dragI}"]`),r=el.getBoundingClientRect();
   c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gFix(c.fill[c.dragI].bi);
   ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.fill[c.dragI].t;document.body.appendChild(ghost);
   gDraw()}
  if(ghost)ghost.style.transform=`translate(${e.clientX-c.ox}px,${e.clientY-c.oy}px) scale(1.12) rotate(-3deg)`;
- const el=document.elementFromPoint(e.clientX,e.clientY),ch=el&&el.closest&&el.closest('#gl .chip');
- if(ch){const j=+ch.dataset.i;if(j!==c.dragI){const[m]=c.fill.splice(c.dragI,1);c.fill.splice(j,0,m);c.dragI=j;gDraw()}}}
+ const j=insIdx(e.clientX,e.clientY);
+ if(j>=0&&j!==c.dragI){const[m]=c.fill.splice(c.dragI,1);c.fill.splice(j,0,m);c.dragI=j;gDraw(true)}}
 function inLine(x,y){const r=$('#gl').getBoundingClientRect();return x>r.left-24&&x<r.right+24&&y>r.top-30&&y<r.bottom+30}
 function flyGhost(g,el,cb){if(g&&el){const r=el.getBoundingClientRect();try{const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1) rotate(0)`}],{duration:180,easing:'ease-out',fill:'forwards'});a.onfinish=()=>{g.remove();cb&&cb()};return}catch(_){}}if(g)g.remove();cb&&cb()}
 function gPU(e){const c=S.c;if(c.dragI==null)return;const i=c.dragI,was=c.dragging;
@@ -839,17 +839,17 @@ function insIdx(x,y){if(!inLine(x,y))return -1;let n=0;
 function bPD(e,i){const c=S.c;if(c.locked||c.blocks[i].used)return;bd={i,sx:e.clientX,sy:e.clientY,drag:false};
  addEventListener('pointermove',bPM,{passive:false});addEventListener('pointerup',bPU);addEventListener('pointercancel',bPU)}
 function bPM(e){const c=S.c;if(!bd)return;
- if(!bd.drag){if(Math.hypot(e.clientX-bd.sx,e.clientY-bd.sy)<8)return;bd.drag=true;
+ if(!bd.drag){if(Math.hypot(e.clientX-bd.sx,e.clientY-bd.sy)<4)return;bd.drag=true;
   const be=document.querySelectorAll('#gb .blk')[bd.i],r=be.getBoundingClientRect();bd.ox=bd.sx-r.left;bd.oy=bd.sy-r.top;
   ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.blocks[bd.i].t;document.body.appendChild(ghost);
   c.blocks[bd.i].used=true;gFix(bd.i);gDraw()}
  e.preventDefault();
  ghost.style.transform=`translate(${e.clientX-bd.ox}px,${e.clientY-bd.oy}px) scale(1.12) rotate(-3deg)`;
  const cur=c.fill.findIndex(f=>f.ph),idx=insIdx(e.clientX,e.clientY);
- if(idx<0){if(cur>=0){c.fill.splice(cur,1);gDraw()}return}
+ if(idx<0){if(cur>=0){c.fill.splice(cur,1);gDraw(true)}return}
  if(cur===idx)return;
  const item=cur>=0?c.fill.splice(cur,1)[0]:{t:c.blocks[bd.i].t,bi:bd.i,ph:true};
- c.fill.splice(Math.min(idx,c.fill.length),0,item);gDraw()}
+ c.fill.splice(Math.min(idx,c.fill.length),0,item);gDraw(true)}
 function bPU(e){const c=S.c;removeEventListener('pointermove',bPM);removeEventListener('pointerup',bPU);removeEventListener('pointercancel',bPU);
  if(!bd)return;const d=bd;bd=null;if(!d.drag)return;
  c.noClick=true;setTimeout(()=>c.noClick=false,50);
