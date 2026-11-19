@@ -124,10 +124,10 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .bx .hh{color:#a5adbd;letter-spacing:2px}
 .shake{animation:shk .35s}
 @keyframes shk{25%{transform:translateX(-2px)}50%{transform:translateX(2px)}75%{transform:translateX(-1px)}}
-.blocks{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;padding-top:4px}
-.blk{padding:9px 13px;border:2px solid var(--line);border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 3px 0 var(--line);background:#fff}
+.blocks{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-content:flex-start;padding-top:2px}
+.blk{padding:7px 12px;border:2px solid var(--line);border-radius:11px;font-weight:700;font-size:15px;box-shadow:0 3px 0 var(--line);background:#fff}
 .blk:active{transform:translateY(2px)}
-.blk.used{visibility:hidden}
+.blk.used{display:none}
 .blk{touch-action:none;user-select:none;-webkit-user-select:none}
 .tinput{flex:1;padding:14px;border:2px solid var(--line);border-radius:14px;font-size:17px;font-family:inherit;outline:none}
 .tinput:focus{border-color:var(--p)}
@@ -147,12 +147,12 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .fcard .chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:#fff;font-weight:900}
 .fcard.on .chk{background:var(--p);border-color:var(--p)}
 .lvup{margin:10px auto 0;display:inline-block;background:#fff3d6;color:#9a6a00;padding:8px 14px;border-radius:12px;font-size:14px}
-.dl{display:flex;gap:8px;align-items:flex-start;margin:5px 0;line-height:1.5}
+.dl{display:flex;gap:8px;align-items:flex-start;margin:3px 0;line-height:1.45}
 .ab{width:22px;height:22px;border-radius:6px;background:var(--bg);font-size:12px;font-weight:800;display:grid;place-items:center;flex:none;margin-top:1px;color:var(--sub)}
-.e2{padding:14px 16px;background:#f7f8fb;border-top:1px solid var(--line);font-size:16px;font-weight:700}
-.line{flex:1;min-height:40px;border-bottom:2px solid #cfd5e0;display:flex;flex-wrap:wrap;gap:6px;padding-bottom:6px;align-items:center}
+.e2{padding:10px 14px;background:#f7f8fb;border-top:1px solid var(--line);font-size:15px;font-weight:700}
+.line{flex:1;min-height:36px;border-bottom:2px solid #cfd5e0;display:flex;flex-wrap:wrap;gap:5px;padding-bottom:5px;align-items:center}
 .line.ok{border-color:var(--p)}.line.no{border-color:var(--red)}
-.chip{padding:5px 10px;border-radius:10px;background:#fff;border:2px solid var(--line);font-weight:700;font-size:15px}
+.chip{padding:4px 9px;border-radius:9px;background:#fff;border:2px solid var(--line);font-weight:700;font-size:14px}
 .line.ok .chip{border-color:var(--p);color:var(--pd)}.line.no .chip{border-color:var(--red);color:var(--redd)}
 #gl{touch-action:none}
 .chip{user-select:none;-webkit-user-select:none;cursor:grab;touch-action:none}
@@ -162,7 +162,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 @keyframes pop2{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
 .chip.bad{border-color:var(--red);color:var(--redd);background:var(--redl)}
 .chip.hinted{border-color:var(--yel);background:#fff7df}
-.gmsg{margin:0 10px 8px;padding:10px 12px;border-radius:12px;background:#ffe9a8;color:#6b4e00;font-size:14px;font-weight:700;line-height:1.4;animation:up .2s ease}
+.gmsg{margin:0 10px 6px;padding:7px 10px;border-radius:10px;background:#ffe9a8;color:#6b4e00;font-size:13px;font-weight:700;line-height:1.4;animation:up .2s ease}
 .chip.minus,.chip.move,.blk.plus{position:relative}
 .chip.move::before{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;color:#fff;font-size:11px;font-weight:900;line-height:18px;text-align:center;content:'↔';background:var(--yel)}
 .chip.minus::before,.blk.plus::before{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;color:#fff;font-size:14px;font-weight:900;line-height:18px;text-align:center}
@@ -780,9 +780,8 @@ function vGCard(){
  <div class="body">
   <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${LV_NAME[g.lv]}</span>${tag}<div style="flex:1"></div>
    <button class="tool" onclick="speak(S.c.g.ae)">🔊 A 듣기</button><button class="tool" onclick="gVoice()" id="micI">🎤</button></div>
-  <div class="qc" id="gqc"><div class="k" style="font-size:15px"><div class="dl"><span class="ab">A</span>${g.ak}</div><div class="dl"><span class="ab">B</span>${g.bk}</div></div>
+  <div class="qc" id="gqc"><div class="k" style="font-size:14px;padding:10px 14px"><div class="dl"><span class="ab">A</span>${g.ak}</div><div class="dl"><span class="ab">B</span>${g.bk}</div></div>
    <div id="gmsg"></div><div class="e2"><div class="dl"><span class="ab">A</span><span>${g.ae}</span></div><div class="dl"><span class="ab">B</span><div class="line" id="gl" onpointerdown="gPD(event)" onpointermove="gPM(event)" onpointerup="gPU(event)" onpointercancel="gPU(event)"></div><span>${g.punct}</span></div></div></div>
-  <p class="note">카드를 누르거나 끌어서 넣고, 넣은 카드는 끌어서 옮기거나 밖으로 빼요</p>
   <div class="blocks" id="gb"></div>
   <div style="flex:1"></div>
   <div class="row"><button class="btn ghost" style="width:auto;flex:none;padding:13px 14px;font-size:14px;white-space:nowrap" onclick="gHint()">💡 힌트</button><button class="btn" id="gok" onclick="gCheck()">확인</button></div>
@@ -794,6 +793,7 @@ function gDraw(lineOnly){
  const c=S.c,gl=$('#gl'),prev=chipRects();
  gl.className='line'+(c.res===true?' ok':'');
  gl.innerHTML=c.fill.map((f,i)=>`<span class="chip${c.minusB&&c.minusB.has(f.bi)?' bad minus':''}${c.moveB&&c.moveB.has(f.bi)?' bad move':''}${(c.dragging&&c.dragI===i)||f.ph?' lift':''}${f.h?' hinted':''}" data-i="${i}" data-k="${f.bi}">${f.t}</span>`).join('')||'<span class="muted" style="font-weight:500">여기에 문장을 만들어요</span>';
+ const bprev={};document.querySelectorAll('#gb .blk').forEach((x,i)=>{if(x.offsetParent)bprev[i]=x.getBoundingClientRect()});
  if(!lineOnly){$('#gb').innerHTML=c.blocks.map((b,i)=>`<button class="blk ${b.used?'used':''}${c.plusB&&c.plusB.has(i)&&!b.used?' plus':''}" onpointerdown="bPD(event,${i})" onclick="gTap(${i})">${b.t}</button>`).join('');
  $('#gmsg').innerHTML=c.msg?`<div class="gmsg">💡 ${c.msg}</div>`:'';
  $('#gok').disabled=c.locked||!c.fill.length;}
@@ -803,6 +803,7 @@ function gDraw(lineOnly){
   else if(c.fly&&c.fly.k===x.dataset.k){const f=c.fly.r,dx=f.left-r.left,dy=f.top-r.top;x.animate([{transform:`translate(${dx}px,${dy}px) scale(1.05)`,boxShadow:'0 10px 20px rgba(0,0,0,.18)'},{transform:'none',boxShadow:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'})}
   else x.animate([{transform:'translateY(14px) scale(.7)',opacity:0},{transform:'none',opacity:1}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}});
  c.fly=null;
+ if(!lineOnly)document.querySelectorAll('#gb .blk').forEach((x,i)=>{const p=bprev[i];if(!p||!x.offsetParent||(c.flyBack&&c.flyBack.b===i))return;const r=x.getBoundingClientRect(),dx=p.left-r.left,dy=p.top-r.top;if(Math.abs(dx)+Math.abs(dy)>1)try{x.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}});
  if(c.flyBack){const b=document.querySelectorAll('#gb .blk')[c.flyBack.b];if(b){const r=b.getBoundingClientRect(),f=c.flyBack.r;try{b.animate([{transform:`translate(${f.left-r.left}px,${f.top-r.top}px) scale(.95)`},{transform:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}}c.flyBack=null}
 }
 function gClr(){const c=S.c;c.bad=c.minus=c.plus=c.move=c.msg=null;c.minusB=c.plusB=c.moveB=null}
@@ -813,20 +814,22 @@ function gUn(i){const c=S.c;if(c.locked||!c.fill[i])return;const bi=c.fill[i].bi
 /* 드래그: 들어서 옮기는 느낌 */
 let ghost=null;
 function gPD(e){const c=S.c;const ch=e.target.closest&&e.target.closest('.chip');if(!ch||c.locked)return;
- c.dragI=+ch.dataset.i;c.sx=e.clientX;c.sy=e.clientY;c.dragging=false;try{$('#gl').setPointerCapture(e.pointerId)}catch(_){}}
+ c.dragI=+ch.dataset.i;c.sx=e.clientX;c.sy=e.clientY;c.dragging=false;c.moved=false;try{$('#gl').setPointerCapture(e.pointerId)}catch(_){}}
 function gPM(e){const c=S.c;if(c.dragI==null)return;
- if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<4)return;
+ if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<7)return;
   const el=document.querySelector(`#gl .chip[data-i="${c.dragI}"]`),r=el.getBoundingClientRect();
   c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gFix(c.fill[c.dragI].bi);
   ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.fill[c.dragI].t;document.body.appendChild(ghost);
   gDraw()}
  if(ghost)ghost.style.transform=`translate(${e.clientX-c.ox}px,${e.clientY-c.oy}px) scale(1.12) rotate(-3deg)`;
  const j=insIdx(e.clientX,e.clientY);
- if(j>=0&&j!==c.dragI){const[m]=c.fill.splice(c.dragI,1);c.fill.splice(j,0,m);c.dragI=j;gDraw(true)}}
+ if(j>=0&&j!==c.dragI){const[m]=c.fill.splice(c.dragI,1);c.fill.splice(j,0,m);c.dragI=j;c.moved=true;gDraw(true)}}
 function inLine(x,y){const r=$('#gl').getBoundingClientRect();return x>r.left-24&&x<r.right+24&&y>r.top-30&&y<r.bottom+30}
 function flyGhost(g,el,cb){if(g&&el){const r=el.getBoundingClientRect();try{const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1) rotate(0)`}],{duration:180,easing:'ease-out',fill:'forwards'});a.onfinish=()=>{g.remove();cb&&cb()};return}catch(_){}}if(g)g.remove();cb&&cb()}
 function gPU(e){const c=S.c;if(c.dragI==null)return;const i=c.dragI,was=c.dragging;
- if(!was){c.dragI=null;return gUn(i)}
+ if(e.type==='pointercancel'&&!was){c.dragI=null;return}
+ const small=Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<14&&!c.moved;
+ if(!was||small){if(ghost){ghost.remove();ghost=null}c.dragI=null;c.dragging=false;return gUn(i)}
  const g=ghost;ghost=null;c.dragI=null;c.dragging=false;
  if(!inLine(e.clientX,e.clientY)){const bi=c.fill[i].bi;c.blocks[bi].used=false;c.fill.splice(i,1);gFix(bi);gDraw();
   return flyHome(g,bi)}
