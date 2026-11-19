@@ -123,7 +123,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .bx.no{background:var(--redl);color:var(--redd)}
 .bx .hh{color:#a5adbd;letter-spacing:2px}
 .shake{animation:shk .35s}
-@keyframes shk{25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}}
+@keyframes shk{25%{transform:translateX(-2px)}50%{transform:translateX(2px)}75%{transform:translateX(-1px)}}
 .blocks{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;padding-top:4px}
 .blk{padding:9px 13px;border:2px solid var(--line);border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 3px 0 var(--line);background:#fff}
 .blk:active{transform:translateY(2px)}
@@ -785,7 +785,7 @@ function vGCard(){
   <p class="note">카드를 누르거나 끌어서 넣고, 넣은 카드는 끌어서 옮기거나 밖으로 빼요</p>
   <div class="blocks" id="gb"></div>
   <div style="flex:1"></div>
-  <div class="row"><button class="btn ghost" style="width:auto;padding:13px 16px" onclick="gHint()">💡 힌트</button><button class="btn" id="gok" onclick="gCheck()">확인</button></div>
+  <div class="row"><button class="btn ghost" style="width:auto;flex:none;padding:13px 14px;font-size:14px;white-space:nowrap" onclick="gHint()">💡 힌트</button><button class="btn" id="gok" onclick="gCheck()">확인</button></div>
  </div><div id="sh"></div>`;
  gDraw();speak(g.ae);
 }
@@ -793,8 +793,8 @@ function chipRects(){const m={};document.querySelectorAll('#gl .chip').forEach(x
 function gDraw(){
  const c=S.c,gl=$('#gl'),prev=chipRects();
  gl.className='line'+(c.res===true?' ok':'');
- gl.innerHTML=c.fill.map((f,i)=>`<span class="chip${c.minus&&c.minus.includes(i)?' bad minus':''}${c.move&&c.move.includes(i)?' bad move':''}${(c.dragging&&c.dragI===i)||f.ph?' lift':''}${f.h?' hinted':''}" data-i="${i}" data-k="${f.bi}">${f.t}</span>`).join('')||'<span class="muted" style="font-weight:500">여기에 문장을 만들어요</span>';
- $('#gb').innerHTML=c.blocks.map((b,i)=>`<button class="blk ${b.used?'used':''}${c.plus&&c.plus.includes(i)?' plus':''}" onpointerdown="bPD(event,${i})" onclick="gTap(${i})">${b.t}</button>`).join('');
+ gl.innerHTML=c.fill.map((f,i)=>`<span class="chip${c.minusB&&c.minusB.has(f.bi)?' bad minus':''}${c.moveB&&c.moveB.has(f.bi)?' bad move':''}${(c.dragging&&c.dragI===i)||f.ph?' lift':''}${f.h?' hinted':''}" data-i="${i}" data-k="${f.bi}">${f.t}</span>`).join('')||'<span class="muted" style="font-weight:500">여기에 문장을 만들어요</span>';
+ $('#gb').innerHTML=c.blocks.map((b,i)=>`<button class="blk ${b.used?'used':''}${c.plusB&&c.plusB.has(i)&&!b.used?' plus':''}" onpointerdown="bPD(event,${i})" onclick="gTap(${i})">${b.t}</button>`).join('');
  $('#gmsg').innerHTML=c.msg?`<div class="gmsg">💡 ${c.msg}</div>`:'';
  $('#gok').disabled=c.locked||!c.fill.length;
  /* 자리 이동 애니메이션 (FLIP) */
@@ -805,9 +805,11 @@ function gDraw(){
  c.fly=null;
  if(c.flyBack){const b=document.querySelectorAll('#gb .blk')[c.flyBack.b];if(b){const r=b.getBoundingClientRect(),f=c.flyBack.r;try{b.animate([{transform:`translate(${f.left-r.left}px,${f.top-r.top}px) scale(.95)`},{transform:'none'}],{duration:280,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}}c.flyBack=null}
 }
-function gClr(){const c=S.c;c.bad=c.minus=c.plus=c.move=c.msg=null}
-function gTap(i){const c=S.c;if(c.noClick||c.locked||!c.blocks[i]||c.blocks[i].used)return;const be=document.querySelectorAll('#gb .blk')[i];if(be)c.fly={k:String(i),r:be.getBoundingClientRect()};c.blocks[i].used=true;c.fill.push({t:c.blocks[i].t,bi:i});gClr();gDraw()}
-function gUn(i){const c=S.c;if(c.locked||!c.fill[i])return;const bi=c.fill[i].bi;const ce=document.querySelector(`#gl .chip[data-i="${i}"]`);if(ce)c.flyBack={b:bi,r:ce.getBoundingClientRect()};c.blocks[bi].used=false;c.fill.splice(i,1);gClr();gDraw()}
+function gClr(){const c=S.c;c.bad=c.minus=c.plus=c.move=c.msg=null;c.minusB=c.plusB=c.moveB=null}
+/* 틀린 표시는 그 카드를 고칠 때만 하나씩 사라진다 */
+function gFix(bi){const c=S.c;[c.minusB,c.plusB,c.moveB].forEach(s=>s&&s.delete(bi));if(c.msg&&!(c.minusB&&c.minusB.size)&&!(c.plusB&&c.plusB.size)&&!(c.moveB&&c.moveB.size))c.msg=null}
+function gTap(i){const c=S.c;if(c.noClick||c.locked||!c.blocks[i]||c.blocks[i].used)return;const be=document.querySelectorAll('#gb .blk')[i];if(be)c.fly={k:String(i),r:be.getBoundingClientRect()};c.blocks[i].used=true;c.fill.push({t:c.blocks[i].t,bi:i});gFix(i);gDraw()}
+function gUn(i){const c=S.c;if(c.locked||!c.fill[i])return;const bi=c.fill[i].bi;const ce=document.querySelector(`#gl .chip[data-i="${i}"]`);if(ce)c.flyBack={b:bi,r:ce.getBoundingClientRect()};c.blocks[bi].used=false;c.fill.splice(i,1);gFix(bi);gDraw()}
 /* 드래그: 들어서 옮기는 느낌 */
 let ghost=null;
 function gPD(e){const c=S.c;const ch=e.target.closest&&e.target.closest('.chip');if(!ch||c.locked)return;
@@ -815,9 +817,8 @@ function gPD(e){const c=S.c;const ch=e.target.closest&&e.target.closest('.chip')
 function gPM(e){const c=S.c;if(c.dragI==null)return;
  if(!c.dragging){if(Math.hypot(e.clientX-c.sx,e.clientY-c.sy)<8)return;
   const el=document.querySelector(`#gl .chip[data-i="${c.dragI}"]`),r=el.getBoundingClientRect();
-  c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gClr();
+  c.ox=c.sx-r.left;c.oy=c.sy-r.top;c.dragging=true;gFix(c.fill[c.dragI].bi);
   ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.fill[c.dragI].t;document.body.appendChild(ghost);
-  try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}
   gDraw()}
  if(ghost)ghost.style.transform=`translate(${e.clientX-c.ox}px,${e.clientY-c.oy}px) scale(1.12) rotate(-3deg)`;
  const el=document.elementFromPoint(e.clientX,e.clientY),ch=el&&el.closest&&el.closest('#gl .chip');
@@ -827,7 +828,7 @@ function flyGhost(g,el,cb){if(g&&el){const r=el.getBoundingClientRect();try{cons
 function gPU(e){const c=S.c;if(c.dragI==null)return;const i=c.dragI,was=c.dragging;
  if(!was){c.dragI=null;return gUn(i)}
  const g=ghost;ghost=null;c.dragI=null;c.dragging=false;
- if(!inLine(e.clientX,e.clientY)){const bi=c.fill[i].bi;c.blocks[bi].used=false;c.fill.splice(i,1);gDraw();
+ if(!inLine(e.clientX,e.clientY)){const bi=c.fill[i].bi;c.blocks[bi].used=false;c.fill.splice(i,1);gFix(bi);gDraw();
   return flyHome(g,bi)}
  gDraw();flyGhost(g,document.querySelector(`#gl .chip[data-i="${i}"]`))}
 /* 아래 보기 카드를 끌어서 원하는 자리에 넣기 */
@@ -841,7 +842,7 @@ function bPM(e){const c=S.c;if(!bd)return;
  if(!bd.drag){if(Math.hypot(e.clientX-bd.sx,e.clientY-bd.sy)<8)return;bd.drag=true;
   const be=document.querySelectorAll('#gb .blk')[bd.i],r=be.getBoundingClientRect();bd.ox=bd.sx-r.left;bd.oy=bd.sy-r.top;
   ghost=document.createElement('div');ghost.className='chip ghost';ghost.textContent=c.blocks[bd.i].t;document.body.appendChild(ghost);
-  c.blocks[bd.i].used=true;gClr();try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}gDraw()}
+  c.blocks[bd.i].used=true;gFix(bd.i);gDraw()}
  e.preventDefault();
  ghost.style.transform=`translate(${e.clientX-bd.ox}px,${e.clientY-bd.oy}px) scale(1.12) rotate(-3deg)`;
  const cur=c.fill.findIndex(f=>f.ph),idx=insIdx(e.clientX,e.clientY);
@@ -856,7 +857,7 @@ function bPU(e){const c=S.c;removeEventListener('pointermove',bPM);removeEventLi
  if(cur>=0){delete c.fill[cur].ph;gDraw();flyGhost(g,document.querySelector(`#gl .chip[data-i="${cur}"]`))}
  else{c.blocks[d.i].used=false;gDraw();flyHome(g,d.i)}}
 function flyHome(g,bi){const b=document.querySelectorAll('#gb .blk')[bi];if(b)b.style.visibility='hidden';flyGhost(g,b,()=>{const x=document.querySelectorAll('#gb .blk')[bi];if(x)x.style.visibility=''})}
-function buzz(){try{navigator.vibrate&&navigator.vibrate(18)}catch(e){}const q=$('#gqc');if(q){q.classList.remove('shake');void q.offsetWidth;q.classList.add('shake')}}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(5)}catch(e){}const q=$('#gqc');if(q){q.classList.remove('shake');void q.offsetWidth;q.classList.add('shake')}}
 function lcsKeep(a,b){const n=a.length,m=b.length,d=Array.from({length:n+1},()=>Array(m+1).fill(0));
  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)d[i][j]=a[i]===b[j]?d[i+1][j+1]+1:Math.max(d[i+1][j],d[i][j+1]);
  const keep=new Set();let i=0,j=0;while(i<n&&j<m){if(a[i]===b[j]){keep.add(i);i++;j++}else if(d[i+1][j]>=d[i][j+1])i++;else j++}return keep}
@@ -870,6 +871,7 @@ function gCheck(){const c=S.c;if(c.locked||!c.fill.length)return;
  const keptIdx=got.map((t,i)=>i).filter(i=>!c.minus.includes(i));
  const keep=lcsKeep(keptIdx.map(i=>got[i]),ans);
  c.move=keptIdx.filter((i,k)=>!keep.has(k));
+ c.minusB=new Set(c.minus.map(i=>c.fill[i].bi));c.moveB=new Set(c.move.map(i=>c.fill[i].bi));c.plusB=new Set(c.plus);
  const P=c.plus.length,M=c.minus.length;
  c.msg=P&&M?`빨간 단어는 빼고, 아래 보기에서 ${P}개 단어를 더 사용해 보세요.`:P?`아래 보기에서 ${P}개 단어를 더 사용해서 문장을 완성해 보세요.`:M?`표시된 ${M}개 단어를 빼고 문장을 다시 만들어 보세요.`:'표시된 단어들을 옮겨서 문장을 다시 만들어 보세요.';
  buzz();gDraw();
