@@ -1439,7 +1439,7 @@ function vGram(){lastView='gram';
    <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
    <button class="btn" style="color:#4b5bff" onclick="startGram()">시작하기</button>
   </div>
-  <div class="card"><div class="row"><b style="flex:1">${M?'IR 마스터 과정':'레벨 '+lv+' · '+LV_NAME[lv]+' 과정'}</b><span class="muted">${M?'과정 섞어서 나와요':'유닛 순서대로 나와요'}</span></div><div class="units">${unitList(lv)}</div></div>
+  ${M?'':`<div class="card"><div class="row"><b style="flex:1">레벨 ${lv} · ${LV_NAME[lv]} 과정</b><span class="muted">유닛 순서대로 나와요</span></div><div class="units">${unitList(lv)}</div></div>`}
   <div class="card">${calendar()}</div>
  </div>`;
 }
@@ -1461,7 +1461,7 @@ function vGCard(){
  const tag=r?`<span class="tag rv">${daysAgo(r.last)}일 전</span>`:`<span class="tag">New</span>`;
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="gQuit()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
  <div class="body">
-  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${g.lv==='M'?'IR 마스터 '+g.u:'레벨 '+g.lv+'-'+g.u}</span>${tag}<div style="flex:1"></div>
+  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">${g.lv==='M'?'🏆 IR 마스터':'레벨 '+g.lv+'-'+g.u}</span>${tag}<div style="flex:1"></div>
    <button class="tool" onclick="speak(S.c.g.ae)">🔊 A 듣기</button><button class="tool" onclick="gVoice()" id="micI">🎤</button></div>
   <div class="qc" id="gqc"><div class="k" style="font-size:14px;padding:10px 14px"><div class="dl"><span class="ab">A</span>${g.ak}</div><div class="dl"><span class="ab">B</span>${g.bk}</div></div>
    <div id="gmsg"></div><div class="e2"><div class="dl"><span class="ab">A</span><span>${g.ae}</span></div><div class="dl"><span class="ab">B</span><div class="line" id="gl" onpointerdown="gPD(event)" onpointermove="gPM(event)" onpointerup="gPU(event)" onpointercancel="gPU(event)" onclick="gClick(event)"></div><span>${g.punct}</span></div></div></div>
