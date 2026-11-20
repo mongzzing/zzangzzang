@@ -213,6 +213,9 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .lopt{padding:16px 8px;border:2px solid var(--line);border-radius:16px;background:#fff;font-size:17px;font-weight:700;box-shadow:0 3px 0 var(--line)}
 .lopt:active{transform:translateY(2px)}
 .lopt.nope{border-color:var(--red);color:var(--redd);background:var(--redl);box-shadow:0 3px 0 var(--red);animation:shk .35s}
+.lspd{flex:1;max-width:160px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px;border-radius:18px;background:var(--pl);color:var(--pd);font-family:'Jua',sans-serif;font-size:16px}
+.lspd span{font-size:30px}
+.lspd:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -1645,25 +1648,12 @@ const L=Object.fromEntries(LS.map(x=>[x.id,x]));
 const LWORDS=[...new Set(LS.flatMap(x=>x.words.map(w=>w.replace(/[,.?!]$/,'').toLowerCase())))].filter(w=>/^[a-z'-]+$/.test(w));
 /* 다음에 올 단어 + 헷갈리는 단어 3개 (문장 뒤쪽 단어 우선) */
 function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
+ /* 보기는 이 문장에 있는 단어로만: 뒤에 나올 단어 먼저, 모자라면 앞 단어 */
  const later=[...new Set(toks.slice(k+1).map(t=>t.toLowerCase()))].filter(t=>t!==a);
- const rnd=shuffle(LWORDS.filter(t=>t!==a&&!later.includes(t)&&Math.abs(t.length-a.length)<=3));
- const out=[];for(const t of [...shuffle(later),...rnd]){if(!out.includes(t))out.push(t);if(out.length>=3)break}
+ const before=[...new Set(toks.slice(0,k).map(t=>t.toLowerCase()))].filter(t=>t!==a&&!later.includes(t));
+ const out=[...shuffle(later),...shuffle(before)].slice(0,3);
  return shuffle([a,...out])}
-function vListen(){lastView='listen';
- if(!D.llevel){D.llevel=1;save()}
- const ls=D.lis||{},seen=Object.keys(ls).length,M=isMaster();
- app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>리스닝</h1></div>
- <div class="body">
-  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅 문장을 듣고 풀어요</small></div>`:''}
-  <div class="today" style="background:linear-gradient(135deg,#ff8a3d,#ff5f6d)">
-   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('l')}/5문제 ${todayCnt('l')>=5?'✅':''}</span>
-   <h3 style="margin-top:10px">듣고 단어를 순서대로 골라요</h3>
-   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 들은 문장 ${seen}개</p>
-   <button class="btn" style="color:#ff5f6d" onclick="lStart()">시작하기</button>
-  </div>
-  <div class="card">${calendar()}</div>
- </div>`;
-}
+
 function lStart(){
  const t=today(),ls=D.lis=D.lis||{},M=isMaster(),mine=x=>M?x.lv==='M':x.lv!=='M';
  const rev=Object.entries(ls).filter(([id,v])=>v.due<=t&&L[id]&&mine(L[id])).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
@@ -1682,7 +1672,7 @@ function lCard(){
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="lQuit()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
  <div class="body">
   <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">🎧 듣고 순서대로 고르기</span>${tag}</div>
-  <div class="lplay"><button class="spk big" onclick="speak(S.c.x.en)">🔊</button><button class="slow" onclick="speak(S.c.x.en,.6)">🐢 천천히</button></div>
+  <div class="lplay"><button class="lspd" onclick="speak(S.c.x.en)"><span>🐇</span>원어민 속도</button><button class="lspd" onclick="speak(S.c.x.en,.6)"><span>🐢</span>천천히</button></div>
   <div class="qc" id="lqc"><div class="e" id="len"></div><div class="k" id="lko" style="display:none;font-size:14px;color:var(--sub);border-top:1px solid var(--line)"></div></div>
   <div class="lops" id="lop"></div>
  </div><div id="sh"></div>`;
