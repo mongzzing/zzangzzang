@@ -203,6 +203,16 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .unit{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:14px}
 .unit .un{font-size:11px;font-weight:800;color:var(--sub);background:var(--bg);border-radius:6px;padding:2px 6px;min-width:38px;text-align:center}
 .bx.vb{text-align:left}
+.lplay{display:flex;align-items:center;justify-content:center;gap:14px;padding:4px 0}
+.lplay .slow{padding:10px 14px;border-radius:20px;background:var(--bg);font-weight:700;font-size:14px}
+.opts .opt{text-align:center}
+#len{font-size:18px;line-height:2;min-height:64px}
+.lw{display:inline-block;color:var(--ink)}
+.lslot{display:inline-block;height:3px;background:#cfd5e0;border-radius:2px;margin:0 4px;vertical-align:middle}
+.lops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.lopt{padding:16px 8px;border:2px solid var(--line);border-radius:16px;background:#fff;font-size:17px;font-weight:700;box-shadow:0 3px 0 var(--line)}
+.lopt:active{transform:translateY(2px)}
+.lopt.nope{border-color:var(--red);color:var(--redd);background:var(--redl);box-shadow:0 3px 0 var(--red);animation:shk .35s}
 </style>
 </head>
 <body>
@@ -611,7 +621,7 @@ function pullCloud(){const who=nameOf(cur),pin=pinOf(),me=cur;if(!who||!pin){clo
   cloud='ok';cloudMark()}).catch(()=>{cloud='err';cloudMark()})}
 function cloudMark(){const e=document.getElementById('cloud');if(e)e.textContent=cloud==='ok'?'☁️ 기록이 구글 드라이브에 저장돼요':cloud==='err'?'⚠️ 드라이브 연결이 안 돼서 이 폰에만 저장 중이에요':cloud==='local'?'⚠️ 이 폰에만 저장 중이에요 (짱짱이네에서 비밀번호로 한 번 들어와 주세요)':''}
 let lastView='home';
-function refreshView(){if(lastView==='vocab')vVocab();else if(lastView==='gram')vGram();else vHome()}
+function refreshView(){if(lastView==='vocab')vVocab();else if(lastView==='gram')vGram();else if(lastView==='listen')vListen();else vHome()}
 if(cur)load();
 
 /* ===== 날짜 ===== */
@@ -631,7 +641,7 @@ const $=s=>document.querySelector(s);
 const app=$('#app');
 const norm=s=>s.toLowerCase().replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
 const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-function speak(t){try{const ss=window.speechSynthesis;ss.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;
+function speak(t,rate){try{const ss=window.speechSynthesis;ss.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate||.9;
  const v=ss.getVoices().filter(v=>/en[-_]US/i.test(v.lang));const g=v.find(v=>/Google|Samantha|Natural/i.test(v.name))||v[0];if(g)u.voice=g;ss.speak(u)}catch(e){}}
 try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -664,7 +674,7 @@ function vHome(){
   <div class="tiles">
    <button class="tile" style="background:linear-gradient(140deg,#18b98a,#0fa3a0)" onclick="vVocab()"><span class="em">${ICON.vocab}</span><div><div class="nm">어휘</div><div class="ds">오늘 ${Math.min(5,todayCnt('v'))}/5 ${todayCnt('v')>=5?'✅':''}</div></div></button>
    <button class="tile" style="background:linear-gradient(140deg,#4b7bff,#6a5cff)" onclick="vGram()"><span class="em">${ICON.gram}</span><div><div class="nm">문법</div><div class="ds">오늘 ${Math.min(5,todayCnt('g'))}/5 ${todayCnt('g')>=5?'✅':''}</div></div></button>
-   <button class="tile off" style="background:linear-gradient(140deg,#ff8a3d,#ff5f6d)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.listen}</span><div><div class="nm">리스닝</div><div class="ds">듣고 이해하기</div></div></button>
+   <button class="tile" style="background:linear-gradient(140deg,#ff8a3d,#ff5f6d)" onclick="vListen()"><span class="em">${ICON.listen}</span><div><div class="nm">리스닝</div><div class="ds">오늘 ${Math.min(5,todayCnt('l'))}/5 ${todayCnt('l')>=5?'✅':''}</div></div></button>
    <button class="tile off" style="background:linear-gradient(140deg,#8b5cf6,#c04cf0)" onclick="soon()"><span class="badge">준비 중</span><span class="em">${ICON.talk}</span><div><div class="nm">회화</div><div class="ds">말하며 대화하기</div></div></button>
   </div>
   <p class="note" id="toast"></p>
@@ -672,7 +682,7 @@ function vHome(){
  </div>`;
  cloudMark();
 }
-function soon(){const t=$('#toast');t.textContent='리스닝·회화는 곧 추가돼요 🙂';setTimeout(()=>t.textContent='',1800)}
+function soon(){const t=$('#toast');t.textContent='회화는 곧 추가돼요 🙂';setTimeout(()=>t.textContent='',1800)}
 
 /* ===== 관심분야 설정 ===== */
 const myF=()=>D.fields&&D.fields.length?D.fields:['biz'];
@@ -828,7 +838,7 @@ function check(g){const c=S.c;if(c.locked)return;
  c.wrongTry++;try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}
  const e=$('#vqc');e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');
  toast(c.hint?'다시 도전해 보세요! 모르겠으면 정답 보기':'다시 도전해 보세요! 막히면 힌트 보기')}
-function toast(m){const s=$('#sh');s.innerHTML=`<div class="toastm">${m}</div>`;setTimeout(()=>{if(s.firstChild&&s.firstChild.className==='toastm')s.innerHTML=''},1200)}
+function toast(m){let s=$('#sh');if(!s){s=document.createElement('div');s.id='sh';app.appendChild(s)}s.innerHTML=`<div class="toastm">${m}</div>`;setTimeout(()=>{if(s.firstChild&&s.firstChild.className==='toastm')s.innerHTML=''},1200)}
 function done(ok,shown){
  const c=S.c;c.locked=true;c.res=ok;vDraw();const kb=$('#kb');if(kb)kb.style.display='none';
  const first=!(c.id in S.first);if(first)S.first[c.id]=ok&&!c.wrongTry;
@@ -1620,6 +1630,104 @@ function gFinish(){
  ${up?`<div class="lvup">⬆️ 레벨업! 이제 더 어려운 문법이 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 문제 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
  <div class="card rlist">${ids.map(id=>{const g=G[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><div style="flex:1"><b style="font-size:14px">${g.be}</b><div class="muted">📌 ${g.pt}</div></div><button class="iconbtn" style="font-size:18px" onclick="speak(G['${id}'].be)">🔊</button></div>`}).join('')}</div>
  <button class="btn" onclick="vGram()">완료</button></div>`;
+}
+
+/* ===== 리스닝: 문장을 듣고 빈칸에 들어갈 단어를 4개 중에서 고르기 ===== */
+const STOP=new Set('the a an and but or for to of in on at by with is are was were be been am it its this that these those you your we our they their he his she her i my me him them do does did have has had will would can could should not no yes so as if than then there here what when where who why how just very also too all some any much many more most'.split(' '));
+const LS=[];
+{const seen=new Set();const add=(id,en,ko,lv)=>{if(!en||!ko||seen.has(en))return;seen.add(en);
+  const words=en.replace(/[.?!]$/,'').split(' ');const cands=words.map((t,i)=>({t:t.replace(/[,]/g,''),i})).filter(x=>x.i>0&&/^[A-Za-z'-]{3,}$/.test(x.t)&&!STOP.has(x.t.toLowerCase()));
+  if(!cands.length)return;let hsh=0;for(const ch of en)hsh=(hsh*31+ch.charCodeAt(0))|0;const pick=cands[Math.abs(hsh)%cands.length];
+  LS.push({id,en,ko,lv,ans:pick.t,bi:pick.i,words})};
+ GR.forEach(g=>{add('La'+g.id,g.ae,g.ak,g.lv);add('Lb'+g.id,g.be,g.bk,g.lv)});
+ WORDS.forEach(w=>add('Lw'+w.id,w.ex,w.exk,w.ms?'M':w.lv));}
+const L=Object.fromEntries(LS.map(x=>[x.id,x]));
+const LWORDS=[...new Set(LS.flatMap(x=>x.words.map(w=>w.replace(/[,.?!]$/,'').toLowerCase())))].filter(w=>/^[a-z'-]+$/.test(w));
+/* 다음에 올 단어 + 헷갈리는 단어 3개 (문장 뒤쪽 단어 우선) */
+function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
+ const later=[...new Set(toks.slice(k+1).map(t=>t.toLowerCase()))].filter(t=>t!==a);
+ const rnd=shuffle(LWORDS.filter(t=>t!==a&&!later.includes(t)&&Math.abs(t.length-a.length)<=3));
+ const out=[];for(const t of [...shuffle(later),...rnd]){if(!out.includes(t))out.push(t);if(out.length>=3)break}
+ return shuffle([a,...out])}
+function vListen(){lastView='listen';
+ if(!D.llevel){D.llevel=1;save()}
+ const ls=D.lis||{},seen=Object.keys(ls).length,M=isMaster();
+ app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>리스닝</h1></div>
+ <div class="body">
+  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅 문장을 듣고 풀어요</small></div>`:''}
+  <div class="today" style="background:linear-gradient(135deg,#ff8a3d,#ff5f6d)">
+   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('l')}/5문제 ${todayCnt('l')>=5?'✅':''}</span>
+   <h3 style="margin-top:10px">듣고 단어를 순서대로 골라요</h3>
+   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 들은 문장 ${seen}개</p>
+   <button class="btn" style="color:#ff5f6d" onclick="lStart()">시작하기</button>
+  </div>
+  <div class="card">${calendar()}</div>
+ </div>`;
+}
+function lStart(){
+ const t=today(),ls=D.lis=D.lis||{},M=isMaster(),mine=x=>M?x.lv==='M':x.lv!=='M';
+ const rev=Object.entries(ls).filter(([id,v])=>v.due<=t&&L[id]&&mine(L[id])).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
+ const fresh=x=>!ls[x.id]&&mine(x);
+ const pool=M?shuffle(LS.filter(fresh)):[...shuffle(LS.filter(x=>fresh(x)&&x.lv===D.llevel)),...shuffle(LS.filter(x=>fresh(x)&&x.lv>D.llevel)).sort((a,b)=>a.lv-b.lv),...LS.filter(x=>fresh(x)&&x.lv<D.llevel)];
+ let ids=[...rev,...pool.slice(0,goal()-rev.length).map(x=>x.id)];
+ if(ids.length<goal())ids=[...ids,...shuffle(LS.filter(mine).map(x=>x.id).filter(id=>!ids.includes(id))).slice(0,goal()-ids.length)];
+ S={mode:'L',first:{},queue:shuffle(ids),qi:0,doneN:0};S.total=S.queue.length;lCard();
+}
+function lCard(){
+ if(S.qi>=S.queue.length)return lFinish();
+ const x=L[S.queue[S.qi]],r=(D.lis||{})[x.id];
+ const toks=x.words.map(w=>w.replace(/[,.?!]$/,''));
+ S.c={id:x.id,x,toks,k:0,locked:false,wrongTry:0};S.c.opts=lOpts(S.c);
+ const tag=r?`<span class="tag rv">${daysAgo(r.last)}일 전</span>`:`<span class="tag">New</span>`;
+ app.innerHTML=`<div class="top"><button class="iconbtn" onclick="lQuit()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
+ <div class="body">
+  <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">🎧 듣고 순서대로 고르기</span>${tag}</div>
+  <div class="lplay"><button class="spk big" onclick="speak(S.c.x.en)">🔊</button><button class="slow" onclick="speak(S.c.x.en,.6)">🐢 천천히</button></div>
+  <div class="qc" id="lqc"><div class="e" id="len"></div><div class="k" id="lko" style="display:none;font-size:14px;color:var(--sub);border-top:1px solid var(--line)"></div></div>
+  <div class="lops" id="lop"></div>
+ </div><div id="sh"></div>`;
+ lDraw();speak(x.en);
+}
+function lDraw(fly){const c=S.c,x=c.x;
+ const placed=x.words.slice(0,c.k).map((w,i)=>`<span class="lw${fly&&i===c.k-1?' new':''}">${w}</span>`).join(' ');
+ const rest=c.toks.slice(c.k).map(t=>`<span class="lslot" style="width:${Math.max(22,t.length*9)}px"></span>`).join('');
+ $('#len').innerHTML=placed+(c.k<c.toks.length?' '+rest:'');
+ $('#lop').innerHTML=c.locked?'':c.opts.map((o,i)=>`<button class="lopt" id="lo${i}" onclick="lPick(${i})">${o}</button>`).join('');
+ if(fly){const nw=$('#len .lw.new');if(nw&&fly.r){const r=nw.getBoundingClientRect();try{nw.animate([{transform:`translate(${fly.r.left-r.left}px,${fly.r.top-r.top}px) scale(1.15)`},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}}}
+}
+function lPick(i){const c=S.c;if(c.locked)return;const b=$('#lo'+i);
+ if(c.opts[i]===c.toks[c.k].toLowerCase()){const r=b.getBoundingClientRect();c.k++;
+  if(c.k>=c.toks.length){c.locked=true;lDraw({r});return lDone(true)}
+  c.opts=lOpts(c);lDraw({r});return}
+ c.wrongTry++;try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}
+ b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');
+}
+function lDone(ok){const c=S.c,x=c.x;c.locked=true;c.res=ok;const lp=$('#lop');if(lp)lp.innerHTML='';
+ const k=$('#lko');k.style.display='block';k.textContent=x.ko;
+ if(!(x.id in S.first))S.first[x.id]=!c.wrongTry;
+ S.doneN++;tally('l');speak(x.en);
+ $('#sh').innerHTML=`<div class="sheet g"><h4><span class="jump">${face(me().ch,34)}</span>${c.wrongTry?'맞았어요! 👍':['정답이에요! 🎉','완벽해요! ✨','잘 들었어요! 👂'][Math.random()*3|0]}</h4>
+ <p><b>${x.en}</b><br><span class="muted">${x.ko}</span></p>
+ <div class="row"><button class="btn ghost" style="width:auto;padding:13px 16px" onclick="speak(S.c.x.en)">🔊</button><button class="btn" onclick="S.qi++;lCard()">계속</button></div></div>`;
+}
+function lSave(){const t=today(),ls=D.lis=D.lis||{};
+ Object.entries(S.first).forEach(([id,ok])=>{const r=ls[id]||{box:0,wrong:0};if(ok){r.box=Math.min(r.box+1,4);r.due=addDays(t,INTV[r.box])}else{r.box=0;r.wrong++;r.due=addDays(t,1)}r.last=t;ls[id]=r});
+ S.first={};save()}
+function lQuit(){app.insertAdjacentHTML('beforeend',`<div id="qa" style="position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;z-index:9"><div class="card" style="width:100%;border-radius:22px 22px 0 0;padding:20px;display:flex;flex-direction:column;gap:10px">
+ <h3 style="font-weight:900">학습을 그만할까요?</h3><p class="muted">푼 문제는 저장돼요.</p>
+ <button class="btn" onclick="$('#qa').remove()">계속하기</button><button class="btn ghost" onclick="lSave();vListen()">그만하기</button></div></div>`)}
+function lFinish(){const res={...S.first};lSave();
+ const t=today(),wasDone=!!D.days[t];D.days[t]=true;
+ const ids=Object.keys(res),okN=ids.filter(id=>res[id]).length;
+ let up=false;D.lhist=[...(D.lhist||[]),okN/Math.max(1,ids.length)].slice(-3);
+ if(!isMaster()&&D.llevel<5&&D.lhist.length>=3&&D.lhist.reduce((a,b)=>a+b,0)/3>=0.8){D.llevel++;D.lhist=[];up=true}
+ save();
+ app.innerHTML=`<div class="body">
+ <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
+ <h2 style="font-size:20px;font-weight:900;margin-top:6px">${wasDone?'리스닝 완료!':'오늘 출석 도장 쾅!'}</h2>
+ ${up?`<div class="lvup">⬆️ 레벨업! 이제 더 어려운 문장이 나와요</div>`:''}<p class="muted" style="font-size:14px;margin-top:4px">한 번에 맞춘 문제 ${okN}/${ids.length} · 🔥 ${streak()}일 연속</p></div>
+ <div class="card rlist">${ids.map(id=>{const x=L[id];return `<div class="it"><span>${res[id]?'✅':'🔁'}</span><div style="flex:1"><b style="font-size:14px">${x.en}</b><div class="muted">${x.ko}</div></div><button class="iconbtn" style="font-size:18px" onclick="speak(L['${id}'].en)">🔊</button></div>`}).join('')}</div>
+ <button class="btn" onclick="vListen()">완료</button></div>`;
 }
 
 /* ===== 내 단어장 ===== */
