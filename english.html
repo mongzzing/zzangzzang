@@ -217,7 +217,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .lspd span{font-size:30px}
 .lspd:active{transform:scale(.96)}
 .lbarw{margin:16px 16px 0;height:12px;border-radius:8px;background:var(--bg);overflow:hidden}
-.lbar{height:100%;width:0;border-radius:8px;background:var(--p)}
+.lbar{height:100%;width:0;border-radius:8px;background:var(--p);transition:width .3s ease}
 .lslot{margin:0 !important;border-radius:0 !important;height:2px !important;background:#b9c0cf !important}
 .lreplay{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .lre{flex:1;max-width:260px;padding:14px;border-radius:30px;background:#6a5cff;color:#fff;font-family:'Jua',sans-serif;font-size:17px;box-shadow:0 3px 0 #4b3fd6;position:relative}
@@ -1703,15 +1703,15 @@ function lCard(){
  </div><div id="sh"></div>`;
  lDraw();lPlay();
 }
-function lPlay(rate){const x=S.c.x,bar=$('#lbar'),btn=$('#lre');rate=rate||.9;
+function lPlay(rate){const x=S.c.x,btn=$('#lre');rate=rate||.9;
  const dur=Math.max(1.2,x.words.length*.36/rate);
- if(bar){bar.style.transition='none';bar.style.width='0%';void bar.offsetWidth;bar.style.transition=`width ${dur}s linear`;bar.style.width='100%'}
  if(btn)btn.classList.add('on');clearTimeout(S.c.pt);S.c.pt=setTimeout(()=>{const b=$('#lre');if(b)b.classList.remove('on')},dur*1000);
  speak(x.en,rate)}
 function lDraw(fly){const c=S.c,x=c.x;
  const placed=x.words.slice(0,c.k).map((w,i)=>`<span class="lw${fly&&i===c.k-1?' new':''}">${w}</span>`).join(' ');
  const rest=c.toks.slice(c.k).map(t=>`<span class="lslot" style="width:${Math.max(22,t.length*9)}px"></span>`).join('');
  $('#len').innerHTML=placed+(c.k<c.toks.length?' '+rest:'');
+ const bar=$('#lbar');if(bar)bar.style.width=(c.k/c.toks.length*100)+'%';
  $('#lop').innerHTML=c.locked?'':c.opts.map((o,i)=>`<button class="lopt" id="lo${i}" onclick="lPick(${i})">${o}</button>`).join('');
  if(fly){const nw=$('#len .lw.new');if(nw&&fly.r){const r=nw.getBoundingClientRect();try{nw.animate([{transform:`translate(${fly.r.left-r.left}px,${fly.r.top-r.top}px) scale(1.15)`},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}}}
 }
