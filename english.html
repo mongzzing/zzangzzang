@@ -1664,6 +1664,21 @@ function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
  const out=[...shuffle(later),...shuffle(before)].slice(0,3);
  return shuffle([a,...out])}
 
+function vListen(){lastView='listen';
+ if(!D.llevel){D.llevel=1;save()}
+ const ls=D.lis||{},seen=Object.keys(ls).length,M=isMaster();
+ app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>리스닝</h1></div>
+ <div class="body">
+  ${M?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅 문장을 듣고 풀어요</small></div>`:''}
+  <div class="today" style="background:linear-gradient(135deg,#ff8a3d,#ff5f6d)">
+   <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('l')}/5문제 ${todayCnt('l')>=5?'✅':''}</span>
+   <h3 style="margin-top:10px">듣고 단어를 순서대로 골라요</h3>
+   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 들은 문장 ${seen}개</p>
+   <button class="btn" style="color:#ff5f6d" onclick="lStart()">시작하기</button>
+  </div>
+  <div class="card">${calendar()}</div>
+ </div>`;
+}
 function lStart(){
  const t=today(),ls=D.lis=D.lis||{},M=isMaster(),mine=x=>M?x.lv==='M':x.lv!=='M';
  const rev=Object.entries(ls).filter(([id,v])=>v.due<=t&&L[id]&&mine(L[id])).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
