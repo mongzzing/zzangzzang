@@ -206,7 +206,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .lplay{display:flex;align-items:center;justify-content:center;gap:14px;padding:4px 0}
 .lplay .slow{padding:10px 14px;border-radius:20px;background:var(--bg);font-weight:700;font-size:14px}
 .opts .opt{text-align:center}
-#len{font-size:18px;line-height:2;min-height:64px}
+#len{font-size:20px;line-height:2.1;min-height:90px;padding:18px 16px}
 .lw{display:inline-block;color:var(--ink)}
 .lslot{display:inline-block;height:3px;background:#cfd5e0;border-radius:2px;margin:0 4px;vertical-align:middle}
 .lops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
@@ -216,6 +216,16 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .lspd{flex:1;max-width:160px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px;border-radius:18px;background:var(--pl);color:var(--pd);font-family:'Jua',sans-serif;font-size:16px}
 .lspd span{font-size:30px}
 .lspd:active{transform:scale(.96)}
+.lbarw{margin:16px 16px 0;height:12px;border-radius:8px;background:var(--bg);overflow:hidden}
+.lbar{height:100%;width:0;border-radius:8px;background:var(--p)}
+.lslot{margin:0 !important;border-radius:0 !important;height:2px !important;background:#b9c0cf !important}
+.lreplay{display:flex;gap:8px;justify-content:center;margin-top:6px}
+.lre{flex:1;max-width:260px;padding:14px;border-radius:30px;background:#6a5cff;color:#fff;font-family:'Jua',sans-serif;font-size:17px;box-shadow:0 3px 0 #4b3fd6;position:relative}
+.lre i{display:none;position:absolute;left:50%;bottom:5px;transform:translateX(-50%);width:26px;height:5px;background:radial-gradient(circle,#ffb35c 2px,transparent 2.5px) 0 0/9px 5px repeat-x}
+.lre.on i{display:block;animation:dots 1s steps(3) infinite}
+@keyframes dots{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+.lslow{padding:14px 16px;border-radius:30px;background:var(--bg);font-weight:700;font-size:14px}
+.lopt{padding:22px 8px;font-size:19px}
 </style>
 </head>
 <body>
@@ -1672,12 +1682,17 @@ function lCard(){
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="lQuit()">✕</button><div class="prog"><i style="width:${S.doneN/S.total*100}%"></i></div><span class="trophy">🏆 ${S.doneN}/${S.total}</span></div>
  <div class="body">
   <div class="row" style="gap:6px"><span class="tag" style="background:var(--bg);color:var(--sub)">🎧 듣고 순서대로 고르기</span>${tag}</div>
-  <div class="lplay"><button class="lspd" onclick="speak(S.c.x.en)"><span>🐇</span>원어민 속도</button><button class="lspd" onclick="speak(S.c.x.en,.6)"><span>🐢</span>천천히</button></div>
-  <div class="qc" id="lqc"><div class="e" id="len"></div><div class="k" id="lko" style="display:none;font-size:14px;color:var(--sub);border-top:1px solid var(--line)"></div></div>
+  <div class="qc" id="lqc"><div class="lbarw"><div class="lbar" id="lbar"></div></div><div class="e" id="len"></div><div class="k" id="lko" style="display:none;font-size:14px;color:var(--sub);border-top:1px solid var(--line)"></div></div>
   <div class="lops" id="lop"></div>
+  <div class="lreplay"><button class="lre" id="lre" onclick="lPlay()">🔊 다시 듣기<i></i></button><button class="lslow" onclick="lPlay(.6)">🐢 천천히</button></div>
  </div><div id="sh"></div>`;
- lDraw();speak(x.en);
+ lDraw();lPlay();
 }
+function lPlay(rate){const x=S.c.x,bar=$('#lbar'),btn=$('#lre');rate=rate||.9;
+ const dur=Math.max(1.2,x.words.length*.36/rate);
+ if(bar){bar.style.transition='none';bar.style.width='0%';void bar.offsetWidth;bar.style.transition=`width ${dur}s linear`;bar.style.width='100%'}
+ if(btn)btn.classList.add('on');clearTimeout(S.c.pt);S.c.pt=setTimeout(()=>{const b=$('#lre');if(b)b.classList.remove('on')},dur*1000);
+ speak(x.en,rate)}
 function lDraw(fly){const c=S.c,x=c.x;
  const placed=x.words.slice(0,c.k).map((w,i)=>`<span class="lw${fly&&i===c.k-1?' new':''}">${w}</span>`).join(' ');
  const rest=c.toks.slice(c.k).map(t=>`<span class="lslot" style="width:${Math.max(22,t.length*9)}px"></span>`).join('');
