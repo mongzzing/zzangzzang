@@ -1720,7 +1720,7 @@ function lPick(i){const c=S.c;if(c.locked)return;const b=$('#lo'+i);
   if(c.k>=c.toks.length){c.locked=true;lDraw({r});return lDone(true)}
   c.opts=lOpts(c);lDraw({r});return}
  c.wrongTry++;try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}
- b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');
+ document.querySelectorAll('#lop .lopt.nope').forEach(x=>x.classList.remove('nope'));void b.offsetWidth;b.classList.add('nope');
 }
 function lDone(ok){const c=S.c,x=c.x;c.locked=true;c.res=ok;const lp=$('#lop');if(lp)lp.innerHTML='';
  const k=$('#lko');k.style.display='block';k.textContent=x.ko;
