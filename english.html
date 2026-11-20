@@ -781,7 +781,7 @@ function tEnd(){
 let S=null;
 function startSession(){
  const t=today();
- const rev=Object.entries(D.words).filter(([,v])=>v.due<=t).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
+ const rev=Object.entries(D.words).filter(([id,v])=>v.due<=t&&W[id]&&(isMaster()?W[id].ms:true)).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
  const need=goal()-rev.length;
  const M=isMaster(),fresh=w=>!D.words[w.id]&&(M?w.ms:myF().includes(w.f));
  const pool=M?shuffle(WORDS.filter(fresh)):[...shuffle(WORDS.filter(w=>fresh(w)&&w.lv===D.level)),...shuffle(WORDS.filter(w=>fresh(w)&&w.lv>D.level)).sort((a,b)=>a.lv-b.lv),...WORDS.filter(w=>fresh(w)&&w.lv<D.level)];
@@ -1652,17 +1652,15 @@ const LS=[];
   const words=en.replace(/[.?!]$/,'').split(' ');const cands=words.map((t,i)=>({t:t.replace(/[,]/g,''),i})).filter(x=>x.i>0&&/^[A-Za-z'-]{3,}$/.test(x.t)&&!STOP.has(x.t.toLowerCase()));
   if(!cands.length)return;let hsh=0;for(const ch of en)hsh=(hsh*31+ch.charCodeAt(0))|0;const pick=cands[Math.abs(hsh)%cands.length];
   LS.push({id,en,ko,lv,ans:pick.t,bi:pick.i,words})};
- GR.forEach(g=>{add('La'+g.id,g.ae,g.ak,g.lv);add('Lb'+g.id,g.be,g.bk,g.lv)});
- WORDS.forEach(w=>add('Lw'+w.id,w.ex,w.exk,w.ms?'M':w.lv));}
+ GR.forEach(g=>{if(g.lv==='M'){if(g.be.split(' ').length>=9)add('Lb'+g.id,g.be,g.bk,'M');return}add('La'+g.id,g.ae,g.ak,g.lv);add('Lb'+g.id,g.be,g.bk,g.lv)});
+ WORDS.forEach(w=>{if(w.ms){if(w.ex.split(' ').length>=8)add('Lw'+w.id,w.ex,w.exk,'M');return}add('Lw'+w.id,w.ex,w.exk,w.lv)});}
 const L=Object.fromEntries(LS.map(x=>[x.id,x]));
 const LWORDS=[...new Set(LS.flatMap(x=>x.words.map(w=>w.replace(/[,.?!]$/,'').toLowerCase())))].filter(w=>/^[a-z'-]+$/.test(w));
 /* 다음에 올 단어 + 헷갈리는 단어 3개 (문장 뒤쪽 단어 우선) */
 function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
- /* 보기는 이 문장에 있는 단어로만: 뒤에 나올 단어 먼저, 모자라면 앞 단어 */
+ /* 보기는 아직 안 쓴(뒤에 나올) 문장 단어로만 */
  const later=[...new Set(toks.slice(k+1).map(t=>t.toLowerCase()))].filter(t=>t!==a);
- const before=[...new Set(toks.slice(0,k).map(t=>t.toLowerCase()))].filter(t=>t!==a&&!later.includes(t));
- const out=[...shuffle(later),...shuffle(before)].slice(0,3);
- return shuffle([a,...out])}
+ return shuffle([a,...shuffle(later).slice(0,3)])}
 
 function vListen(){lastView='listen';
  if(!D.llevel){D.llevel=1;save()}
