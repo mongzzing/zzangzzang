@@ -851,7 +851,8 @@ function check(g){const c=S.c;if(c.locked)return;
  c.wrongTry++;try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}
  const e=$('#vqc');e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');
  toast(c.hint?'다시 도전해 보세요! 모르겠으면 정답 보기':'다시 도전해 보세요! 막히면 힌트 보기')}
-function toast(m){let s=$('#sh');if(!s){s=document.createElement('div');s.id='sh';app.appendChild(s)}s.innerHTML=`<div class="toastm">${m}</div>`;setTimeout(()=>{if(s.firstChild&&s.firstChild.className==='toastm')s.innerHTML=''},1200)}
+/* 알림은 따로 띄워서, 아래 '계속' 시트를 덮어쓰지 않게 */
+function toast(m){let s=document.getElementById('toastbox');if(!s){s=document.createElement('div');s.id='toastbox';document.body.appendChild(s)}const t=document.createElement('div');t.className='toastm';t.textContent=m;s.innerHTML='';s.appendChild(t);setTimeout(()=>{if(t.parentNode)t.remove()},1500)}
 function done(ok,shown){
  const c=S.c;c.locked=true;c.res=ok;vDraw();const kb=$('#kb');if(kb)kb.style.display='none';
  const first=!(c.id in S.first);if(first)S.first[c.id]=ok&&!c.wrongTry;
@@ -1663,7 +1664,7 @@ function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
  return shuffle([a,...shuffle(later).slice(0,3)])}
 
 function vListen(){lastView='listen';
- if(!D.llevel){D.llevel=1;save()}
+ if(!D.llevel){D.llevel=Math.max(2,D.level||1,D.glevel||1);save()}
  const ls=D.lis||{},seen=Object.keys(ls).length,M=isMaster();
  app.innerHTML=`<div class="top"><button class="iconbtn" onclick="vHome()">‹</button><h1>리스닝</h1></div>
  <div class="body">
@@ -1678,9 +1679,10 @@ function vListen(){lastView='listen';
  </div>`;
 }
 function lStart(){
+ if(!D.llevel)D.llevel=Math.max(2,D.level||1,D.glevel||1);
  const t=today(),ls=D.lis=D.lis||{},M=isMaster(),mine=x=>M?x.lv==='M':x.lv!=='M';
  const rev=Object.entries(ls).filter(([id,v])=>v.due<=t&&L[id]&&mine(L[id])).sort((a,b)=>a[1].due<b[1].due?-1:1).slice(0,Math.ceil(goal()*0.3)).map(x=>x[0]);
- const fresh=x=>!ls[x.id]&&mine(x);
+ const fresh=x=>!ls[x.id]&&mine(x)&&(M||D.llevel<2||x.words.length>=6);
  const pool=M?shuffle(LS.filter(fresh)):[...shuffle(LS.filter(x=>fresh(x)&&x.lv===D.llevel)),...shuffle(LS.filter(x=>fresh(x)&&x.lv>D.llevel)).sort((a,b)=>a.lv-b.lv),...LS.filter(x=>fresh(x)&&x.lv<D.llevel)];
  let ids=[...rev,...pool.slice(0,goal()-rev.length).map(x=>x.id)];
  if(ids.length<goal())ids=[...ids,...shuffle(LS.filter(mine).map(x=>x.id).filter(id=>!ids.includes(id))).slice(0,goal()-ids.length)];
@@ -1738,7 +1740,7 @@ function lFinish(){const res={...S.first};lSave();
  const t=today(),wasDone=!!D.days[t];D.days[t]=true;
  const ids=Object.keys(res),okN=ids.filter(id=>res[id]).length;
  let up=false;D.lhist=[...(D.lhist||[]),okN/Math.max(1,ids.length)].slice(-3);
- if(!isMaster()&&D.llevel<5&&D.lhist.length>=3&&D.lhist.reduce((a,b)=>a+b,0)/3>=0.8){D.llevel++;D.lhist=[];up=true}
+ if(!isMaster()&&D.llevel<5&&(okN/Math.max(1,ids.length)>=0.9||(D.lhist.length>=3&&D.lhist.reduce((a,b)=>a+b,0)/3>=0.8))){D.llevel++;D.lhist=[];up=true}
  save();
  app.innerHTML=`<div class="body">
  <div style="text-align:center;padding-top:16px"><div class="big stampPop">${wasDone?'💪':`<span style="display:inline-block;width:70px;height:70px">${PAW}</span>`}</div>
