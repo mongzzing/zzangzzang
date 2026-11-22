@@ -369,6 +369,23 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
 .bubble { border-radius: 4px; background: #f5f5f5; }
 .bubble.me { background: var(--brand-tint); }
 :focus-visible { outline-color: var(--brand); }
+
+/* 홈 = 앱 고르기 (로고 누르면) */
+.home-view { max-width: 720px; padding: 28px 16px; }
+.tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile, .tiles > .tile:nth-child(1), .tiles > .tile:nth-child(2), .tiles > .tile:nth-child(3):not(.soon) { background: #fff; color: var(--text); border: 1px solid var(--line); border-radius: 4px; min-height: 0; padding: 22px 12px 18px; align-items: center; text-align: center; gap: 10px; }
+.tile:hover { transform: none; box-shadow: none; border-color: var(--brand); background: #fafaff; }
+.tile .t-ico { width: 56px; height: 56px; border-radius: 12px; background: var(--brand); display: grid; place-items: center; }
+.tile .t-ico svg { width: 40px; height: 40px; }
+.tile .t-name { font-size: 15px; font-weight: 600 !important; margin: 0; }
+.tile .t-desc { color: var(--soft); font-size: 12px; }
+.tile .t-status, .tile .t-status.todo { margin: 0; align-self: center; background: var(--alert-tint); color: var(--alert); border-top: 2px solid var(--alert); border-radius: 2px; padding: 1px 8px; font-weight: 600; }
+.tile.soon { border: 1px solid var(--line); background: #fff; cursor: default; }
+.tile.soon:hover { border-color: var(--line); background: #fff; }
+.tile.soon .t-ico { background: #c8c8c8; }
+.tile.soon .t-ico svg path { stroke: #c8c8c8; }
+.mode.on { cursor: default; }
+@media (max-width: 800px) { .tiles { gap: 8px; } .tile { padding: 16px 6px 14px; } .tile .t-ico { width: 48px; height: 48px; } }
 @media (max-width: 800px) {
   .titlebar { flex-wrap: wrap; height: auto; padding: 8px 10px 0; row-gap: 8px; }
   .titlebar .logo { font-size: 0 !important; margin-right: 4px; }
@@ -532,7 +549,7 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
 const STEPS = ['맡김', '글 쓰는 중', '임시저장 끝'];
 const PEOPLE = { '수운': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZTdjMiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxjaXJjbGUgY3g9IjI3IiBjeT0iMjciIHI9IjEzIiBmaWxsPSIjZjM5NTMyIi8+PGNpcmNsZSBjeD0iMjciIGN5PSIyNyIgcj0iNyIgZmlsbD0iI2ZmZTJjNCIvPjxjaXJjbGUgY3g9IjczIiBjeT0iMjciIHI9IjEzIiBmaWxsPSIjZjM5NTMyIi8+PGNpcmNsZSBjeD0iNzMiIGN5PSIyNyIgcj0iNyIgZmlsbD0iI2ZmZTJjNCIvPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjU3IiByeD0iMzkiIHJ5PSIzNSIgZmlsbD0iI2Y3YTQ0MCIvPjxnIGZpbGw9IiM0YTJjMWEiPjxwYXRoIGQ9Ik01MCAyMiBsLTQuNSAxMiBoOXoiLz48cGF0aCBkPSJNMzcgMjYgbC0xIDEwIGw3IC0zeiIvPjxwYXRoIGQ9Ik02MyAyNiBsMSAxMCBsLTcgLTN6Ii8+PHBhdGggZD0iTTExIDUyIGwxMyAyLjUgbC0xMyAzLjV6Ii8+PHBhdGggZD0iTTEyIDYzIGwxMiAtMSBsLTExIDV6Ii8+PHBhdGggZD0iTTg5IDUyIGwtMTMgMi41IGwxMyAzLjV6Ii8+PHBhdGggZD0iTTg4IDYzIGwtMTIgLTEgbDExIDV6Ii8+PC9nPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMTkiIHJ5PSIxNCIgZmlsbD0iI2ZmZjRlNiIvPjxjaXJjbGUgY3g9IjM2IiBjeT0iNTMiIHI9IjUiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSIzNy42IiBjeT0iNTEuNCIgcj0iMS43IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNjQiIGN5PSI1MyIgcj0iNSIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjY1LjYiIGN5PSI1MS40IiByPSIxLjciIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDQgNjIgaDEyIGwtNiA2eiIgZmlsbD0iI2UwNjQ0YSIgc3Ryb2tlPSIjZTA2NDRhIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNTAgNjggcS00IDcgLTkgMyBNNTAgNjggcTQgNyA5IDMiIHN0cm9rZT0iIzJiMWQxNCIgc3Ryb2tlLXdpZHRoPSIyLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4=', '예원': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2UzZjFkYyIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjU1IiByeD0iNDEiIHJ5PSIzOCIgZmlsbD0iI2MyYTE4MyIvPjxwYXRoIGQ9Ik01MCAyNiBDMjggMjYgMTQgNDAgMTUgNTcgQzE2IDc2IDMyIDg4IDUwIDg4IEM2OCA4OCA4NCA3NiA4NSA1NyBDODYgNDAgNzIgMjYgNTAgMjZaIiBmaWxsPSIjZmZmNGU2Ii8+PHBhdGggZD0iTTQ1IDUwIEM0MSA0NSAyOSA0NiAyNSA1MyBDMjIgNTkgMjYgNjUgMzIgNjMgQzM4IDYxIDQ0IDU3IDQ1IDUwWiIgZmlsbD0iIzhjNjc0YiIvPjxwYXRoIGQ9Ik01NSA1MCBDNTkgNDUgNzEgNDYgNzUgNTMgQzc4IDU5IDc0IDY1IDY4IDYzIEM2MiA2MSA1NiA1NyA1NSA1MFoiIGZpbGw9IiM4YzY3NGIiLz48ZWxsaXBzZSBjeD0iMjUiIGN5PSI3MCIgcng9IjYiIHJ5PSIzLjgiIGZpbGw9IiNmZmEzYjEiIG9wYWNpdHk9Ii44NSIvPjxlbGxpcHNlIGN4PSI3NSIgY3k9IjcwIiByeD0iNiIgcnk9IjMuOCIgZmlsbD0iI2ZmYTNiMSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjIiIHJ4PSI0LjUiIHJ5PSIzLjIiIGZpbGw9IiM0YTMzMjQiLz48Y2lyY2xlIGN4PSIzNiIgY3k9IjU0IiByPSI0LjYiIGZpbGw9IiMxZjE2MTEiLz48Y2lyY2xlIGN4PSIzNy42IiBjeT0iNTIuNCIgcj0iMS42IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNjQiIGN5PSI1NCIgcj0iNC42IiBmaWxsPSIjMWYxNjExIi8+PGNpcmNsZSBjeD0iNjUuNiIgY3k9IjUyLjQiIHI9IjEuNiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik00MiA2OCBxOCA4IDE2IDAiIHN0cm9rZT0iIzRhMzMyNCIgc3Ryb2tlLXdpZHRoPSIyLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00OSAxOSBDNDYgMTAgNTIgNCA2MCA0IEM2MCAxMSA1NyAxNyA0OSAxOVoiIGZpbGw9IiM3Y2MyNmEiLz48cGF0aCBkPSJNNTAgMTggUTU0IDExIDU4IDciIHN0cm9rZT0iIzVlYTI0ZSIgc3Ryb2tlLXdpZHRoPSIxLjMiIGZpbGw9Im5vbmUiLz48L2c+PC9zdmc+', '수림': 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmZTBlYyIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDEwKSBzY2FsZSguOCkiPjxlbGxpcHNlIGN4PSIzNSIgY3k9IjI0IiByeD0iOSIgcnk9IjIxIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNmMWRjZTMiIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN4PSIzNSIgY3k9IjI2IiByeD0iNC41IiByeT0iMTQiIGZpbGw9IiNmZmMyZDEiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIyNCIgcng9IjkiIHJ5PSIyMSIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZjFkY2UzIiBzdHJva2Utd2lkdGg9IjIiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIyNiIgcng9IjQuNSIgcnk9IjE0IiBmaWxsPSIjZmZjMmQxIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjIiIHJ4PSIzNSIgcnk9IjMxIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNmMWRjZTMiIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN4PSIzMCIgY3k9IjcwIiByeD0iNi41IiByeT0iNCIgZmlsbD0iI2ZmYzJkMSIvPjxlbGxpcHNlIGN4PSI3MCIgY3k9IjcwIiByeD0iNi41IiByeT0iNCIgZmlsbD0iI2ZmYzJkMSIvPjxjaXJjbGUgY3g9IjM3IiBjeT0iNTkiIHI9IjQuOCIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjM4LjUiIGN5PSI1Ny41IiByPSIxLjYiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI2MyIgY3k9IjU5IiByPSI0LjgiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSI2NC41IiBjeT0iNTcuNSIgcj0iMS42IiBmaWxsPSIjZmZmIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjYiIHJ4PSI0IiByeT0iMyIgZmlsbD0iI2ZmOGZhYiIvPjxwYXRoIGQ9Ik01MCA2OSBxLTMgNSAtNyAzIE01MCA2OSBxMyA1IDcgMyIgc3Ryb2tlPSIjMmIxZDE0IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4=' };
 const PAW_COLOR = { '수운': '#f7a440', '예원': '#c39d7b', '수림': '#ffffff' };
-const TILE_ICON = {"blog": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"8\" y=\"7\" width=\"26\" height=\"34\" rx=\"6\" fill=\"#fff\"/><path d=\"M14 16h14M14 22h14M14 28h8\" stroke=\"#ff8a6a\" stroke-width=\"3\" stroke-linecap=\"round\"/><g transform=\"rotate(32 37 27)\"><rect x=\"33\" y=\"12\" width=\"8\" height=\"22\" rx=\"2\" fill=\"#ffd25a\"/><path d=\"M33 34l4 7 4-7z\" fill=\"#ffe9b0\"/><rect x=\"33\" y=\"9\" width=\"8\" height=\"5\" rx=\"2\" fill=\"#ff9fb0\"/></g></svg>", "eng": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M7 13a7 7 0 0 1 7-7h20a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7H22l-8 7v-7a7 7 0 0 1-7-7z\" fill=\"#fff\"/><text x=\"24\" y=\"25\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"14\" fill=\"#14a884\">Hi!</text></svg>"};
+const TILE_ICON = {"money": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"7\" y=\"12\" width=\"34\" height=\"26\" rx=\"5\" fill=\"#fff\"/><path d=\"M17 20l3 10 4-8 4 8 3-10M15 25h18\" stroke=\"#5b5fc7\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>", "blog": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><rect x=\"8\" y=\"7\" width=\"26\" height=\"34\" rx=\"6\" fill=\"#fff\"/><path d=\"M14 16h14M14 22h14M14 28h8\" stroke=\"#ff8a6a\" stroke-width=\"3\" stroke-linecap=\"round\"/><g transform=\"rotate(32 37 27)\"><rect x=\"33\" y=\"12\" width=\"8\" height=\"22\" rx=\"2\" fill=\"#ffd25a\"/><path d=\"M33 34l4 7 4-7z\" fill=\"#ffe9b0\"/><rect x=\"33\" y=\"9\" width=\"8\" height=\"5\" rx=\"2\" fill=\"#ff9fb0\"/></g></svg>", "eng": "<svg viewBox=\"0 0 48 48\" width=\"40\" height=\"40\"><path d=\"M7 13a7 7 0 0 1 7-7h20a7 7 0 0 1 7 7v12a7 7 0 0 1-7 7H22l-8 7v-7a7 7 0 0 1-7-7z\" fill=\"#fff\"/><text x=\"24\" y=\"25\" text-anchor=\"middle\" font-family=\"Jua,sans-serif\" font-size=\"14\" fill=\"#14a884\">Hi!</text></svg>"};
 const MAX_LONG_SIDE = 2400;
 const MAX_FILE_MB = 40;
 
@@ -860,7 +877,6 @@ const APPS = [
 ];
 
 function go(v) {
-  if (v === 'home') v = 'blog';  // 홈 화면 없이 블로그부터
   if (v === 'money') return;     // 가계부는 준비 중
   // 영어는 새로 만든 별도 화면(english.html)으로 연다
   if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
@@ -868,15 +884,9 @@ function go(v) {
   stopSpeak();
   ['home', 'blog', 'eng'].forEach(x => { $('view-' + x).hidden = x !== v; });
   $('back').hidden = true;
-  // 위 줄 메뉴: 지금 메뉴만 보라 알약
-  $('menus').replaceChildren(...APPS.map(n => {
-    const b = el('button', 'mode' + (n.id === v ? ' on' : ''), n.short);
-    b.type = 'button';
-    if (n.soon) { b.disabled = true; b.title = '준비 중'; }
-    b.setAttribute('aria-pressed', String(n.id === v));
-    b.addEventListener('click', () => { if (!busy) go(n.id); });
-    return b;
-  }));
+  // 위 줄: 지금 들어와 있는 메뉴 이름만 보라 알약으로 (홈에서는 없음)
+  const curApp = APPS.find(n => n.id === v);
+  $('menus').replaceChildren(...(curApp ? [el('span', 'mode on', curApp.name)] : []));
   $('subtabs').hidden = v !== 'blog';
   if (v === 'home') renderHome();
   if (v === 'blog') showTab(tab);
@@ -886,33 +896,21 @@ function go(v) {
 }
 
 function renderHome() {
-  const wv = el('span', 'wave'), wf = el('span', 'wf'), pw = el('span', 'paw'), txt = el('span');
-  const img = photo(current); img.style.cssText = 'width:56px;height:56px;border-radius:18px;display:block';
-  wf.append(img); pw.style.background = PAW_COLOR[current] || '#c48a5a'; wv.append(wf, pw);
-  txt.append(current + '님, 안녕하세요', el('small', '', '오늘 뭐 할까요?'));
-  $('hello').replaceChildren(wv, txt);
-  const tiles = APPS.map(a => {
-    const b = el('button', 'card tile');
+  $('hello').replaceChildren();
+  $('hello').hidden = true;
+  $('tiles').replaceChildren(...APPS.map(a => {
+    const b = el('button', 'card tile' + (a.soon ? ' soon' : ''));
     b.type = 'button';
     const ic = el('span', 't-ico'); ic.innerHTML = TILE_ICON[a.id] || a.icon;
     b.append(ic, el('span', 't-name', a.name));
-    if (a.desc) b.append(el('span', 't-desc', a.desc));
+    if (a.soon) { b.disabled = true; b.append(el('span', 't-desc', '준비 중')); }
     if (a.id === 'blog') {
       const n = state ? todo(state[current] || []) : 0;
-      if (n) b.append(el('span', 't-status todo', '● 확인할 글 ' + n + '개'));
+      if (n) b.append(el('span', 't-status todo', '확인할 글 ' + n + '개'));
     }
-    if (a.id === 'eng' && false) {
-      const done = !!engData.done[keyOf(new Date())];
-      b.append(el('span', 't-status ' + (done ? 'done' : 'todo'), done ? '✓ 오늘 공부 완료' : '● 오늘 아직 안 했어요'));
-      const fam = familyDoneToday();
-      if (fam) b.append(el('span', 't-desc', '가족 ' + fam.n + '/' + fam.total + '명 오늘 공부함'));
-    }
-    b.addEventListener('click', () => { if (!busy) go(a.id); });
+    b.addEventListener('click', () => { if (!busy && !a.soon) go(a.id); });
     return b;
-  });
-  const soon = el('div', 'card tile soon');
-  soon.append(el('span', 't-ico', '＋'));
-  $('tiles').replaceChildren(...tiles, soon);
+  }));
 }
 
 /* ───────── 영어 ───────── */

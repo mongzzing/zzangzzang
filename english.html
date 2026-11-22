@@ -226,9 +226,95 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 @keyframes dots{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 .lslow{padding:14px 16px;border-radius:30px;background:var(--bg);font-weight:700;font-size:14px}
 .lopt{padding:22px 8px;font-size:19px}
+
+/* ===== 생산포털 기준 디자인 (2026-11-23, index.html 과 같은 기준) ===== */
+:root{--p:#5b5fc7;--pd:#4f52b2;--pl:#e8ebfa;--ink:#242424;--sub:#616161;--line:#e0e0e0;--bg:#f5f5f5;--red:#bc4b09;--redd:#a3410a;--redl:#fdf3ec;--yel:#c19c00;--blue:#5b5fc7;--purple:#5b5fc7}
+html,body{background:var(--bg)}
+body{font-family:"Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:14px}
+body *{font-family:inherit !important}
+.body > .row > .wave{display:none}
+.today .tag[style]{background:#fff !important;color:var(--pd) !important}
+[style*="color:#fff"]:not(.btn):not(.mode){color:inherit}
+/* 위 줄: 로고 · 지금 메뉴(보라 알약) ……… 시계 · 계정 */
+.ptop{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;height:48px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line)}
+.ptop .plogo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;margin-right:10px}
+.ptop .plogo svg{width:24px;height:24px}
+.ptop .mode{background:var(--p);color:#fff;border-radius:999px;padding:4px 14px;font-weight:600}
+.ptop .pr{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--sub)}
+.ptop .pme{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:600;font-size:14px}
+.ptop .pme svg{width:26px;height:26px;border-radius:50%}
+@media (max-width:800px){.ptop .plogo span,.ptop .pclock,.ptop .pme span{display:none}}
+#app{max-width:560px;margin:16px auto;min-height:calc(100vh - 80px);border:1px solid var(--line);border-radius:4px;overflow:visible}
+@media (max-width:600px){#app{margin:0;border:0;border-radius:0;min-height:calc(100vh - 48px)}}
+.top{min-height:44px;padding:6px 10px}
+.top h1{font-size:15px;font-weight:700}
+.iconbtn{border-radius:4px;font-size:20px}
+.iconbtn:hover{background:var(--bg)}
+.av{width:30px;height:30px}
+.btn{border-radius:4px;padding:10px;font-size:14px;font-weight:600;box-shadow:none !important;background:var(--p)}
+.btn:hover{background:var(--pd)}
+.btn:active{transform:none}
+.btn.ghost{border:1px solid var(--line);background:#fff;color:var(--ink)}
+.btn.red{background:var(--red)}
+.card{border:1px solid var(--line);border-radius:4px}
+.greet{font-size:16px;font-weight:700}
+.sbox{border-radius:4px;background:#fff;border:1px solid var(--line)}
+.sbox b{font-weight:700}
+/* 홈 타일: 흰 상자 + 보라 아이콘 */
+.tile,.tile[style]{background:#fff !important;color:var(--ink);border:1px solid var(--line);border-radius:4px;min-height:0;padding:14px;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px}
+.tile:hover{border-color:var(--p);background:#fafaff !important}
+.tile .em{width:44px;height:44px;border-radius:10px;background:var(--p);display:grid;place-items:center;flex:none}
+.tile .em svg{width:32px;height:32px}
+.tile .nm{font-size:15px;font-weight:600}
+.tile .ds{font-size:12px;color:var(--sub);opacity:1}
+.tile.off{filter:none;opacity:1}
+.tile.off .em{background:#c8c8c8}
+.tile .badge{background:#f5f5f5;color:var(--sub);border-top:2px solid #c8c8c8;border-radius:2px;top:8px;right:8px}
+.lvseg{border-radius:4px;background:#f0f0f0}
+.lvseg button{border-radius:3px}
+.today{border-radius:4px;background:var(--pl);color:var(--ink);border-top:2px solid var(--p)}
+.today h3{font-weight:700}
+.today .btn{background:var(--p);color:#fff}
+.master{border-radius:4px;background:var(--pl);color:var(--pd);border-top:2px solid var(--p);font-weight:700}
+[style*="linear-gradient"]:not(.tile){background:var(--pl) !important;color:var(--ink) !important;border-top:2px solid var(--p)}
+.cal .d{border-radius:4px}
+.cal .d.td{outline-color:var(--p)}
+.prog{border-radius:2px;height:8px}
+.prog i{border-radius:2px}
+.wcard{border:1px solid var(--line);border-radius:4px}
+.wcard .w{font-weight:700}
+.wcard .ex{border-radius:4px}
+.tag{border-radius:2px;border-top:2px solid var(--p)}
+.tag.rv{background:#fff8e0;color:#8a6500;border-top-color:#c19c00}
+.qmain{font-weight:700}
+.qsent{border-radius:4px}
+.opt{border:1px solid var(--line);border-radius:4px;box-shadow:none;font-weight:500}
+.opt:hover{border-color:var(--p)}
+.opt.ok{box-shadow:none;border-top:2px solid var(--p)}
+.opt.no{box-shadow:none;border-top:2px solid var(--red)}
+.sheet h4{font-weight:700}
+.mic{box-shadow:none}
+.tabs button{border-radius:0;background:transparent;color:var(--ink);font-weight:400;border-bottom:2px solid transparent;padding:8px 12px}
+.tabs button.on{background:transparent;color:var(--ink);font-weight:700;border-bottom-color:var(--p)}
+.qc{border:1px solid var(--line);border-radius:4px}
+.bx,.bxi{border-radius:4px}
+.blk{border:1px solid var(--line);border-radius:4px;box-shadow:none;font-weight:600}
+.tinput{border:1px solid var(--line);border-bottom:1px solid #8a8a8a;border-radius:4px}
+.tinput:focus{border-color:var(--line);border-bottom:2px solid var(--p)}
+.tool{border-radius:4px}
+.fcard{border:1px solid var(--line);border-radius:4px}
+.lvup{border-radius:4px}
+.chip{border:1px solid var(--line);border-radius:4px}
+.toastm{border-radius:4px}
+.trophy{color:var(--pd)}
 </style>
 </head>
 <body>
+<div class="ptop">
+  <a class="plogo" href="./" title="짱짱이네"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="29" r="12" fill="#b07a4f"/><circle cx="25" cy="29" r="6" fill="#e8b98f"/><circle cx="75" cy="29" r="12" fill="#b07a4f"/><circle cx="75" cy="29" r="6" fill="#e8b98f"/><ellipse cx="50" cy="59" rx="37" ry="34" fill="#c48a5a"/><path d="M47 27 q0 -11 9 -10 q-6 3 -4 10z" fill="#c48a5a"/><ellipse cx="50" cy="70" rx="16" ry="12" fill="#f3d9b8"/><ellipse cx="29" cy="68" rx="6" ry="3.5" fill="#f4a29a" opacity=".85"/><ellipse cx="71" cy="68" rx="6" ry="3.5" fill="#f4a29a" opacity=".85"/><circle cx="37" cy="56" r="5.5" fill="#2b1d14"/><circle cx="38.8" cy="54.2" r="2" fill="#fff"/><circle cx="63" cy="56" r="5.5" fill="#2b1d14"/><circle cx="64.8" cy="54.2" r="2" fill="#fff"/><ellipse cx="50" cy="65" rx="5" ry="3.6" fill="#3b2416"/><path d="M50 68 q-3 5 -6 2.5 M50 68 q3 5 6 2.5" stroke="#3b2416" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span>짱짱이네</span></a>
+  <span class="mode">영어 공부</span>
+  <div class="pr"><span class="pclock" id="pclock"></span><span class="pme" id="pme"></span></div>
+</div>
 <div id="app"></div>
 <script>
 /* ===== 계정 ===== */
@@ -677,7 +763,7 @@ const me=()=>PEOPLE.find(p=>p.id===cur);
 function vHome(){
  lastView='home';
  const p=me();
- app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1 style="display:flex;align-items:center;gap:6px">${face('bear',28)}짱짱이네 영어</h1><button class="av" style="background:${p.c}" onclick="location.href='./'" title="짱짱이네로">${face(p.ch,30)}</button><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
+ app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1></h1><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
  <div class="body">
   <div class="row" style="gap:14px">${wave(p.ch,56)}<div class="greet">${dispName(p)}, 오늘도<br>영어 한 걸음 가볼까요?</div></div>
   <div class="streakbar">
@@ -1768,6 +1854,11 @@ function vBook(){
 (()=>{let me=null;try{me=localStorage.getItem('zz-me')}catch(e){}
  const p=PEOPLE.find(x=>x.name===me);if(p&&pinOf())return setP(p.id);
  location.replace('./')})();
+
+/* 위 줄: 시계와 계정(캐릭터는 계정 아이콘으로만) */
+(()=>{const t=()=>{const d=new Date();const c=document.getElementById('pclock');if(c)c.textContent=(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};t();setInterval(t,20000);
+ let me=null;try{me=localStorage.getItem('zz-me')}catch(e){}const p=PEOPLE.find(x=>x.name===me);
+ if(p)document.getElementById('pme').innerHTML=face(p.ch,26)+'<span>'+p.name+'</span>'})();
 </script>
 </body>
 </html>
