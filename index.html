@@ -298,6 +298,87 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 .tile .t-name { font-size: 19px; }
 .tile .t-ico { line-height: 0; }
 .tile .t-ico svg { width: 44px; height: 44px; stroke: none; }
+/* ===== 생산포털 기준 디자인 (2026-11-23) =====
+   글꼴 Segoe UI·맑은 고딕 14px, 글씨 #242424, 바탕 #f5f5f5, 상자 #fff, 줄 #e0e0e0, 대표 보라 #5b5fc7.
+   원색 바탕 대신 옅은 바탕 + 위에 같은 색 줄. 위 줄: 로고 · 메뉴 알약 · 하위 탭 ……… 시계 · 계정 · 로그아웃 */
+:root {
+  --bg: #f5f5f5; --panel: #fff; --card: #fff; --line: #e0e0e0;
+  --text: #242424; --soft: #616161;
+  --brand: #5b5fc7; --brand-dark: #4f52b2; --brand-tint: #e8ebfa;
+  --alert: #bc4b09; --alert-tint: #fdf3ec; --good: #107c41; --good-tint: #eef7f1;
+  --font: "Segoe UI", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+}
+body { background: var(--bg); font-family: var(--font); font-size: 14px; }
+.logo, .hello, .tile .t-name, .section-title, .btn, .tab, .account, .back { font-family: var(--font) !important; }
+.section-title { font-weight: 600 !important; font-size: 15px; }
+.btn { font-weight: 600 !important; }
+/* 첫 화면(로그인) */
+.picker { background: var(--bg); }
+.picker-card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 36px 28px 28px; max-width: 360px; gap: 22px; }
+.picker-card .logo { font-size: 22px !important; font-weight: 700 !important; color: var(--text); gap: 8px; }
+.picker-card .logo img { width: 64px; height: 64px; }
+/* 위 줄 */
+.app { grid-template-rows: auto minmax(0, 1fr); background: var(--bg); }
+.titlebar { display: flex; align-items: center; justify-content: flex-start; gap: 6px; height: 48px; padding: 0 14px; background: #fff; border-bottom: 1px solid var(--line); }
+.titlebar .logo { font-size: 15px !important; font-weight: 700 !important; color: var(--text); gap: 6px; margin-right: 10px; }
+.titlebar .logo img { width: 24px; height: 24px; }
+.menus { display: flex; gap: 4px; }
+.mode { border: 0; background: transparent; color: var(--soft); border-radius: 999px; padding: 4px 14px; font-weight: 600; }
+.mode:hover:not(:disabled) { background: var(--brand-tint); color: var(--brand-dark); }
+.mode.on { background: var(--brand); color: #fff; }
+.mode.on:hover { background: var(--brand); color: #fff; }
+.mode:disabled { color: #b0b0b0; cursor: default; }
+.subtabs { display: flex; align-self: stretch; gap: 2px; margin-left: 14px; }
+.subtabs .tab { background: transparent !important; color: var(--text) !important; border: 0; border-radius: 0; border-bottom: 2px solid transparent; padding: 0 12px; font-weight: 400 !important; }
+.subtabs .tab:hover { background: #f5f5f5 !important; }
+.subtabs .tab[aria-selected="true"] { font-weight: 700 !important; border-bottom-color: var(--brand); }
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.clock { color: var(--soft); font-size: 13px; }
+.me { display: flex; align-items: center; gap: 6px; padding: 0; font-weight: 600; border-radius: 0; }
+.me:hover { background: transparent; }
+.me .avatar { width: 26px; height: 26px; }
+.link { background: transparent; border: 0; padding: 0; color: var(--soft); font-size: 13px; }
+.link:hover { color: var(--brand-dark); text-decoration: underline; }
+.shell { grid-template-columns: minmax(0, 1fr); }
+.rail { display: none; }
+.stage { background: var(--bg); border-radius: 0; }
+/* 상자·입력 */
+.card { border: 1px solid var(--line); border-radius: 4px; box-shadow: none; }
+.columns { padding: 16px; gap: 16px; }
+.pane { padding: 16px; }
+.field input, .field textarea, .answer input, .chat-form textarea { background: #fff; border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 4px; padding: 7px 10px; }
+.field input:focus, .field textarea:focus, .answer input:focus, .chat-form textarea:focus { border: 1px solid var(--line); border-bottom: 2px solid var(--brand); }
+.drop { border: 1px dashed #b0b0b0; border-radius: 4px; background: #fafafa; color: var(--brand-dark); }
+.drop:hover, .drop.over { background: var(--brand-tint); border-color: var(--brand); }
+.btn { border-radius: 4px; padding: 6px 18px; box-shadow: none; background: var(--brand); }
+.btn:hover { background: var(--brand-dark); }
+.btn:active { transform: none; box-shadow: none; }
+.btn.ghost { background: #fff; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
+/* 맡긴 글: 상태는 옅은 바탕 + 위 줄, 단계는 번호 동그라미 */
+.ticket { padding: 12px 14px; gap: 10px; }
+.ticket.ask { border-color: var(--line); border-top: 2px solid var(--alert); }
+.chip { border-radius: 2px; padding: 1px 8px; background: #f5f5f5; color: var(--soft); border-top: 2px solid #c8c8c8; }
+.chip.ready { background: var(--good-tint); color: var(--good); border-top-color: var(--good); }
+.chip.need { background: var(--alert-tint); color: var(--alert); border-top-color: var(--alert); }
+.steps { counter-reset: st; display: flex; gap: 6px; flex-wrap: wrap; }
+.steps li { counter-increment: st; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 3px; display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--soft); background: #fff; }
+.steps li::before { content: counter(st); width: 18px; height: 18px; border-radius: 50%; background: #e0e0e0; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.steps li.on { border-color: var(--brand); color: var(--brand-dark); font-weight: 600; background: var(--brand-tint); }
+.steps li.on::before { background: var(--brand); }
+.ticket.finished .steps li.on { border-color: var(--brand); }
+.bubble { border-radius: 4px; background: #f5f5f5; }
+.bubble.me { background: var(--brand-tint); }
+:focus-visible { outline-color: var(--brand); }
+@media (max-width: 800px) {
+  .titlebar { flex-wrap: wrap; height: auto; padding: 8px 10px 0; row-gap: 8px; }
+  .titlebar .logo { font-size: 0 !important; margin-right: 4px; }
+  .clock { display: none; }
+  .me span { display: none; }
+  .tb-right { gap: 10px; }
+  .subtabs { order: 5; flex: 0 0 calc(100% + 20px); margin: 0 -10px; padding: 0 6px; height: 40px; border-top: 1px solid var(--line); overflow-x: auto; }
+  .columns { padding: 10px; gap: 10px; }
+}
+
 .btn { font-size: 16px; }
 </style>
 <meta name="theme-color" content="#ffffff">
@@ -328,11 +409,19 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 
 <div class="app" id="app" hidden>
   <div class="titlebar">
-    <div class="brand">
-      <button class="back" id="back" type="button" hidden><svg><use href="#i-back"/></svg>홈</button>
-      <button class="logo home" id="home" type="button" aria-label="홈으로"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9IjI1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI1OSIgcng9IjM3IiByeT0iMzQiIGZpbGw9IiNjNDhhNWEiLz48cGF0aCBkPSJNNDcgMjcgcTAgLTExIDkgLTEwIHEtNiAzIC00IDEweiIgZmlsbD0iI2M0OGE1YSIvPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iI2YzZDliOCIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjY4IiByeD0iNiIgcnk9IjMuNSIgZmlsbD0iI2Y0YTI5YSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjcxIiBjeT0iNjgiIHJ4PSI2IiByeT0iMy41IiBmaWxsPSIjZjRhMjlhIiBvcGFjaXR5PSIuODUiLz48Y2lyY2xlIGN4PSIzNyIgY3k9IjU2IiByPSI1LjUiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSIzOC44IiBjeT0iNTQuMiIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYzIiBjeT0iNTYiIHI9IjUuNSIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjY0LjgiIGN5PSI1NC4yIiByPSIyIiBmaWxsPSIjZmZmIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjUiIHJ4PSI1IiByeT0iMy42IiBmaWxsPSIjM2IyNDE2Ii8+PHBhdGggZD0iTTUwIDY4IHEtMyA1IC02IDIuNSBNNTAgNjggcTMgNSA2IDIuNSIgc3Ryb2tlPSIjM2IyNDE2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==" alt="">짱짱이네</button>
+    <button class="logo home" id="home" type="button" title="짱짱이네"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9IjI1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI1OSIgcng9IjM3IiByeT0iMzQiIGZpbGw9IiNjNDhhNWEiLz48cGF0aCBkPSJNNDcgMjcgcTAgLTExIDkgLTEwIHEtNiAzIC00IDEweiIgZmlsbD0iI2M0OGE1YSIvPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iI2YzZDliOCIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjY4IiByeD0iNiIgcnk9IjMuNSIgZmlsbD0iI2Y0YTI5YSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjcxIiBjeT0iNjgiIHJ4PSI2IiByeT0iMy41IiBmaWxsPSIjZjRhMjlhIiBvcGFjaXR5PSIuODUiLz48Y2lyY2xlIGN4PSIzNyIgY3k9IjU2IiByPSI1LjUiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSIzOC44IiBjeT0iNTQuMiIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYzIiBjeT0iNTYiIHI9IjUuNSIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjY0LjgiIGN5PSI1NC4yIiByPSIyIiBmaWxsPSIjZmZmIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjUiIHJ4PSI1IiByeT0iMy42IiBmaWxsPSIjM2IyNDE2Ii8+PHBhdGggZD0iTTUwIDY4IHEtMyA1IC02IDIuNSBNNTAgNjggcTMgNSA2IDIuNSIgc3Ryb2tlPSIjM2IyNDE2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==" alt="">짱짱이네</button>
+    <nav class="menus" id="menus" aria-label="메뉴"></nav>
+    <nav class="subtabs" id="subtabs" role="tablist" aria-label="화면 바꾸기">
+      <button class="tab" type="button" role="tab" id="tab-post" aria-selected="true">맡기기</button>
+      <button class="tab" type="button" role="tab" id="tab-chat" aria-selected="false">채팅</button>
+      <button class="tab" type="button" role="tab" id="tab-guide" aria-selected="false">내 지침</button>
+    </nav>
+    <div class="tb-right">
+      <span class="clock" id="clock"></span>
+      <span class="me" id="me"></span>
+      <button class="link" id="logout" type="button">로그아웃</button>
+      <button class="back" id="back" type="button" hidden>홈</button>
     </div>
-    <button class="me" id="me" type="button" aria-label="다른 사람으로 들어가기"></button>
   </div>
   <div class="shell">
     <nav class="rail" id="rail" aria-label="메뉴"></nav>
@@ -382,20 +471,14 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
       </section>
 
       <div id="view-blog" hidden>
-      <div class="tabs" role="tablist" aria-label="화면 바꾸기">
-        <button class="tab" type="button" role="tab" id="tab-post" aria-selected="true">맡기기</button>
-        <button class="tab" type="button" role="tab" id="tab-chat" aria-selected="false">채팅</button>
-        <button class="tab" type="button" role="tab" id="tab-guide" aria-selected="false">내 지침</button>
-      </div>
       <main class="columns" id="pane-post">
         <form class="card form" id="form" novalidate>
           <h2 class="section-title">새 글 맡기기</h2>
           <div class="field">
             <span class="field-label">사진</span>
-            <label class="drop" id="drop" for="photos">
+            <label class="drop" id="drop" for="photos" title="대충 다 넣어도 돼요. 고르고 보정하는 건 맡겨 주세요">
               <svg><use href="#i-photo"/></svg>
               사진 고르기
-              <small>대충 다 넣어도 돼요. 고르고 보정하는 건 맡겨 주세요</small>
               <input class="sr-only" id="photos" type="file" accept="image/*,video/*" multiple>
             </label>
             <div class="thumbs" id="thumbs"></div>
@@ -548,9 +631,7 @@ function enter(name) {
   $('picker').hidden = !!name;
   $('app').hidden = !name;
   if (!name) { renderAccounts(); return; }
-  $('me').replaceChildren(el('span', '', name), avatar(name));
-  $('me').setAttribute('aria-label', name + ' 로그아웃');
-  $('me').title = '로그아웃';
+  $('me').replaceChildren(avatar(name), el('span', '', name));
   guideDirty = false;
   $('guide').value = '';
   $('guide-saved').textContent = '';
@@ -775,24 +856,28 @@ async function submit(e) {
 const APPS = [
   { id: 'blog', icon: '📝', name: '블로그 쓰기', short: '블로그', desc: '' },
   { id: 'eng', icon: '🗣️', name: '영어 공부', short: '영어', desc: '' },
+  { id: 'money', icon: '💰', name: '가계부', short: '가계부', desc: '', soon: true },
 ];
 
 function go(v) {
+  if (v === 'home') v = 'blog';  // 홈 화면 없이 블로그부터
+  if (v === 'money') return;     // 가계부는 준비 중
   // 영어는 새로 만든 별도 화면(english.html)으로 연다
   if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
   view = v;
   stopSpeak();
   ['home', 'blog', 'eng'].forEach(x => { $('view-' + x).hidden = x !== v; });
-  $('back').hidden = v === 'home';
-  const nav = [{ id: 'home', icon: '🏠', short: '홈' }].concat(APPS);
-  $('rail').replaceChildren(...nav.map(n => {
-    const b = el('button', 'rail-btn');
+  $('back').hidden = true;
+  // 위 줄 메뉴: 지금 메뉴만 보라 알약
+  $('menus').replaceChildren(...APPS.map(n => {
+    const b = el('button', 'mode' + (n.id === v ? ' on' : ''), n.short);
     b.type = 'button';
+    if (n.soon) { b.disabled = true; b.title = '준비 중'; }
     b.setAttribute('aria-pressed', String(n.id === v));
-    b.append(el('span', 'ico', n.icon), n.short);
     b.addEventListener('click', () => { if (!busy) go(n.id); });
     return b;
   }));
+  $('subtabs').hidden = v !== 'blog';
   if (v === 'home') renderHome();
   if (v === 'blog') showTab(tab);
   if (v === 'eng') { renderEng(); loadFamily(); }
@@ -1797,7 +1882,10 @@ $('guide-form').addEventListener('submit', async e => {
     $('guide-save').disabled = false;
   }
 });
-$('me').addEventListener('click', () => { if (!busy && confirm('로그아웃할까요?')) { stopSpeak(); signedOut(); } });
+$('logout').addEventListener('click', () => { if (!busy && confirm('로그아웃할까요?')) { stopSpeak(); signedOut(); } });
+// 위 줄 시계
+const tick = () => { const d = new Date(); $('clock').textContent = (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+tick(); setInterval(tick, 20000);
 $('home').addEventListener('click', () => { if (!busy) go('home'); });
 $('back').addEventListener('click', () => { if (!busy) go('home'); });
 $('photos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
