@@ -386,6 +386,71 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
 .tile.soon .t-ico svg path { stroke: #c8c8c8; }
 .mode.on { cursor: default; }
 @media (max-width: 800px) { .tiles { gap: 8px; } .tile { padding: 16px 6px 14px; } .tile .t-ico { width: 48px; height: 48px; } }
+/* 가계부: 엑셀처럼. 페이지 스크롤 없이 표 안에서만, 아래에 달 시트 탭 */
+.stage.fit { overflow: hidden; display: flex; flex-direction: column; }
+.money { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding: 12px 16px 0; }
+.money .m-pane { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.m-input { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
+.m-input input, .m-input select { border: 1px solid var(--line); border-bottom: 1px solid #8a8a8a; border-radius: 4px; padding: 5px 8px; background: #fff; font: inherit; min-width: 0; height: 32px; }
+.m-input input:focus, .m-input select:focus { outline: none; border-bottom: 2px solid var(--brand); }
+#m-d { width: 140px; } #m-cat { width: 104px; } #m-text { flex: 1 1 160px; } #m-pay { width: 72px; } #m-memo { flex: 1 1 140px; }
+.m-input .zn { width: 112px; text-align: right; }
+.m-input .zn.plus { box-shadow: inset 0 2px 0 var(--good); }
+.m-input .zn.minus { box-shadow: inset 0 2px 0 #c4314b; }
+.m-input .btn { padding: 5px 18px; height: 32px; }
+.m-wrap { flex: 1; min-height: 120px; overflow: auto; background: #fff; border: 1px solid #c8c8c8; }
+.ztbl { table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+#m-table { width: 962px; }
+#m-cat-table { width: 510px; }
+.ztbl th, .ztbl td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 0 8px; height: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ztbl thead th { position: sticky; top: 0; z-index: 2; background: #f3f3f8; color: #242424; font-weight: 600; text-align: center; cursor: pointer; user-select: none; height: 34px; }
+.ztbl thead th[data-nofilter] { cursor: default; }
+.ztbl thead th.filtered::after { content: " ⚑"; color: var(--brand); }
+.ztbl th.plus { color: var(--good); background: #eef7f1; box-shadow: inset 0 2px 0 var(--good); }
+.ztbl th.minus { color: #c4314b; background: #fcf0f2; box-shadow: inset 0 2px 0 #c4314b; }
+.ztbl td.plus { background: #f7fbf8; color: var(--good); }
+.ztbl td.minus { background: #fdf7f8; color: #c4314b; }
+.ztbl td.zn { text-align: right; font-variant-numeric: tabular-nums; }
+.ztbl tbody td { user-select: none; cursor: cell; }
+.ztbl tbody td.sel { background: #dfe2f7 !important; }
+.ztbl tbody td.copied { outline: 1px dashed var(--brand-dark); outline-offset: -2px; }
+.ztbl tbody tr.editing td { background: #fff8e0; }
+.ztbl td.empty { text-align: center; color: var(--soft); cursor: default; height: 64px; }
+.ztbl td.tool-cell { padding: 0; text-align: center; cursor: default; }
+.ztbl tfoot td { position: sticky; bottom: 0; z-index: 1; background: #fff4c2 !important; font-weight: 700; border-top: 1px solid #e0c96a; }
+.del { border: 0; background: transparent; color: #9a9a9a; font-size: 16px; line-height: 1; padding: 2px 6px; }
+.del:hover { color: #c4314b; }
+.zstat { height: 20px; font-size: 12px; color: var(--soft); text-align: right; padding: 0 4px; white-space: pre; }
+.sheets { display: flex; align-items: stretch; flex: none; border-top: 1px solid #c8c8c8; background: #f0f0f0; margin: 0 -16px; padding: 0 12px; overflow-x: auto; }
+.sheet { border: 0; border-right: 1px solid #d6d6d6; background: transparent; padding: 7px 14px; font-size: 13px; color: var(--text); white-space: nowrap; }
+.sheet:hover { background: #e8e8e8; }
+.sheet.on { background: #fff; font-weight: 700; color: var(--brand-dark); box-shadow: inset 0 -2px 0 var(--brand); }
+.sheet.nav { padding: 7px 8px; color: var(--soft); border-right: 0; }
+.sheet-year { display: flex; align-items: center; padding: 0 6px; font-size: 13px; font-weight: 600; border-right: 1px solid #d6d6d6; }
+.zmenu { position: fixed; z-index: 30; width: 224px; background: #fff; border: 1px solid #c8c8c8; box-shadow: 0 4px 14px rgba(0,0,0,.12); padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.zmenu .mi { text-align: left; border: 0; background: transparent; padding: 5px 8px; }
+.zmenu .mi:hover { background: var(--brand-tint); }
+.zmenu > input { border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+.mlist { max-height: 220px; overflow: auto; display: flex; flex-direction: column; border: 1px solid var(--line); padding: 4px; }
+.mlist label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 1px 2px; }
+.mfoot { display: flex; justify-content: space-between; align-items: center; }
+.mfoot .btn { padding: 3px 16px; }
+@media (max-width: 800px) {
+  .money { padding: 8px 8px 0; }
+  .sheets { margin: 0 -8px; }
+  #m-d { width: calc(50% - 3px); } #m-cat { width: calc(50% - 3px); }
+  .m-input .zn { width: calc(50% - 3px); }
+  #m-text { flex: 1 1 100%; } #m-memo { flex: 1 1 0; } #m-save { flex: none; }
+  /* 폰: 분류·결제·메모 칸은 접고 날짜·내용·금액만 */
+  #m-table { width: 100%; }
+  #m-table col:nth-child(1) { width: 74px !important; } #m-table col:nth-child(3) { width: auto !important; }
+  #m-table col:nth-child(4), #m-table col:nth-child(5) { width: 80px !important; } #m-table col:nth-child(8) { width: 28px !important; }
+  #m-table col:nth-child(2), #m-table col:nth-child(6), #m-table col:nth-child(7) { width: 0 !important; }
+  #m-table :is(thead, tbody) tr > :is(:nth-child(2), :nth-child(6), :nth-child(7)) { padding: 0; border-right: 0; font-size: 0; }
+  #m-table td[data-c="0"] { padding: 0 4px; font-size: 12px; }
+  #m-sum-left { font-size: 0; padding: 0; }
+  #m-cat-table { width: 100%; }
+}
 @media (max-width: 800px) {
   .titlebar { flex-wrap: wrap; height: auto; padding: 8px 10px 0; row-gap: 8px; }
   .titlebar .logo { font-size: 0 !important; margin-right: 4px; }
@@ -432,6 +497,10 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
       <button class="tab" type="button" role="tab" id="tab-post" aria-selected="true">맡기기</button>
       <button class="tab" type="button" role="tab" id="tab-chat" aria-selected="false">채팅</button>
       <button class="tab" type="button" role="tab" id="tab-guide" aria-selected="false">내 지침</button>
+    </nav>
+    <nav class="subtabs" id="subtabs-money" role="tablist" aria-label="가계부 화면" hidden>
+      <button class="tab" type="button" role="tab" id="mtab-list" aria-selected="true">내역</button>
+      <button class="tab" type="button" role="tab" id="mtab-cats" aria-selected="false">분류별</button>
     </nav>
     <div class="tb-right">
       <span class="clock" id="clock"></span>
@@ -541,6 +610,47 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
         </form>
       </section>
       </div>
+      <section class="money" id="view-money" hidden>
+        <div class="m-pane" id="m-list">
+          <form class="m-input" id="m-form" autocomplete="off">
+            <input id="m-d" type="date" aria-label="날짜">
+            <select id="m-cat" aria-label="분류"></select>
+            <input id="m-text" type="text" placeholder="내용" aria-label="내용">
+            <input id="m-inc" class="zn plus" type="text" inputmode="numeric" placeholder="+ 수입" aria-label="수입">
+            <input id="m-out" class="zn minus" type="text" inputmode="numeric" placeholder="− 지출" aria-label="지출">
+            <select id="m-pay" aria-label="결제"><option>카드</option><option>현금</option><option>이체</option></select>
+            <input id="m-memo" type="text" placeholder="메모" aria-label="메모">
+            <button class="btn" id="m-save" type="submit">추가</button>
+            <button class="link" id="m-cancel" type="button" hidden>취소</button>
+          </form>
+          <p class="error" id="m-error" role="alert"></p>
+          <div class="m-wrap" id="m-wrap">
+            <table class="ztbl" id="m-table">
+              <colgroup><col style="width:92px"><col style="width:96px"><col style="width:220px"><col style="width:112px"><col style="width:112px"><col style="width:70px"><col style="width:220px"><col style="width:40px"></colgroup>
+              <thead><tr>
+                <th data-k="d">날짜</th><th data-k="cat">분류</th><th data-k="text">내용</th>
+                <th data-k="inc" class="plus">+ 수입</th><th data-k="out" class="minus">− 지출</th>
+                <th data-k="pay">결제</th><th data-k="memo">메모</th><th data-nofilter></th>
+              </tr></thead>
+              <tbody id="m-body"></tbody>
+              <tfoot><tr class="gsum"><td colspan="3">합계</td><td class="zn plus" id="m-sum-inc"></td><td class="zn minus" id="m-sum-out"></td><td colspan="3" id="m-sum-left"></td></tr></tfoot>
+            </table>
+          </div>
+          <div class="zstat" id="m-stat"></div>
+        </div>
+        <div class="m-pane" id="m-cats" hidden>
+          <div class="m-wrap">
+            <table class="ztbl" id="m-cat-table">
+              <colgroup><col style="width:120px"><col style="width:120px"><col style="width:80px"><col style="width:120px"><col style="width:70px"></colgroup>
+              <thead><tr><th data-nofilter>분류</th><th data-nofilter class="minus">− 지출</th><th data-nofilter>비율</th><th data-nofilter class="plus">+ 수입</th><th data-nofilter>건수</th></tr></thead>
+              <tbody id="m-cat-body"></tbody>
+              <tfoot><tr class="gsum"><td>합계</td><td class="zn minus" id="m-cat-out"></td><td></td><td class="zn plus" id="m-cat-inc"></td><td class="zn" id="m-cat-n"></td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="sheets" id="m-sheets"></div>
+        <div class="zmenu" id="m-menu" hidden></div>
+      </section>
     </div>
   </div>
 </div>
@@ -873,16 +983,17 @@ async function submit(e) {
 const APPS = [
   { id: 'blog', icon: '📝', name: '블로그 쓰기', short: '블로그', desc: '' },
   { id: 'eng', icon: '🗣️', name: '영어 공부', short: '영어', desc: '' },
-  { id: 'money', icon: '💰', name: '가계부', short: '가계부', desc: '', soon: true },
+  { id: 'money', icon: '💰', name: '가계부', short: '가계부', desc: '' },
 ];
 
 function go(v) {
-  if (v === 'money') return;     // 가계부는 준비 중
   // 영어는 새로 만든 별도 화면(english.html)으로 연다
   if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
   view = v;
   stopSpeak();
-  ['home', 'blog', 'eng'].forEach(x => { $('view-' + x).hidden = x !== v; });
+  ['home', 'blog', 'eng', 'money'].forEach(x => { $('view-' + x).hidden = x !== v; });
+  $('subtabs-money').hidden = v !== 'money';
+  $('stage').classList.toggle('fit', v === 'money');
   $('back').hidden = true;
   // 위 줄: 지금 들어와 있는 메뉴 이름만 보라 알약으로 (홈에서는 없음)
   const curApp = APPS.find(n => n.id === v);
@@ -890,6 +1001,7 @@ function go(v) {
   $('subtabs').hidden = v !== 'blog';
   if (v === 'home') renderHome();
   if (v === 'blog') showTab(tab);
+  if (v === 'money') openMoney();
   if (v === 'eng') { renderEng(); loadFamily(); }
   if (v === 'home') loadFamily();
   $('stage').scrollTop = 0;
@@ -1893,6 +2005,295 @@ const drop = $('drop');
 drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
 $('place').addEventListener('input', () => { $('error').textContent = ''; });
 $('form').addEventListener('submit', submit);
+/* ───────── 가계부 (각자 따로, 달마다 파일 하나) ─────────
+   표는 엑셀처럼: 칸 너비 고정, 머리글 누르면 정렬·값 필터(⚑), 칸 끌어 고르면 아래에 개수·합계·평균,
+   Ctrl+C 복사(점선, Esc 로 지움), Ctrl+A, 노란 합계 줄(보이는 줄만), 아래 달 시트 탭 */
+const M_CATS = ['식비', '카페·간식', '장보기', '교통', '쇼핑', '생활', '주거·통신', '의료', '교육', '여가', '경조사', '육아', '기타', '월급', '부수입', '용돈'];
+const M = { ym: '', year: 0, items: null, sort: { k: 'd', dir: -1 }, filters: {}, edit: null, editYm: '', tab: 'list', sel: new Set(), anchor: null, dragging: false };
+const won = n => n ? Number(n).toLocaleString('ko-KR') : '';
+const ymOf = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+const todayStr = () => { const d = new Date(); return ymOf(d) + '-' + String(d.getDate()).padStart(2, '0'); };
+const toNum = v => Math.max(0, Math.round(Number(String(v || '').replace(/[^\d]/g, '')) || 0));
+const DOW = '일월화수목금토';
+const M_KEYS = ['d', 'cat', 'text', 'inc', 'out', 'pay', 'memo'];
+
+function openMoney() {
+  if (!$('m-cat').options.length) $('m-cat').replaceChildren(...M_CATS.map(c => el('option', '', c)));
+  if (!$('m-d').value) $('m-d').value = todayStr();
+  if (!M.ym) { M.ym = ymOf(new Date()); M.year = +M.ym.slice(0, 4); }
+  showMoneyTab(M.tab);
+  loadMoney(M.ym);
+}
+
+function showMoneyTab(t) {
+  M.tab = t;
+  ['list', 'cats'].forEach(n => { $('mtab-' + n).setAttribute('aria-selected', String(n === t)); $('m-' + n).hidden = n !== t; });
+  closeMenu();
+  renderMoney();
+}
+
+async function loadMoney(ym) {
+  M.ym = ym; M.items = null; M.sel.clear(); M.filters = {};
+  if (M.edit) cancelEdit();
+  $('m-error').textContent = '';
+  renderSheets(); renderMoney();
+  const who = current;
+  try {
+    const items = await call('getMoney', pin, who, ym);
+    if (who !== current || ym !== M.ym) return;
+    M.items = items || [];
+  } catch (e) {
+    M.items = [];
+    $('m-error').textContent = '불러오지 못했어요. 새로고침해 주세요.';
+  }
+  renderMoney();
+}
+
+function renderSheets() {
+  const y = M.year;
+  const nav = (t, title, d) => { const b = el('button', 'sheet nav', t); b.type = 'button'; b.title = title; b.onclick = () => { M.year += d; renderSheets(); }; return b; };
+  const tabs = [];
+  for (let m = 1; m <= 12; m++) {
+    const ym = y + '-' + String(m).padStart(2, '0');
+    const b = el('button', 'sheet' + (ym === M.ym ? ' on' : ''), m + '월');
+    b.type = 'button';
+    b.onclick = () => loadMoney(ym);
+    tabs.push(b);
+  }
+  $('m-sheets').replaceChildren(nav('‹', (y - 1) + '년', -1), el('span', 'sheet-year', y + '년'), nav('›', (y + 1) + '년', 1), ...tabs);
+}
+
+function cellText(x, k) {
+  if (k === 'd') return x.d.slice(5).replace('-', '/') + ' (' + DOW[new Date(x.d + 'T00:00').getDay()] + ')';
+  if (k === 'inc' || k === 'out') return won(x[k]);
+  return x[k] || '';
+}
+
+function moneyRows() {
+  const rows = (M.items || []).filter(x => Object.keys(M.filters).every(k => M.filters[k].has(cellText(x, k))));
+  const { k, dir } = M.sort;
+  rows.sort((a, b) => {
+    const va = a[k] == null ? '' : a[k], vb = b[k] == null ? '' : b[k];
+    const c = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb), 'ko');
+    return c * dir || (a.id < b.id ? -1 : 1);
+  });
+  return rows;
+}
+
+function rowMsg(t, span) { const tr = el('tr'); const td = el('td', 'empty', t); td.colSpan = span; tr.append(td); return tr; }
+
+function renderMoney() {
+  document.querySelectorAll('#m-table th[data-k]').forEach(th => th.classList.toggle('filtered', !!M.filters[th.dataset.k]));
+  if (!M.items) {
+    $('m-body').replaceChildren(rowMsg('불러오는 중이에요.', 8));
+    setSums([]); renderCats(); renderStat();
+    return;
+  }
+  const rows = moneyRows();
+  if (!rows.length) $('m-body').replaceChildren(rowMsg(M.items.length ? '조건에 맞는 내역이 없어요.' : '아직 적은 내역이 없어요.', 8));
+  else $('m-body').replaceChildren(...rows.map((x, r) => {
+    const tr = el('tr', M.edit === x.id ? 'editing' : '');
+    M_KEYS.forEach((k, c) => {
+      const t = cellText(x, k);
+      const td = el('td', (k === 'inc' ? 'zn plus' : k === 'out' ? 'zn minus' : ''), t);
+      td.dataset.r = r; td.dataset.c = c; td.title = t;
+      if (M.sel.has(r + ':' + c)) td.classList.add('sel');
+      tr.append(td);
+    });
+    const del = el('button', 'del', '×');
+    del.type = 'button'; del.title = '지우기';
+    del.addEventListener('mousedown', e => e.stopPropagation());
+    del.addEventListener('click', e => { e.stopPropagation(); removeMoney(x); });
+    const td = el('td', 'tool-cell'); td.append(del); tr.append(td);
+    tr.addEventListener('dblclick', () => startEdit(x));
+    tr.title = '두 번 누르면 고쳐요';
+    return tr;
+  }));
+  setSums(rows);
+  renderStat();
+  renderCats();
+}
+
+function setSums(rows) {
+  const inc = rows.reduce((a, x) => a + (x.inc || 0), 0), out = rows.reduce((a, x) => a + (x.out || 0), 0);
+  $('m-sum-inc').textContent = won(inc) || '0';
+  $('m-sum-out').textContent = won(out) || '0';
+  $('m-sum-left').textContent = rows.length ? '남은 돈 ' + (inc - out < 0 ? '−' : '') + Math.abs(inc - out).toLocaleString('ko-KR') : '';
+}
+
+function renderCats() {
+  const items = M.items || [];
+  const by = {};
+  items.forEach(x => { const c = x.cat || '기타'; by[c] = by[c] || { out: 0, inc: 0, n: 0 }; by[c].out += x.out || 0; by[c].inc += x.inc || 0; by[c].n++; });
+  const total = items.reduce((a, x) => a + (x.out || 0), 0);
+  const cats = Object.keys(by).sort((a, b) => by[b].out - by[a].out || by[b].inc - by[a].inc);
+  $('m-cat-body').replaceChildren(...(cats.length ? cats.map(c => {
+    const tr = el('tr');
+    tr.append(el('td', '', c), el('td', 'zn minus', won(by[c].out)),
+      el('td', 'zn', total && by[c].out ? Math.round(by[c].out / total * 100) + '%' : ''),
+      el('td', 'zn plus', won(by[c].inc)), el('td', 'zn', by[c].n));
+    return tr;
+  }) : [rowMsg(M.items ? '아직 적은 내역이 없어요.' : '불러오는 중이에요.', 5)]));
+  $('m-cat-out').textContent = won(total) || '0';
+  $('m-cat-inc').textContent = won(items.reduce((a, x) => a + (x.inc || 0), 0)) || '0';
+  $('m-cat-n').textContent = items.length;
+}
+
+// 고른 칸: 아래 상태줄에 개수·합계·평균
+function renderStat() {
+  const cells = [...document.querySelectorAll('#m-body td.sel')];
+  const nums = cells.filter(td => td.classList.contains('zn') && td.textContent).map(td => toNum(td.textContent));
+  if (cells.length < 2 && !nums.length) { $('m-stat').textContent = ''; return; }
+  const sum = nums.reduce((a, b) => a + b, 0);
+  $('m-stat').textContent = '개수 ' + cells.length + (nums.length ? '   합계 ' + sum.toLocaleString('ko-KR') + '   평균 ' + Math.round(sum / nums.length).toLocaleString('ko-KR') : '');
+}
+function paintSel() {
+  document.querySelectorAll('#m-body td[data-r]').forEach(td => { td.classList.toggle('sel', M.sel.has(td.dataset.r + ':' + td.dataset.c)); td.classList.remove('copied'); });
+  renderStat();
+}
+function selectRange(a, b, add) {
+  if (!add) M.sel.clear();
+  const r0 = Math.min(a.r, b.r), r1 = Math.max(a.r, b.r), c0 = Math.min(a.c, b.c), c1 = Math.max(a.c, b.c);
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) M.sel.add(r + ':' + c);
+  paintSel();
+}
+const cellPos = td => ({ r: +td.dataset.r, c: +td.dataset.c });
+$('m-body').addEventListener('mousedown', e => {
+  const td = e.target.closest('td[data-r]');
+  if (!td || e.button) return;
+  const p = cellPos(td);
+  if (e.shiftKey && M.anchor) selectRange(M.anchor, p, e.ctrlKey || e.metaKey);
+  else if (e.ctrlKey || e.metaKey) { const k = p.r + ':' + p.c; if (M.sel.has(k)) M.sel.delete(k); else M.sel.add(k); M.anchor = p; paintSel(); }
+  else { M.anchor = p; M.dragging = true; selectRange(p, p, false); }
+  // 검색·입력 칸에 커서가 있어도 표를 누르면 Ctrl+C 가 표로 가게
+  if (document.activeElement && document.activeElement.matches('input, select, textarea')) document.activeElement.blur();
+  e.preventDefault();
+});
+$('m-body').addEventListener('mouseover', e => {
+  if (!M.dragging) return;
+  const td = e.target.closest('td[data-r]');
+  if (td) selectRange(M.anchor, cellPos(td), false);
+});
+document.addEventListener('mouseup', () => { M.dragging = false; });
+document.addEventListener('keydown', e => {
+  if (view !== 'money' || M.tab !== 'list') return;
+  if (e.key === 'Escape') { closeMenu(); M.sel.clear(); paintSel(); return; }
+  if (document.activeElement && document.activeElement.matches('input, select, textarea')) return;
+  const key = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && key === 'c' && M.sel.size) {
+    const cells = [...M.sel].map(k => k.split(':').map(Number));
+    const rs = [...new Set(cells.map(x => x[0]))].sort((a, b) => a - b);
+    const cs = [...new Set(cells.map(x => x[1]))].sort((a, b) => a - b);
+    const text = rs.map(r => cs.map(c => {
+      const td = document.querySelector('#m-body td[data-r="' + r + '"][data-c="' + c + '"]');
+      if (!td || !M.sel.has(r + ':' + c)) return '';
+      return td.classList.contains('zn') ? String(toNum(td.textContent) || '') : td.textContent;
+    }).join('\t')).join('\n');
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+    document.querySelectorAll('#m-body td.sel').forEach(td => td.classList.add('copied'));
+    e.preventDefault();
+  }
+  if ((e.ctrlKey || e.metaKey) && key === 'a') {
+    const n = document.querySelectorAll('#m-body td[data-r][data-c="0"]').length;
+    if (n) { selectRange({ r: 0, c: 0 }, { r: n - 1, c: M_KEYS.length - 1 }, false); e.preventDefault(); }
+  }
+});
+
+// 머리글: 정렬 + 값 필터 (와일드카드 * ?)
+function closeMenu() { $('m-menu').hidden = true; }
+document.querySelectorAll('#m-table th[data-k]').forEach(th => th.addEventListener('click', e => {
+  e.stopPropagation();
+  const k = th.dataset.k;
+  const isNum = k === 'inc' || k === 'out';
+  const vals = [...new Set((M.items || []).map(x => cellText(x, k)))].sort((a, b) => isNum ? toNum(a) - toNum(b) : a.localeCompare(b, 'ko'));
+  const on = M.filters[k] || new Set(vals);
+  const asc = el('button', 'mi', '오름차순'), desc = el('button', 'mi', '내림차순');
+  asc.type = desc.type = 'button';
+  asc.onclick = () => { M.sort = { k, dir: 1 }; closeMenu(); renderMoney(); };
+  desc.onclick = () => { M.sort = { k, dir: -1 }; closeMenu(); renderMoney(); };
+  const search = el('input'); search.placeholder = '검색'; search.type = 'text';
+  const list = el('div', 'mlist');
+  const boxes = vals.map(v => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.checked = on.has(v); c.value = v; l.append(c, el('span', '', v || '(빈 칸)')); return l; });
+  list.append(...boxes);
+  search.addEventListener('input', () => {
+    const q = search.value.trim();
+    const re = q ? new RegExp('^' + q.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$', 'i') : null;
+    boxes.forEach(l => { const t = l.lastChild.textContent; l.hidden = !!re && !(re.test(t) || t.toLowerCase().includes(q.toLowerCase())); l.firstChild.checked = !l.hidden; });
+  });
+  const all = el('button', 'link', '모두'); all.type = 'button';
+  all.onclick = () => boxes.forEach(l => { l.hidden = false; l.firstChild.checked = true; });
+  const ok = el('button', 'btn', '확인'); ok.type = 'button';
+  ok.onclick = () => {
+    const s = new Set(boxes.filter(l => l.firstChild.checked).map(l => l.firstChild.value));
+    if (s.size === vals.length) delete M.filters[k]; else M.filters[k] = s;
+    M.sel.clear(); closeMenu(); renderMoney();
+  };
+  search.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); ok.click(); } });
+  const foot = el('div', 'mfoot'); foot.append(all, ok);
+  const menu = $('m-menu');
+  menu.replaceChildren(asc, desc, search, list, foot);
+  const r = th.getBoundingClientRect();
+  menu.style.left = Math.max(4, Math.min(r.left, window.innerWidth - 228)) + 'px';
+  menu.style.top = r.bottom + 'px';
+  menu.hidden = false;
+  search.focus();
+}));
+document.addEventListener('click', e => { if (!$('m-menu').hidden && !e.target.closest('#m-menu')) closeMenu(); });
+
+// 입력 줄 (늘 열어 둔다). 표의 줄을 두 번 누르면 그 줄을 여기로 불러와 고친다
+function cancelEdit() {
+  M.edit = null; M.editYm = '';
+  $('m-save').textContent = '추가';
+  $('m-cancel').hidden = true;
+  ['m-text', 'm-inc', 'm-out', 'm-memo'].forEach(i => { $(i).value = ''; });
+}
+function startEdit(x) {
+  M.edit = x.id; M.editYm = M.ym;
+  $('m-d').value = x.d; $('m-cat').value = x.cat; $('m-text').value = x.text;
+  $('m-inc').value = won(x.inc); $('m-out').value = won(x.out); $('m-pay').value = x.pay || '카드'; $('m-memo').value = x.memo;
+  $('m-save').textContent = '수정';
+  $('m-cancel').hidden = false;
+  $('m-text').focus();
+  renderMoney();
+}
+['m-inc', 'm-out'].forEach(id => $(id).addEventListener('input', e => { const n = toNum(e.target.value); e.target.value = n ? n.toLocaleString('ko-KR') : ''; }));
+$('m-cancel').addEventListener('click', () => { cancelEdit(); renderMoney(); });
+$('m-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('m-error').textContent = '';
+  const d = $('m-d').value;
+  const item = { id: M.edit || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)), d, cat: $('m-cat').value,
+    text: $('m-text').value.trim(), inc: toNum($('m-inc').value), out: toNum($('m-out').value), pay: $('m-pay').value, memo: $('m-memo').value.trim() };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { $('m-error').textContent = '날짜를 골라 주세요.'; return; }
+  if (!item.inc && !item.out) { $('m-error').textContent = '수입이나 지출 금액을 적어 주세요.'; $('m-out').focus(); return; }
+  const ym = d.slice(0, 7), who = current, oldYm = M.edit ? M.editYm : '';
+  $('m-save').disabled = true;
+  try {
+    if (oldYm && oldYm !== ym) await call('delMoney', pin, who, oldYm, item.id);
+    const items = await call('saveMoney', pin, who, ym, item);
+    cancelEdit();
+    $('m-d').value = d;
+    if (ym === M.ym) { M.items = items; renderMoney(); } else { M.year = +ym.slice(0, 4); loadMoney(ym); }
+    $('m-text').focus();
+  } catch (err) {
+    $('m-error').textContent = '저장하지 못했어요. 다시 눌러 주세요.';
+  } finally {
+    $('m-save').disabled = false;
+  }
+});
+async function removeMoney(x) {
+  if (!confirm((x.text || x.cat) + ' ' + won(x.out || x.inc) + '원을 지울까요?')) return;
+  try {
+    M.items = await call('delMoney', pin, current, M.ym, x.id);
+    if (M.edit === x.id) cancelEdit();
+    M.sel.clear();
+    renderMoney();
+  } catch (e) {
+    $('m-error').textContent = '지우지 못했어요. 다시 해 주세요.';
+  }
+}
+['list', 'cats'].forEach(n => $('mtab-' + n).addEventListener('click', () => showMoneyTab(n)));
+
 // 로그인돼 있으면 바로 내 화면으로
 if (me) enter(me); else enter(null);
 // 구글 로그인 스크립트가 이 코드보다 먼저 받아졌으면 여기서 버튼을 그린다
