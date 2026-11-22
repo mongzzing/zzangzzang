@@ -53,6 +53,7 @@ h1, h2, h3, p { margin: 0; }
 .account:hover .app-icon { transform: translateY(-4px); }
 .account:active .app-icon { transform: scale(.94); }
 .badge { position: absolute; top: -6px; right: -6px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 12px; background: var(--alert); color: #fff; font-size: 13px; font-weight: 600; display: grid; place-items: center; border: 2px solid var(--bg); }
+.gsi { display: flex; justify-content: center; min-height: 44px; margin-top: 8px; }
 .pin-form { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; text-align: left; font-weight: 600; }
 .btn:disabled { opacity: .7; cursor: default; }
 @media (max-width: 460px) { .accounts { gap: 16px; } }
@@ -306,6 +307,7 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/zz-bear-180.png">
 <link rel="icon" type="image/png" href="icons/zz-bear-192.png">
+<script src="https://accounts.google.com/gsi/client" async onload="gsiReady()"></script>
 <script>window.ZZ_API = "https://script.google.com/macros/s/AKfycbwq4vdiYAzv1yI2LbwTTCjMXVoLCYMFGjeoBPOzHmmF8nIWEJk3QASSmybGHTA1Till/exec";</script>
 </head>
 <body>
@@ -318,12 +320,8 @@ body { -webkit-font-smoothing: antialiased; background: #fff; }
 <section class="picker" id="picker" aria-labelledby="picker-title">
   <div class="picker-card">
     <h1 class="logo" id="picker-title"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9IjI1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48Y2lyY2xlIGN4PSI3NSIgY3k9IjI5IiByPSIxMiIgZmlsbD0iI2IwN2E0ZiIvPjxjaXJjbGUgY3g9Ijc1IiBjeT0iMjkiIHI9IjYiIGZpbGw9IiNlOGI5OGYiLz48ZWxsaXBzZSBjeD0iNTAiIGN5PSI1OSIgcng9IjM3IiByeT0iMzQiIGZpbGw9IiNjNDhhNWEiLz48cGF0aCBkPSJNNDcgMjcgcTAgLTExIDkgLTEwIHEtNiAzIC00IDEweiIgZmlsbD0iI2M0OGE1YSIvPjxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMTYiIHJ5PSIxMiIgZmlsbD0iI2YzZDliOCIvPjxlbGxpcHNlIGN4PSIyOSIgY3k9IjY4IiByeD0iNiIgcnk9IjMuNSIgZmlsbD0iI2Y0YTI5YSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjcxIiBjeT0iNjgiIHJ4PSI2IiByeT0iMy41IiBmaWxsPSIjZjRhMjlhIiBvcGFjaXR5PSIuODUiLz48Y2lyY2xlIGN4PSIzNyIgY3k9IjU2IiByPSI1LjUiIGZpbGw9IiMyYjFkMTQiLz48Y2lyY2xlIGN4PSIzOC44IiBjeT0iNTQuMiIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYzIiBjeT0iNTYiIHI9IjUuNSIgZmlsbD0iIzJiMWQxNCIvPjxjaXJjbGUgY3g9IjY0LjgiIGN5PSI1NC4yIiByPSIyIiBmaWxsPSIjZmZmIi8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNjUiIHJ4PSI1IiByeT0iMy42IiBmaWxsPSIjM2IyNDE2Ii8+PHBhdGggZD0iTTUwIDY4IHEtMyA1IC02IDIuNSBNNTAgNjggcTMgNSA2IDIuNSIgc3Ryb2tlPSIjM2IyNDE2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==" alt="">짱짱이네</h1>
-    <div class="accounts" id="accounts"></div>
-    <form class="pin-form" id="pin-form" hidden>
-      <label for="pin">가족 비밀번호</label>
-      <div class="answer"><input id="pin" type="password" inputmode="numeric" autocomplete="current-password"><button class="btn" type="submit">들어가기</button></div>
-      <p class="error" id="pin-error" role="alert"></p>
-    </form>
+    <div class="gsi" id="gsi"></div>
+    <p class="error" id="pin-error" role="alert"></p>
     <p class="error" id="load-error" role="alert"></p>
   </div>
 </section>
@@ -500,8 +498,40 @@ const todo = items => items.filter(t => t.question || t.step === 2 || t.error).l
 const messageOf = e => (e && e.message ? String(e.message) : '').replace(/^Error:\s*/, '');
 
 let state = null, current = null, picked = [], pending = null, busy = false;
-let pin = '', tab = 'post', chatWaiting = false, guideDirty = false, view = 'home', engData = null;
-try { pin = localStorage.getItem('zz-pin') || ''; } catch (e) { /* 저장 못 해도 동작 */ }
+let pin = '', me = '', tab = 'post', chatWaiting = false, guideDirty = false, view = 'home', engData = null;
+// 로그인 열쇠. 영어 화면(english.html)도 같은 'zz-pin' 을 읽는다
+try { pin = localStorage.getItem('zz-pin') || ''; me = localStorage.getItem('zz-me') || ''; } catch (e) { /* 저장 못 해도 동작 */ }
+if (!pin || !PEOPLE[me]) { pin = ''; me = ''; }
+
+/* ───────── 구글 로그인 ───────── */
+const GOOGLE_CLIENT_ID = '844433039962-n81u2qon10hipfdeg675pscc8mhbg620.apps.googleusercontent.com';
+let gsiDone = false;
+function gsiReady() {
+  if (gsiDone || !(window.google && google.accounts && google.accounts.id)) return;
+  gsiDone = true;
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogle, auto_select: false, cancel_on_tap_outside: true });
+  google.accounts.id.renderButton($('gsi'), { theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: 'ko', width: 260 });
+}
+async function onGoogle(resp) {
+  $('pin-error').textContent = '';
+  try {
+    const r = await call('login', resp.credential);
+    pin = r.token; me = r.person;
+    try { localStorage.setItem('zz-pin', pin); localStorage.setItem('zz-me', me); } catch (e) { /* 저장 못 해도 동작 */ }
+    enter(me);
+  } catch (e) {
+    const m = messageOf(e);
+    $('pin-error').textContent = /가족 계정/.test(m) ? '짱짱이네 가족 계정이 아니에요. 다른 구글 계정으로 해 주세요.' : '로그인하지 못했어요. 다시 해 주세요.';
+  }
+}
+function signedOut() {
+  const old = pin;
+  pin = ''; me = ''; state = null;
+  try { localStorage.removeItem('zz-pin'); localStorage.removeItem('zz-me'); } catch (e) { /* 없어도 됨 */ }
+  if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
+  if (old) call('logout', old).catch(() => {});
+  enter(null);
+}
 
 function whenText(iso) {
   const min = Math.floor((Date.now() - new Date(iso).getTime()) / 6e4);
@@ -511,24 +541,7 @@ function whenText(iso) {
   return Math.floor(min / 1440) + '일 전';
 }
 
-function renderAccounts() {
-  $('accounts').replaceChildren(...Object.keys(PEOPLE).map(name => {
-    const b = el('button', 'account');
-    b.type = 'button';
-    b.id = 'account-' + name;
-    const iconBox = el('span', 'app-icon');
-    iconBox.append(photo(name));
-    const n = state ? todo(state[name] || []) : 0;
-    if (n) {
-      const badge = el('span', 'badge', n);
-      badge.setAttribute('aria-label', '할 일 ' + n + '개');
-      iconBox.append(badge);
-    }
-    b.append(iconBox, name);
-    b.addEventListener('click', () => enter(name));
-    return b;
-  }));
-}
+function renderAccounts() { /* 사람 고르기는 없앴다. 로그인한 사람으로만 들어간다 */ }
 
 function enter(name) {
   current = name;
@@ -536,6 +549,8 @@ function enter(name) {
   $('app').hidden = !name;
   if (!name) { renderAccounts(); return; }
   $('me').replaceChildren(el('span', '', name), avatar(name));
+  $('me').setAttribute('aria-label', name + ' 로그아웃');
+  $('me').title = '로그아웃';
   guideDirty = false;
   $('guide').value = '';
   $('guide-saved').textContent = '';
@@ -644,9 +659,8 @@ function render() {
 
 async function refresh() {
   try {
+    if (!pin) return;
     state = await call('getState', pin);
-    $('pin-form').hidden = true;
-    $('accounts').hidden = false;
     if (current) {
       const typing = document.activeElement && document.activeElement.id.startsWith('answer-');
       if (!typing) render();
@@ -654,10 +668,9 @@ async function refresh() {
       renderAccounts();
     }
   } catch (e) {
-    if (messageOf(e) === 'PIN') {
-      $('accounts').hidden = true;
-      $('pin-form').hidden = false;
-      if (pin) $('pin-error').textContent = '비밀번호가 달라요.';
+    if (messageOf(e) === 'LOGIN') {
+      signedOut();
+      $('pin-error').textContent = '다시 로그인해 주세요.';
     } else {
       $('load-error').textContent = '불러오지 못했어요. 새로고침해 주세요.';
     }
@@ -1699,12 +1712,12 @@ function familyMarkMe(render) {
 function familyDoneToday() {
   if (!family) return null;
   const today = keyOf(new Date());
-  const names = Object.keys(PEOPLE);
+  const names = Object.keys(family);
   return { n: names.filter(n => (family[n] || []).includes(today)).length, total: names.length };
 }
 function renderFamily(now) {
   if (!$('fam-cal')) return;
-  const names = Object.keys(PEOPLE);
+  const names = family ? Object.keys(family) : [current];
   const sets = {};
   names.forEach(n => { sets[n] = new Set((family && family[n]) || []); });
   if (engData) Object.keys(engData.done || {}).forEach(k => sets[current].add(k));
@@ -1784,7 +1797,7 @@ $('guide-form').addEventListener('submit', async e => {
     $('guide-save').disabled = false;
   }
 });
-$('me').addEventListener('click', () => { if (!busy) { stopSpeak(); enter(null); } });
+$('me').addEventListener('click', () => { if (!busy && confirm('로그아웃할까요?')) { stopSpeak(); signedOut(); } });
 $('home').addEventListener('click', () => { if (!busy) go('home'); });
 $('back').addEventListener('click', () => { if (!busy) go('home'); });
 $('photos').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
@@ -1794,21 +1807,10 @@ const drop = $('drop');
 drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
 $('place').addEventListener('input', () => { $('error').textContent = ''; });
 $('form').addEventListener('submit', submit);
-$('pin-form').addEventListener('submit', e => {
-  e.preventDefault();
-  pin = $('pin').value.trim();
-  try { localStorage.setItem('zz-pin', pin); } catch (err) { /* 저장 못 해도 동작 */ }
-  $('pin-error').textContent = '';
-  refresh();
-});
-
-renderAccounts();
-refresh();
-// 영어 화면에서 돌아오면(?u=이름) 그 계정으로 바로 들어간다
-try {
-  const u = new URLSearchParams(location.search).get('u');
-  if (u && PEOPLE[u]) { enter(u); history.replaceState(null, '', location.pathname); }
-} catch (e) { /* 없어도 동작 */ }
+// 로그인돼 있으면 바로 내 화면으로
+if (me) enter(me); else enter(null);
+// 구글 로그인 스크립트가 이 코드보다 먼저 받아졌으면 여기서 버튼을 그린다
+gsiReady();
 setInterval(() => { if (!busy) refresh(); }, 60000);
 // 채팅 화면에서 답을 기다릴 때만 자주 확인한다
 setInterval(() => { if (current && view === 'blog' && tab === 'chat' && chatWaiting) loadChat(); }, 8000);

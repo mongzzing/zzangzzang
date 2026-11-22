@@ -677,7 +677,7 @@ const me=()=>PEOPLE.find(p=>p.id===cur);
 function vHome(){
  lastView='home';
  const p=me();
- app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1 style="display:flex;align-items:center;gap:6px">${face('bear',28)}짱짱이네 영어</h1><button class="av" style="background:${p.c}" onclick="vProfile()">${face(p.ch,30)}</button><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
+ app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1 style="display:flex;align-items:center;gap:6px">${face('bear',28)}짱짱이네 영어</h1><button class="av" style="background:${p.c}" onclick="location.href='./'" title="짱짱이네로">${face(p.ch,30)}</button><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
  <div class="body">
   <div class="row" style="gap:14px">${wave(p.ch,56)}<div class="greet">${dispName(p)}, 오늘도<br>영어 한 걸음 가볼까요?</div></div>
   <div class="streakbar">
@@ -1764,9 +1764,10 @@ function vBook(){
 }
 
 /* 시작 */
-(()=>{let u=null;try{u=new URLSearchParams(location.search).get('u')}catch(e){}
- const p=PEOPLE.find(x=>x.name===u);if(p)return setP(p.id);
- cur&&PEOPLE.some(p=>p.id===cur)?vHome():vProfile()})();
+// 로그인한 사람으로만 연다. 로그인 전이면 짱짱이네 첫 화면으로
+(()=>{let me=null;try{me=localStorage.getItem('zz-me')}catch(e){}
+ const p=PEOPLE.find(x=>x.name===me);if(p&&pinOf())return setP(p.id);
+ location.replace('./')})();
 </script>
 </body>
 </html>
