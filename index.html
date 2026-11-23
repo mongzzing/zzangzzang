@@ -398,6 +398,9 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
 .m-input .zn.plus { box-shadow: inset 0 2px 0 var(--good); }
 .m-input .zn.minus { box-shadow: inset 0 2px 0 #c4314b; }
 .m-input .btn { padding: 5px 18px; height: 32px; }
+.m-input .btn.ghost { background: #fff; color: var(--brand-dark); border: 1px solid var(--line); margin-left: auto; }
+.m-import { font-size: 13px; color: var(--brand-dark); min-height: 0; margin: 0; }
+.m-import:empty { display: none; }
 .m-wrap { flex: 1; min-height: 120px; overflow: auto; background: #fff; border: 1px solid #c8c8c8; }
 .ztbl { table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 13px; }
 #m-table { width: 962px; }
@@ -622,7 +625,10 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
             <input id="m-memo" type="text" placeholder="메모" aria-label="메모">
             <button class="btn" id="m-save" type="submit">추가</button>
             <button class="link" id="m-cancel" type="button" hidden>취소</button>
+            <button class="btn ghost" id="m-up" type="button" title="카드 명세서(엑셀·PDF·캡처)를 올리면 알아서 내역에 넣어요. PC가 켜져 있어야 해요">명세서 올리기</button>
+            <input id="m-file" type="file" multiple accept=".xlsx,.xls,.csv,.pdf,.txt,.html,.htm,image/*" hidden>
           </form>
+          <p class="m-import" id="m-import"></p>
           <p class="error" id="m-error" role="alert"></p>
           <div class="m-wrap" id="m-wrap">
             <table class="ztbl" id="m-table">
@@ -2023,6 +2029,7 @@ function openMoney() {
   if (!M.ym) { M.ym = ymOf(new Date()); M.year = +M.ym.slice(0, 4); }
   showMoneyTab(M.tab);
   loadMoney(M.ym);
+  stWait = 0; $('m-import').textContent = ''; checkStatements();
 }
 
 function showMoneyTab(t) {
@@ -2293,6 +2300,50 @@ async function removeMoney(x) {
   }
 }
 ['list', 'cats'].forEach(n => $('mtab-' + n).addEventListener('click', () => showMoneyTab(n)));
+// ───────── 카드 명세서 한 번에 올리기: 서버 inbox 에 두면 PC 감시 프로그램이 읽어 내역에 넣는다
+let stTimer = null, stWait = 0;
+$('m-up').addEventListener('click', () => $('m-file').click());
+$('m-file').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  e.target.value = '';
+  if (!files.length) return;
+  const who = current;
+  $('m-up').disabled = true;
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      if (f.size > 25e6) { $('m-import').textContent = f.name + ' 은 너무 커요 (25MB까지).'; continue; }
+      $('m-import').textContent = '올리는 중 ' + (i + 1) + '/' + files.length + ' · ' + f.name;
+      const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = no; r.readAsDataURL(f); });
+      await call('uploadStatement', pin, who, f.name, f.type, b64);
+    }
+    checkStatements();
+  } catch (err) {
+    $('m-import').textContent = '올리지 못했어요. ' + (err && err.message || '');
+  } finally {
+    $('m-up').disabled = false;
+  }
+});
+async function checkStatements() {
+  clearTimeout(stTimer);
+  if (view !== 'money') return;
+  const who = current;
+  let list;
+  try { list = await call('getStatements', pin, who); } catch (e) { return; }
+  if (who !== current) return;
+  const wait = list.filter(x => x.state === 'wait');
+  const last = list[0];
+  if (wait.length) $('m-import').textContent = '명세서 정리 중 (' + wait.length + '개) · PC가 읽고 있어요';
+  else if (last && last.state === 'error') $('m-import').textContent = last.name + ': ' + last.msg;
+  else if (last && last.state === 'done' && stWait) {
+    const mon = Object.keys(last.months || {}).sort().map(k => +k.slice(5) + '월 ' + last.months[k] + '건').join(', ');
+    $('m-import').textContent = '명세서에서 ' + last.added + '건 넣었어요' + (mon ? ' (' + mon + ')' : '') + (last.skipped ? ' · 이미 있던 ' + last.skipped + '건은 뺐어요' : '');
+  } else $('m-import').textContent = '';
+  if (stWait && wait.length < stWait) loadMoney(M.ym);
+  stWait = wait.length;
+  if (wait.length) stTimer = setTimeout(checkStatements, 20000);
+}
+
 
 // 로그인돼 있으면 바로 내 화면으로
 if (me) enter(me); else enter(null);
