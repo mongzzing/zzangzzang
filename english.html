@@ -1757,10 +1757,10 @@ function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
  while(o.length<4){const w=lSim(a,o,rem);if(!w)break;o.push(w)}
  return shuffle(o)}
 /* 남은 단어가 모자라면 다른 문장에서 비슷한 단어(첫 글자·길이 비슷)로 채워 늘 4장 */
-let LWORDS=null;
+let LSIMW=null;
 function lSim(a,have,rem){
- if(!LWORDS)LWORDS=[...new Set(LS.flatMap(x=>x.words.map(w=>w.replace(/[,.?!]$/,'').toLowerCase())))];
- const c=LWORDS.filter(w=>!have.includes(w)&&!rem.includes(w));
+ if(!LSIMW)LSIMW=[...new Set(LS.flatMap(x=>x.words.map(w=>w.replace(/[,.?!]$/,'').toLowerCase())))];
+ const c=LSIMW.filter(w=>!have.includes(w)&&!rem.includes(w));
  if(!c.length)return null;
  const sc=w=>(w[0]===a[0]?0:3)+Math.abs(w.length-a.length)+Math.random()*2;
  return c.sort((x,y)=>sc(x)-sc(y))[0]}
