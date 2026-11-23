@@ -385,6 +385,7 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
 .tile.soon .t-ico { background: #c8c8c8; }
 .tile.soon .t-ico svg path { stroke: #c8c8c8; }
 .mode.on { cursor: default; }
+.mode .ms { display: none; }
 @media (max-width: 800px) { .tiles { gap: 8px; } .tile { padding: 16px 6px 14px; } .tile .t-ico { width: 48px; height: 48px; } }
 /* 가계부: 엑셀처럼. 페이지 스크롤 없이 표 안에서만, 아래에 달 시트 탭 */
 .stage.fit { overflow: hidden; display: flex; flex-direction: column; }
@@ -455,12 +456,17 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
   #m-cat-table { width: 100%; }
 }
 @media (max-width: 800px) {
-  .titlebar { flex-wrap: wrap; height: auto; padding: 8px 10px 0; row-gap: 8px; }
-  .titlebar .logo { font-size: 0 !important; margin-right: 4px; }
-  .clock { display: none; }
+  /* 위 줄은 어느 화면이든 48px 한 줄로 같게. 로그아웃은 내 아이콘을 누르면 */
+  .titlebar { flex-wrap: nowrap; height: 48px; padding: 0 10px; gap: 4px; }
+  .titlebar .logo { font-size: 0 !important; margin-right: 2px; }
+  .mode { padding: 4px 11px; }
+  .mode .mf { display: none; } .mode .ms { display: inline; }
+  .clock, #logout { display: none; }
   .me span { display: none; }
+  .me { cursor: pointer; }
   .tb-right { gap: 10px; }
-  .subtabs { order: 5; flex: 0 0 calc(100% + 20px); margin: 0 -10px; padding: 0 6px; height: 40px; border-top: 1px solid var(--line); overflow-x: auto; }
+  .subtabs { margin-left: 4px; gap: 0; overflow-x: auto; min-width: 0; }
+  .subtabs .tab { padding: 0 9px; white-space: nowrap; }
   .columns { padding: 10px; gap: 10px; }
 }
 
@@ -1003,7 +1009,10 @@ function go(v) {
   $('back').hidden = true;
   // 위 줄: 지금 들어와 있는 메뉴 이름만 보라 알약으로 (홈에서는 없음)
   const curApp = APPS.find(n => n.id === v);
-  $('menus').replaceChildren(...(curApp ? [el('span', 'mode on', curApp.name)] : []));
+  // 홈에서도 같은 자리에 '메인화면'. 폰에서는 짧은 이름
+  const pill = el('span', 'mode on');
+  pill.append(el('span', 'mf', curApp ? curApp.name : '메인화면'), el('span', 'ms', curApp ? curApp.short : '메인화면'));
+  $('menus').replaceChildren(pill);
   $('subtabs').hidden = v !== 'blog';
   if (v === 'home') renderHome();
   if (v === 'blog') showTab(tab);
@@ -1998,6 +2007,7 @@ $('guide-form').addEventListener('submit', async e => {
     $('guide-save').disabled = false;
   }
 });
+$('me').addEventListener('click', () => { if (matchMedia('(max-width: 800px)').matches) $('logout').click(); });
 $('logout').addEventListener('click', () => { if (!busy && confirm('로그아웃할까요?')) { stopSpeak(); signedOut(); } });
 // 위 줄 시계
 const tick = () => { const d = new Date(); $('clock').textContent = (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
