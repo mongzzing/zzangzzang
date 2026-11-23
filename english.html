@@ -244,6 +244,7 @@ body *{font-family:inherit !important}
 .ptop .pme{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:600;font-size:14px}
 .ptop .pme svg{width:26px;height:26px;border-radius:50%}
 .ptop .ms{display:none}
+.setrow{display:flex;justify-content:flex-end;margin:-6px 0 -10px}
 .ptop .plogo{margin-right:8px !important}.ptop .mode{line-height:21px}
 .ptop .plogout{border:0;background:transparent;color:var(--sub);font-size:13px;padding:0;cursor:pointer}
 .ptop .plogout:hover{text-decoration:underline}
@@ -767,9 +768,9 @@ const me=()=>PEOPLE.find(p=>p.id===cur);
 function vHome(){
  lastView='home';
  const p=me();
- app.innerHTML=`<div class="top"><a class="iconbtn" href="./?u=${encodeURIComponent(p.name)}" style="text-decoration:none;color:inherit" title="짱짱이네로">‹</a><h1></h1><button class="iconbtn" onclick="vSettings()">⚙️</button></div>
- <div class="body">
+ app.innerHTML=`<div class="body">
   <div class="row" style="gap:14px">${wave(p.ch,56)}<div class="greet">${dispName(p)}, 오늘도<br>영어 한 걸음 가볼까요?</div></div>
+  <div class="setrow"><button class="iconbtn" onclick="vSettings()" title="관심분야 설정">⚙️</button></div>
   <div class="streakbar">
    <div class="sbox"><span class="muted">연속 학습</span><b>🔥 ${streak()}일</b></div>
    <div class="sbox"><span class="muted">외운 단어</span><b>📚 ${masterCnt()}개</b></div>
@@ -1866,6 +1867,17 @@ function vBook(){
  const out=()=>{if(!confirm('로그아웃할까요?'))return;try{localStorage.removeItem('zz-pin');localStorage.removeItem('zz-me')}catch(e){}location.replace('./')};
  document.getElementById('plogout').onclick=out;
  document.getElementById('pme').onclick=()=>{if(matchMedia('(max-width:800px)').matches)out()}})();
+/* 폰 뒤로가기: 안쪽 화면이면 그 화면의 ‹/✕ 를 누른 것처럼 한 단계 위로. 영어 첫 화면에서 뒤로 = 메인화면 */
+(()=>{const app=document.getElementById('app');if(!app)return;
+ const upBtn=()=>app.querySelector('.top button.iconbtn');
+ const inS=()=>!!(history.state&&history.state.zzIn);
+ const sync=()=>{if(upBtn()&&!inS())history.pushState({zzIn:1},'');else if(!upBtn()&&inS())history.back()};
+ new MutationObserver(sync).observe(app,{childList:true});sync();
+ addEventListener('popstate',()=>{const b=upBtn();if(b){b.click();setTimeout(sync,0)}});
+ // 위 곰 로고: 메인화면에서 왔으면 새로 열지 말고 뒤로 (뒤로가기 줄이 꼬이지 않게)
+ const logo=document.querySelector('.ptop .plogo');
+ if(logo)logo.addEventListener('click',e=>{try{const r=new URL(document.referrer);if(r.origin===location.origin&&/\/(index\.html)?$/.test(r.pathname)){e.preventDefault();history.go(inS()?-2:-1)}}catch(_){}});
+})();
 </script>
 </body>
 </html>

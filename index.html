@@ -212,6 +212,9 @@ h1, h2, h3, p { margin: 0; }
 .fam-day.today { outline: 2px solid var(--brand); outline-offset: -2px; color: var(--text); font-weight: 700; }
 .fam-day.future { opacity: .45; }
 .fam-faces { display: flex; flex-wrap: wrap; justify-content: center; gap: 1px; margin-top: 1px; }
+.fam-card .fam-day { aspect-ratio: auto; height: 54px; }
+.fam-card .fam-faces img { width: 18px; height: 18px; }
+@media (max-width: 800px) { .fam-card .fam-day { height: 46px; } .fam-card .fam-faces img { width: 13px; height: 13px; } .fam-person { font-size: 12px; } }
 .fam-faces img { width: clamp(10px, 3.2vw, 16px); height: clamp(10px, 3.2vw, 16px); border-radius: 50%; display: block; }
 .source { font-size: 12px; color: var(--soft); }
 .done-btn { width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; font-weight: 700; }
@@ -524,6 +527,14 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
       <section class="home-view" id="view-home">
         <h2 class="hello" id="hello"></h2>
         <div class="tiles" id="tiles"></div>
+        <section class="card fam-card" aria-labelledby="fam-title" title="영어 공부 5문제를 채운 날에 얼굴 도장이 찍혀요">
+          <div class="board-head">
+            <h2 class="section-title" id="fam-title">공부 달력</h2>
+            <p class="meta" id="fam-meta"></p>
+          </div>
+          <div class="fam-today" id="fam-today"></div>
+          <div class="cal" id="fam-cal"></div>
+        </section>
       </section>
 
       <section class="eng" id="view-eng" hidden>
@@ -554,14 +565,6 @@ body { background: var(--bg); font-family: var(--font); font-size: 14px; }
           </div>
           <div class="cal" id="cal"></div>
           <div id="complete"></div>
-        </section>
-        <section class="card" aria-labelledby="fam-title">
-          <div class="board-head">
-            <h2 class="section-title" id="fam-title">👨‍👩‍👧 가족 공부 달력</h2>
-            <p class="meta" id="fam-meta"></p>
-          </div>
-          <div class="fam-today" id="fam-today"></div>
-          <div class="cal" id="fam-cal"></div>
         </section>
       </section>
 
@@ -998,9 +1001,16 @@ const APPS = [
   { id: 'money', icon: '💰', name: '가계부', short: '가계부', desc: '' },
 ];
 
-function go(v) {
+function go(v, fromPop) {
   // 영어는 새로 만든 별도 화면(english.html)으로 연다
   if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
+  // 뒤로가기: 앱에 들어가면 한 칸 쌓고, 뒤로 누르면 메인화면
+  if (!fromPop) {
+    const inApp = !!(history.state && history.state.zzApp);
+    if (v !== 'home' && !inApp) history.pushState({ zzApp: v }, '');
+    else if (v !== 'home') history.replaceState({ zzApp: v }, '');
+    else if (inApp) { history.back(); return; }
+  }
   view = v;
   stopSpeak();
   ['home', 'blog', 'eng', 'money'].forEach(x => { $('view-' + x).hidden = x !== v; });
@@ -1038,6 +1048,7 @@ function renderHome() {
     b.addEventListener('click', () => { if (!busy && !a.soon) go(a.id); });
     return b;
   }));
+  renderFamily(new Date());
 }
 
 /* ───────── 영어 ───────── */
@@ -1935,7 +1946,9 @@ function renderFamily(now) {
   const y = now.getFullYear(), m = now.getMonth();
   const days = new Date(y, m + 1, 0).getDate();
   $('fam-meta').textContent = family ? (m + 1) + '월' : '불러오는 중';
-  $('fam-today').replaceChildren(...names.map(n => {
+  const monthCnt = n => { let c = 0; for (let d = 1; d <= days; d++) if (sets[n].has(keyOf(new Date(y, m, d)))) c++; return c; };
+  names.sort((a, b) => monthCnt(b) - monthCnt(a));
+  $('fam-today').replaceChildren(...names.map((n, rank) => {
     const did = sets[n].has(today);
     let count = 0, streak = 0;
     for (let d = 1; d <= days; d++) if (sets[n].has(keyOf(new Date(y, m, d)))) count++;
@@ -1943,7 +1956,7 @@ function renderFamily(now) {
     if (!sets[n].has(keyOf(c))) c.setDate(c.getDate() - 1);
     while (sets[n].has(keyOf(c))) { streak++; c.setDate(c.getDate() - 1); }
     const chip = el('div', 'fam-person' + (did ? '' : ' not'));
-    chip.append(photo(n), el('b', '', n), (did ? ' ✓ ' : ' 아직 ') + '· ' + count + '일' + (streak > 1 ? ' 🔥' + streak : ''));
+    chip.append(photo(n), el('b', '', (count && rank === 0 ? '👑 ' : '') + n), (did ? ' 오늘 ✓ ' : ' 오늘 아직 ') + '· 이번 달 ' + count + '일' + (streak > 1 ? ' · 🔥' + streak + '일 연속' : ''));
     return chip;
   }));
   const first = new Date(y, m, 1).getDay();
@@ -2007,6 +2020,8 @@ $('guide-form').addEventListener('submit', async e => {
     $('guide-save').disabled = false;
   }
 });
+addEventListener('popstate', () => { if (current) go(history.state && history.state.zzApp ? history.state.zzApp : 'home', true); });
+if (history.state && history.state.zzApp) history.replaceState(null, '');
 $('me').addEventListener('click', () => { if (matchMedia('(max-width: 800px)').matches) $('logout').click(); });
 $('logout').addEventListener('click', () => { if (!busy && confirm('로그아웃할까요?')) { stopSpeak(); signedOut(); } });
 // 위 줄 시계
