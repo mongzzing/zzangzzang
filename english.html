@@ -218,7 +218,7 @@ button{font-family:inherit;border:0;cursor:pointer;background:none;color:inherit
 .lspd:active{transform:scale(.96)}
 .lbarw{margin:16px 16px 0;height:12px;border-radius:8px;background:var(--bg);overflow:hidden}
 .lbar{height:100%;width:0;border-radius:8px;background:var(--p);transition:width .3s ease}
-.lslot{display:inline !important;margin:0 !important;height:auto !important;background:none !important;color:transparent;user-select:none;text-decoration:underline 2px #b9c0cf;text-underline-offset:7px}
+.lslot{display:inline-block !important;margin:0 !important;height:auto !important;background:none !important;color:transparent;user-select:none;text-decoration:underline 2px #b9c0cf;text-underline-offset:7px}
 .lreplay{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .lre{flex:1;max-width:260px;padding:14px;border-radius:30px;background:#6a5cff;color:#fff;font-family:'Jua',sans-serif;font-size:17px;box-shadow:0 3px 0 #4b3fd6;position:relative}
 .lre i{display:none;position:absolute;left:50%;bottom:5px;transform:translateX(-50%);width:26px;height:5px;background:radial-gradient(circle,#ffb35c 2px,transparent 2.5px) 0 0/9px 5px repeat-x}
@@ -1755,6 +1755,14 @@ function lOpts(c){const toks=c.toks,k=c.k,a=toks[k].toLowerCase();
  const later=[...new Set(toks.slice(k+1).map(t=>t.toLowerCase()))].filter(t=>t!==a);
  return shuffle([a,...shuffle(later).slice(0,3)])}
 
+/* 맞힌 뒤 다음 보기: 다른 카드는 제자리에 두고 빈 자리만 채운다 (자리가 바뀌어 잘못 누르지 않게) */
+function lNext(c,i){const rem=c.toks.slice(c.k).map(t=>t.toLowerCase()),a=rem[0],o=c.opts.slice(),seen=new Set();o[i]=null;
+ for(let j=0;j<o.length;j++){if(o[j]==null||!rem.includes(o[j])||seen.has(o[j]))o[j]=null;else seen.add(o[j])}
+ if(!o.includes(a)){const e=o.map((v,j)=>v==null?j:-1).filter(j=>j>=0);o[e[Math.floor(Math.random()*e.length)]]=a}
+ const pool=shuffle([...new Set(rem)].filter(t=>!o.includes(t)));
+ for(let j=0;j<o.length;j++)if(o[j]==null&&pool.length)o[j]=pool.pop();
+ return o}
+
 function vListen(){lastView='listen';
  if(!D.llevel){D.llevel=Math.max(2,D.level||1,D.glevel||1);save()}
  const ls=D.lis||{},seen=Object.keys(ls).length,M=isMaster();
@@ -1803,13 +1811,13 @@ function lDraw(fly){const c=S.c,x=c.x;
  // 빈칸에도 실제 단어를 투명하게 넣어 두어, 고를 때마다 줄바꿈·높이가 바뀌지 않게 (카드 위치 고정)
  $('#len').innerHTML=x.words.map((w,i)=>i<c.k?`<span class="lw${fly&&i===c.k-1?' new':''}">${w}</span>`:`<span class="lslot">${w}</span>`).join(' ');
  const bar=$('#lbar');if(bar)bar.style.width=(c.k/c.toks.length*100)+'%';
- $('#lop').innerHTML=c.locked?'':c.opts.map((o,i)=>`<button class="lopt" id="lo${i}" onclick="lPick(${i})">${o}</button>`).join('');
+ $('#lop').innerHTML=c.locked?'':c.opts.map((o,i)=>o==null?`<button class="lopt" style="visibility:hidden" disabled></button>`:`<button class="lopt" id="lo${i}" onclick="lPick(${i})">${o}</button>`).join('');
  if(fly){const nw=$('#len .lw.new');if(nw&&fly.r){const r=nw.getBoundingClientRect();try{nw.animate([{transform:`translate(${fly.r.left-r.left}px,${fly.r.top-r.top}px) scale(1.15)`},{transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(_){}}}
 }
 function lPick(i){const c=S.c;if(c.locked)return;const b=$('#lo'+i);
  if(c.opts[i]===c.toks[c.k].toLowerCase()){const r=b.getBoundingClientRect();c.k++;
   if(c.k>=c.toks.length){c.locked=true;lDraw({r});return lDone(true)}
-  c.opts=lOpts(c);lDraw({r});return}
+  c.opts=lNext(c,i);lDraw({r});return}
  c.wrongTry++;try{navigator.vibrate&&navigator.vibrate(5)}catch(_){}
  document.querySelectorAll('#lop .lopt.nope').forEach(x=>x.classList.remove('nope'));void b.offsetWidth;b.classList.add('nope');
 }
