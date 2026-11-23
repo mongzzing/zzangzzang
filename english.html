@@ -810,7 +810,7 @@ function vVocab(){lastView='vocab';
   ${isMaster()?`<div class="master">🏆 이노션 IR 마스터<small>실적 콜·투자자 미팅에서 쓰는 실전 용어만 나와요</small></div>`:``}
   <div class="today">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('v')}/5문제 ${todayCnt('v')>=5?'✅':''}</span>
-   <h3 style="margin-top:10px">${done?'잘했어요! 한 세트 더 할까요?':'한 세트 '+goal()+'문제'}</h3>
+   <h3 style="margin-top:10px">${done?'잘했어요! 한 세트 더 할까요?':'목표 '+goal()+'문제'}</h3>
    <p style="font-size:14px;opacity:.9;margin-top:4px">복습 대기 ${dueCnt()}개 · 학습한 단어 ${learnedCnt()}개</p>
    <button class="btn" onclick="startSession()">${done?'한 세트 더 하기':'시작하기'}</button>
   </div>
@@ -818,7 +818,7 @@ function vVocab(){lastView='vocab';
    <div class="sbox"><span class="muted">연속 학습</span><b>🔥 ${streak()}일</b></div>
    <div class="sbox"><span class="muted">외운 단어</span><b>⭐ ${masterCnt()}개</b></div>
   </div>
-  <div class="card"><div class="row"><b style="flex:1">한 세트 문제 수</b><span class="muted">하루 5문제 맞히면 출석 🐾</span></div>
+  <div class="card"><div class="row"><b style="flex:1">목표 문제 수</b><span class="muted">하루 5문제 맞히면 출석 🐾</span></div>
    <div class="lvseg" style="margin-top:10px">${[5,10,20,30].map(g=>`<button class="${goal()===g?'on':''}" onclick="setGoal(${g})">${g}개</button>`).join('')}</div></div>
   <div class="card">${calendar()}</div>
  </div>`;
@@ -1552,8 +1552,8 @@ function vGram(){lastView='gram';
   <div class="today" style="background:linear-gradient(135deg,#4b7bff,#6a5cff)">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('g')}/5문제 ${todayCnt('g')>=5?'✅':''}</span>
    <h3 style="margin-top:10px">단어 카드로 대화 문장을 완성해요</h3>
-   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
-   <button class="btn" style="color:#4b5bff" onclick="startGram()">시작하기</button>
+   <p style="font-size:13px;opacity:.9;margin-top:4px">목표 ${goal()}문제 · 푼 문법 ${seen}개 · 익힌 문법 ${mast}개</p>
+   <button class="btn" onclick="startGram()">시작하기</button>
   </div>
   <div class="card">${calendar()}</div>
  </div>`;
@@ -1764,8 +1764,8 @@ function vListen(){lastView='listen';
   <div class="today" style="background:linear-gradient(135deg,#ff8a3d,#ff5f6d)">
    <span class="tag" style="background:rgba(255,255,255,.25);color:#fff">오늘 ${todayCnt('l')}/5문제 ${todayCnt('l')>=5?'✅':''}</span>
    <h3 style="margin-top:10px">듣고 단어를 순서대로 골라요</h3>
-   <p style="font-size:13px;opacity:.9;margin-top:4px">한 세트 ${goal()}문제 · 들은 문장 ${seen}개</p>
-   <button class="btn" style="color:#ff5f6d" onclick="lStart()">시작하기</button>
+   <p style="font-size:13px;opacity:.9;margin-top:4px">목표 ${goal()}문제 · 들은 문장 ${seen}개</p>
+   <button class="btn" onclick="lStart()">시작하기</button>
   </div>
   <div class="card">${calendar()}</div>
  </div>`;
