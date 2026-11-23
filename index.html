@@ -1100,7 +1100,8 @@ const APPS = [
 
 function go(v, fromPop) {
   // 영어는 새로 만든 별도 화면(english.html)으로 연다
-  if (v === 'eng') { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
+  // 수림은 옛 화면(오늘의 표현: 하루 2개 × 예문 3개) 그대로 (사용자 2026-11-23)
+  if (v === 'eng' && !engX3()) { stopSpeak(); location.href = 'english.html?u=' + encodeURIComponent(current); return; }
   // 뒤로가기: 앱에 들어가면 한 칸 쌓고, 뒤로 누르면 메인화면
   if (!fromPop) {
     const inApp = !!(history.state && history.state.zzApp);
@@ -1157,6 +1158,7 @@ const engDefault = () => ({ field: 'fin', level: 'basic', done: {}, slow: false,
 const LEVELS = { basic: '기본', adv: '심화' };
 // 날짜별 표현 파일(드라이브 english/<분야>-<난이도>/날짜.json, PC 의 Claude 가 매일 만든다)
 const dayCache = {}, dayLoading = {};
+const engX3 = () => current === '수림' || /[?&]x3=1/.test(location.search);
 function loadDay(field, level, date) {
   const k = field + '-' + level + '-' + date;
   if (k in dayCache || dayLoading[k]) return;
@@ -1167,7 +1169,7 @@ function loadDay(field, level, date) {
   dayLoading[k] = true;
   call('getEngDay', pin, field, level, date)
     .then(d => {
-      dayCache[k] = d && Array.isArray(d.items) && d.items.length === 3 ? d.items : null;
+      dayCache[k] = d && Array.isArray(d.items) && d.items.length >= 2 ? d.items : null;
       if (dayCache[k]) { try { localStorage.setItem('zz-day-' + k, JSON.stringify(dayCache[k])); } catch (e) { /* 없어도 됨 */ } }
     })
     .catch(() => { dayCache[k] = null; })
@@ -1764,11 +1766,12 @@ function renderEng() {
   if (!LEVELS[s.level]) s.level = 'basic';
   const base = field.start ? new Date(field.start[0], field.start[1], field.start[2]) : ENG_BASE;
   const idx = dayIndex(now, field.days.length, base);
-  const dk = keyOf(now), ck = s.field + '-' + s.level + '-' + dk;
-  Object.keys(LEVELS).forEach(lv => loadDay(s.field, lv, dk));
+  const sx = engX3() ? '3' : '';
+  const dk = keyOf(now), ck = s.field + '-' + s.level + sx + '-' + dk;
+  Object.keys(LEVELS).forEach(lv => loadDay(s.field, lv + sx, dk));
   const fromFile = dayCache[ck];
   const waiting = !fromFile && dayLoading[ck];
-  const items = fromFile || (waiting && s.level === 'adv' ? [] : field.days[idx]);
+  const items = fromFile || (waiting && s.level === 'adv' ? [] : sx ? field.days[idx].slice(0, 2) : field.days[idx]);
   $('eng-source').textContent = fromFile ? '' : dayLoading[ck] ? '오늘 표현 불러오는 중이에요.'
     : s.level === 'adv' ? '오늘 심화 표현이 아직 준비 안 돼서 기본 표현을 보여 드려요. 내일부터는 매일 새로 나와요.' : '';
   const W = ['일', '월', '화', '수', '목', '금', '토'];
@@ -1888,7 +1891,7 @@ function startQuiz() {
   const qs = [];
   const t = todayQuiz;
   if (t && t.items) t.items.forEach(it => qs.push({ key: exprKey(t.field, it.en), en: it.en, ko: it.ko, ex: it.ex, sen: it.ex[0], isNew: true, field: t.field, level: t.level }));
-  dueReviews().forEach(([k, x]) => qs.push({ key: k, en: x.en, ko: x.ko, ex: x.ex, sen: x.ex[(x.box || 0) % 2] || x.ex[0], isNew: false, field: x.field, level: x.level }));
+  dueReviews().forEach(([k, x]) => qs.push({ key: k, en: x.en, ko: x.ko, ex: x.ex, sen: x.ex[(x.box || 0) % x.ex.length] || x.ex[0], isNew: false, field: x.field, level: x.level }));
   if (!qs.length) return;
   quiz = { qs, i: 0, graded: false, right: 0 };
   $('done-btn').hidden = true;
