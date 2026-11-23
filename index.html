@@ -2040,7 +2040,7 @@ $('form').addEventListener('submit', submit);
 /* ───────── 가계부 (각자 따로, 달마다 파일 하나) ─────────
    표는 엑셀처럼: 칸 너비 고정, 머리글 누르면 정렬·값 필터(⚑), 칸 끌어 고르면 아래에 개수·합계·평균,
    Ctrl+C 복사(점선, Esc 로 지움), Ctrl+A, 노란 합계 줄(보이는 줄만), 아래 달 시트 탭 */
-const M_CATS = ['식비', '카페·간식', '장보기', '교통', '쇼핑', '생활', '주거·통신', '의료', '교육', '여가', '경조사', '육아', '기타', '월급', '부수입', '용돈'];
+const M_CATS = ['식비', '카페·간식', '장보기', '교통', '자동차', '쇼핑', '생활', '주거·통신', '구독', '보험', '대출', '의료', '교육', '여가', '여행', '경조사', '모임', '육아', '송금', '기타', '월급', '부수입', '이자', '환불', '용돈', '기타수입'];
 const M = { ym: '', year: 0, items: null, sort: { k: 'd', dir: -1 }, filters: {}, edit: null, editYm: '', tab: 'list', sel: new Set(), anchor: null, dragging: false };
 const won = n => n ? Number(n).toLocaleString('ko-KR') : '';
 const ymOf = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
