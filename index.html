@@ -796,6 +796,14 @@ const call = (fn, ...args) => new Promise((resolve, reject) => {
   }
 });
 
+// 이 기기에 저장해 둔 마지막 결과 (들어오자마자 보여 주고 뒤에서 새로 받는다). 로그아웃하면 지운다
+const stash = {
+  get(k) { try { const v = localStorage.getItem('zc:' + k); return v ? JSON.parse(v) : undefined; } catch (e) { return undefined; } },
+  put(k, v) { try { localStorage.setItem('zc:' + k, JSON.stringify(v)); } catch (e) { /* 꽉 차면 그냥 안 둔다 */ } },
+  clear() { try { Object.keys(localStorage).filter(k => k.startsWith('zc:')).forEach(k => localStorage.removeItem(k)); } catch (e) { /* 없어도 됨 */ } },
+};
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const photo = (name, cls) => { const i = el('img', cls); i.src = PEOPLE[name]; i.alt = ''; return i; };
@@ -834,6 +842,7 @@ function signedOut() {
   const old = pin;
   pin = ''; me = ''; state = null;
   try { localStorage.removeItem('zz-pin'); localStorage.removeItem('zz-me'); } catch (e) { /* 없어도 됨 */ }
+  stash.clear();
   if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
   if (old) call('logout', old).catch(() => {});
   enter(null);
@@ -964,7 +973,14 @@ function render() {
 async function refresh() {
   try {
     if (!pin) return;
-    state = await call('getState', pin);
+    if (!state && stash.get('state:' + me)) {
+      state = stash.get('state:' + me);
+      if (current) render(); else renderAccounts();
+    }
+    const fresh = await call('getState', pin);
+    stash.put('state:' + me, fresh);
+    if (same(fresh, state)) return;
+    state = fresh;
     if (current) {
       const typing = document.activeElement && document.activeElement.id.startsWith('answer-');
       if (!typing) render();
@@ -2002,7 +2018,9 @@ function renderSummary() {
 /* ───────── 가족 공부 달력 ───────── */
 let family = null;
 function loadFamily() {
-  call('getEngAll', pin).then(f => { family = f || {}; familyMarkMe(false); if (view === 'eng') renderFamily(new Date()); if (view === 'home') renderHome(); }).catch(() => {});
+  const c = stash.get('engAll');
+  if (c && !family) { family = c; familyMarkMe(false); if (view === 'eng') renderFamily(new Date()); if (view === 'home') renderHome(); }
+  call('getEngAll', pin).then(f => { stash.put('engAll', f || {}); if (same(f || {}, family)) return; family = f || {}; familyMarkMe(false); if (view === 'eng') renderFamily(new Date()); if (view === 'home') renderHome(); }).catch(() => {});
 }
 function familyMarkMe(render) {
   if (!family || !engData) return;
@@ -2153,12 +2171,16 @@ async function loadMoney(ym) {
   if (M.edit) cancelEdit();
   $('m-error').textContent = '';
   renderSheets(); renderMoney();
-  const who = current;
+  const who = current, key = 'money:' + who + ':' + ym, c = stash.get(key);
+  if (c) { M.items = c; renderMoney(); }
   try {
-    const items = await call('getMoney', pin, who, ym);
+    const items = (await call('getMoney', pin, who, ym)) || [];
     if (who !== current || ym !== M.ym) return;
-    M.items = items || [];
+    stash.put(key, items);
+    if (c && (same(items, M.items) || M.edit)) return;
+    M.items = items;
   } catch (e) {
+    if (c) return;
     M.items = [];
     $('m-error').textContent = '불러오지 못했어요. 새로고침해 주세요.';
   }
@@ -2200,6 +2222,7 @@ function rowMsg(t, span) { const tr = el('tr'); const td = el('td', 'empty', t);
 
 function renderMoney() {
   if (M.items && M.yd && M.yd.data && M.yd.year === +M.ym.slice(0, 4)) M.yd.data[M.ym] = M.items;
+  if (M.items) stash.put('money:' + current + ':' + M.ym, M.items);
   document.querySelectorAll('#m-table th[data-k]').forEach(th => th.classList.toggle('filtered', !!M.filters[th.dataset.k]));
   if (!M.items) {
     $('m-body').replaceChildren(rowMsg('불러오는 중이에요.', 8));
@@ -2415,13 +2438,16 @@ async function removeMoney(x) {
 async function loadYear() {
   const y = M.year, who = current;
   if (!M.yd || M.yd.year !== y || M.yd.who !== who) {
-    M.yd = { year: y, who, data: null };
+    const key = 'year:' + who + ':' + y, c = stash.get(key);
+    M.yd = { year: y, who, data: c || null };
     renderSum();
     try {
-      const data = await call('getMoneyYear', pin, who, y);
+      const data = (await call('getMoneyYear', pin, who, y)) || {};
       if (!M.yd || M.yd.year !== y || who !== current) return;
-      M.yd.data = data || {};
-    } catch (e) { M.yd.data = {}; $('m-error').textContent = '요약을 불러오지 못했어요.'; }
+      stash.put(key, data);
+      if (c && same(data, c)) return;
+      M.yd.data = data;
+    } catch (e) { if (!c) { M.yd.data = {}; $('m-error').textContent = '요약을 불러오지 못했어요.'; } }
   }
   if (M.items && +M.ym.slice(0, 4) === y) M.yd.data[M.ym] = M.items;
   renderSum();
@@ -2495,9 +2521,10 @@ async function openCatMonth(ym, cat) {
 async function loadAssets() {
   const who = current;
   if (M.assets === undefined || M.assetsWho !== who) {
-    M.assets = null; M.assetsWho = who;
+    const key = 'assets:' + who, c = stash.get(key);
+    M.assets = c || null; M.assetsWho = who;
     renderAssets();
-    try { M.assets = (await call('getAssets', pin, who)) || false; } catch (e) { M.assets = false; }
+    try { const a = (await call('getAssets', pin, who)) || false; stash.put(key, a); if (c && same(a, c)) return; M.assets = a; } catch (e) { if (!c) M.assets = false; }
     if (who !== current) return;
   }
   renderAssets();
